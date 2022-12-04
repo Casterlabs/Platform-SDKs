@@ -110,6 +110,9 @@ public abstract class OAuthProvider extends AuthProvider {
     protected abstract String getTokenEndpoint();
 
     public final String getRefreshToken() {
+        if (this.isApplicationAuth()) {
+            return null;
+        }
         return this.refreshTokenSupplier.get();
     }
 
@@ -153,7 +156,7 @@ public abstract class OAuthProvider extends AuthProvider {
 
     @Override
     public boolean isApplicationAuth() {
-        return this.refreshTokenSupplier != null;
+        return this.refreshTokenSupplier == null;
     }
 
     @Override
