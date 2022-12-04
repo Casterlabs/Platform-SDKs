@@ -16,8 +16,6 @@ import okhttp3.Request;
 public abstract class OAuthProvider extends AuthProvider {
     protected final Object lock = new Object();
 
-    private @Nullable Consumer<String> onNewRefreshToken;
-
     private OAuthStrategy strategy;
 
     /**
@@ -26,8 +24,9 @@ public abstract class OAuthProvider extends AuthProvider {
      */
     @Deprecated
     private String _lastRefreshToken;
-
     private Supplier<String> refreshTokenSupplier;
+    private @Nullable Consumer<String> onNewRefreshToken;
+
     private @Getter String clientId;
     private @Getter String clientSecret;
     private @Getter String redirectUri;
@@ -38,7 +37,14 @@ public abstract class OAuthProvider extends AuthProvider {
     private long loginTimestamp = -1;
     private int expiresIn = -1;
 
+    // Application auth.
+
+    public OAuthProvider(@NonNull String clientId) {
+        this.clientId = clientId;
+    }
+
     // Regular constructors.
+
     public OAuthProvider(@NonNull OAuthStrategy strategy, @NonNull String clientId, @NonNull String clientSecret, @NonNull String refreshToken) throws ApiAuthException {
         this(strategy, clientId, clientSecret, refreshToken, "");
     }
@@ -52,30 +58,18 @@ public abstract class OAuthProvider extends AuthProvider {
         this.refreshTokenSupplier = () -> this._lastRefreshToken;
     }
 
-    // Database-aware constructors.
+    // Database-aware.
+    // We use <T> so that implementing classes don't have to override this.
 
-    public OAuthProvider(@NonNull OAuthStrategy strategy, @NonNull String clientId, @NonNull String clientSecret, @NonNull Supplier<String> refreshTokenSupplier) throws ApiAuthException {
-        this(strategy, clientId, clientSecret, refreshTokenSupplier, "");
-    }
-
-    public OAuthProvider(@NonNull OAuthStrategy strategy, @NonNull String clientId, @NonNull String clientSecret, @NonNull Supplier<String> refreshTokenSupplier, @NonNull String redirectUri) throws ApiAuthException {
-        this.strategy = strategy;
-        this.clientId = clientId;
-        this.clientSecret = clientSecret;
-        this.refreshTokenSupplier = refreshTokenSupplier;
-        this.redirectUri = redirectUri;
-    }
-
-    // Application auth.
-    public OAuthProvider(@NonNull String clientId) {
-        this.clientId = clientId;
-    }
-
-    // Setter for the handler. We use <T> so that implementing classes don't have to
-    // override this and return themselves.
     @SuppressWarnings("unchecked")
     public <T extends OAuthProvider> T onNewRefreshToken(@Nullable Consumer<String> handler) {
         this.onNewRefreshToken = handler;
+        return (T) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends OAuthProvider> T supplyRefreshToken(@NonNull Supplier<String> supplier) {
+        this.refreshTokenSupplier = supplier;
         return (T) this;
     }
 
