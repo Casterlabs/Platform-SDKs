@@ -8,7 +8,16 @@
 	<modules>
 		<module>_Base</module>
 
-		<module>CaffeineTV</module>
+		<module>Caffeine</module>
+		<module>Twitch</module>
+		<module>Trovo</module>
+		<module>Zoho</module>
+		<module>Glimesh</module>
+		<module>Brime</module>
+		<module>YouTube</module>
+		<module>TikTok</module>
+		<module>DLive</module>
+		<module>Theta</module>
 	</modules>
 
 	<properties>
