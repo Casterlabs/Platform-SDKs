@@ -28,8 +28,7 @@ public enum YoutubeLiveEventType {
     private Class<? extends YoutubeLiveEvent> clazz;
 
     @SuppressWarnings({
-            "unchecked",
-            "deprecation"
+            "unchecked"
     })
     public static <T extends YoutubeLiveEvent> T fromJson(@NonNull JsonObject json) throws JsonValidationException, JsonParseException {
         // Remove all the subtypes and extract them to the root snippet.
@@ -37,7 +36,7 @@ public enum YoutubeLiveEventType {
 
         for (String sub : subs) {
             if (json.containsKey(sub)) {
-                json.getMap().putAll(json.remove(sub).getAsObject().getMap());
+                json.toMap().putAll(json.remove(sub).getAsObject().toMap());
             }
         }
 
