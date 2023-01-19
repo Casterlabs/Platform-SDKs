@@ -5,6 +5,7 @@ import java.io.IOException;
 import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.web.ApiException;
 import co.casterlabs.apiutil.web.AuthenticatedWebRequest;
+import co.casterlabs.rakurai.json.element.JsonArray;
 import co.casterlabs.rakurai.json.element.JsonObject;
 import co.casterlabs.sdk.twitch.HttpUtil;
 import co.casterlabs.sdk.twitch.TwitchApi;
@@ -23,8 +24,10 @@ public class HelixModifyChannelInformationRequest extends AuthenticatedWebReques
     private String broadcasterId;
 
     private String title;
-    private String language = "other";
-    private String gameId = "0";
+    private String language; // Null to ignore.
+    private String gameId; // Null to ignore.
+    private String[] tags; // Null to ignore.
+    private int delay = -1; // Max 900, -1 to ignore.
 
     public HelixModifyChannelInformationRequest(@NonNull TwitchHelixAuth auth) {
         super(auth);
@@ -48,10 +51,12 @@ public class HelixModifyChannelInformationRequest extends AuthenticatedWebReques
         String url = "https://api.twitch.tv/helix/channels?broadcaster_id=" + this.broadcasterId;
 
         JsonObject body = new JsonObject()
-            .put("game_id", this.gameId)
-            .put("broadcaster_language", this.language)
             .put("title", this.title);
-        // Delay is unsupported.
+
+        if (this.gameId != null) body.put("game_id", this.gameId);
+        if (this.language != null) body.put("broadcaster_language", this.language.toLowerCase());
+        if (this.tags != null) body.put("tags", JsonArray.of((Object[]) this.tags));
+        if (this.delay != -1) body.put("delay", this.delay);
 
         try (Response response = HttpUtil.sendHttp(body.toString(), "PATCH", url, null, "application/json", this.auth)) {
             if (!response.isSuccessful()) {
