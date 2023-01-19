@@ -43,7 +43,7 @@ public class HelixGetChannelInformationRequest extends AuthenticatedWebRequest<L
         }
 
         // Build the url
-        StringBuilder sb = new StringBuilder("https://api.twitch.tv/helix/streams?");
+        StringBuilder sb = new StringBuilder("https://api.twitch.tv/helix/channels?");
 
         this.ids.forEach((id) -> sb.append("&broadcaster_id=").append(id));
 
