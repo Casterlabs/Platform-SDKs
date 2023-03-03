@@ -40,10 +40,13 @@ public class HelixGetAllStreamTagsRequest extends AuthenticatedWebRequest<List<H
 
                     result.addAll(tags);
 
-                    JsonObject pagination = json.getObject("pagination");
-
-                    if (pagination.containsKey("cursor")) {
-                        after = pagination.get("cursor").getAsString();
+                    if (json.containsKey("pagination")) {
+                        JsonObject pagination = json.getObject("pagination");
+                        if (pagination.containsKey("cursor")) {
+                            after = pagination.getString("cursor");
+                        } else {
+                            break;
+                        }
                     } else {
                         break;
                     }
