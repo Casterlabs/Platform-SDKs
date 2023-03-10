@@ -9,9 +9,6 @@ import com.pusher.client.connection.ConnectionEventListener;
 import com.pusher.client.connection.ConnectionState;
 import com.pusher.client.connection.ConnectionStateChange;
 
-import co.casterlabs.rakurai.json.Rson;
-import co.casterlabs.rakurai.json.element.JsonObject;
-import co.casterlabs.rakurai.json.serialization.JsonParseException;
 import co.casterlabs.sdk.kick.KickApi;
 import lombok.Getter;
 import lombok.NonNull;
@@ -66,26 +63,22 @@ public class KickChannelRealtime implements Closeable {
     }
 
     private void onEvent(PusherEvent event) {
-        try {
-            String type = event.getEventName();
-            JsonObject data = Rson.DEFAULT.fromJson(event.getData(), JsonObject.class);
-            this.logger.debug("%s: %s", type, data);
+        String type = event.getEventName();
+        String data = event.getData();
+        this.logger.debug("%s: %s", type, data);
 
-            switch (type) {
-                case "App\\Events\\StreamerIsLive":
-                    this.listener.onChannelLive(true);
-                    return;
+        switch (type) {
+            case "App\\Events\\StreamerIsLive":
+                this.listener.onChannelLive(true);
+                return;
 
-                case "App\\Events\\StopStreamBroadcast":
-                    this.listener.onChannelLive(false);
-                    return;
+            case "App\\Events\\StopStreamBroadcast":
+                this.listener.onChannelLive(false);
+                return;
 
-                default:
-                    this.logger.warn("Unrecognized type: %s", type);
-                    return;
-            }
-        } catch (JsonParseException e) {
-            this.logger.exception(e);
+            default:
+                this.logger.warn("Unrecognized type: %s", type);
+                return;
         }
     }
 

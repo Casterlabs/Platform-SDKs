@@ -11,10 +11,12 @@ import com.pusher.client.connection.ConnectionStateChange;
 
 import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.element.JsonObject;
-import co.casterlabs.rakurai.json.serialization.JsonParseException;
 import co.casterlabs.sdk.kick.KickApi;
+import co.casterlabs.sdk.kick.realtime.types.KickChatEvent;
+import co.casterlabs.sdk.kick.realtime.types.KickReactionEvent;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.SneakyThrows;
 import xyz.e3ndr.fastloggingframework.logging.FastLogger;
 
 public class KickChatRealtime implements Closeable {
@@ -65,27 +67,31 @@ public class KickChatRealtime implements Closeable {
             .bindGlobal(this::onEvent);
     }
 
+    @SneakyThrows
     private void onEvent(PusherEvent event) {
-        try {
-            String type = event.getEventName();
-            JsonObject data = Rson.DEFAULT.fromJson(event.getData(), JsonObject.class);
-            this.logger.debug("%s: %s", type, data);
+        String type = event.getEventName();
+        String data = event.getData();
+        this.logger.debug("%s: %s", type, data);
 
-            switch (type) {
-                case "App\\Events\\ChatMessageSentEvent": {
-                    return;
-                }
+        switch (type) {
+            case "App\\Events\\ChatMessageSentEvent":
+                this.listener.onChat(
+                    Rson.DEFAULT.fromJson(data, KickChatEvent.class)
+                );
+                return;
 
-                case "App\\Events\\ChatMessageReact": {
-                    return;
-                }
+            case "App\\Events\\ChatMessageReact": {
+                JsonObject json = Rson.DEFAULT.fromJson(data, JsonObject.class);
 
-                default:
-                    this.logger.warn("Unrecognized type: %s", type);
-                    return;
+                this.listener.onReaction(
+                    Rson.DEFAULT.fromJson(json.get("data"), KickReactionEvent.class)
+                );
+                return;
             }
-        } catch (JsonParseException e) {
-            this.logger.exception(e);
+
+            default:
+                this.logger.warn("Unrecognized type: %s", type);
+                return;
         }
     }
 
