@@ -21,4 +21,8 @@ public class KickEmote {
         return String.format("https://files.kick.com/emotes/%d/fullsize", this.id);
     }
 
+    public String getAsChatEmote() {
+        return String.format("[emote:%%s]", this.id, this.name);
+    }
+
 }
