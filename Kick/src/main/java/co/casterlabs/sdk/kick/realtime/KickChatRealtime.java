@@ -21,13 +21,14 @@ import xyz.e3ndr.fastloggingframework.logging.FastLogger;
 
 public class KickChatRealtime implements Closeable {
     private final FastLogger logger;
-    private final KickChannelListener listener;
+    private final KickChatListener listener;
 
     private final @Getter long chatRoomId;
 
     private Pusher pusher;
+    private Thread holdThread;
 
-    public KickChatRealtime(long chatRoomId, @NonNull KickChannelListener listener) {
+    public KickChatRealtime(long chatRoomId, @NonNull KickChatListener listener) {
         this.chatRoomId = chatRoomId;
         this.listener = listener;
         this.logger = new FastLogger("Kick Chat Realtime: " + this.chatRoomId);
@@ -49,6 +50,7 @@ public class KickChatRealtime implements Closeable {
                         break;
 
                     case DISCONNECTED:
+                        holdThread.interrupt();
                         listener.onClose();
                         break;
 
@@ -65,6 +67,15 @@ public class KickChatRealtime implements Closeable {
 
         this.pusher.subscribe("chatrooms." + this.chatRoomId)
             .bindGlobal(this::onEvent);
+
+        this.holdThread = new Thread(() -> {
+            try {
+                Thread.sleep(Long.MAX_VALUE);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        });
+        this.holdThread.start();
     }
 
     @SneakyThrows

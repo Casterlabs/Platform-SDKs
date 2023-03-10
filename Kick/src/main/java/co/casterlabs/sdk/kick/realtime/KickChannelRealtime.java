@@ -21,6 +21,7 @@ public class KickChannelRealtime implements Closeable {
     private final @Getter long channelId;
 
     private Pusher pusher;
+    private Thread holdThread;
 
     public KickChannelRealtime(long channelId, @NonNull KickChannelListener listener) {
         this.channelId = channelId;
@@ -44,6 +45,7 @@ public class KickChannelRealtime implements Closeable {
                         break;
 
                     case DISCONNECTED:
+                        holdThread.interrupt();
                         listener.onClose();
                         break;
 
@@ -60,6 +62,15 @@ public class KickChannelRealtime implements Closeable {
 
         this.pusher.subscribe("channel." + this.channelId)
             .bindGlobal(this::onEvent);
+
+        this.holdThread = new Thread(() -> {
+            try {
+                Thread.sleep(Long.MAX_VALUE);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        });
+        this.holdThread.start();
     }
 
     private void onEvent(PusherEvent event) {
