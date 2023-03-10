@@ -11,8 +11,13 @@ public class KickApi {
     public static final Rson RSON = new Rson.Builder()
         .build();
 
+    private static boolean hasInitialized = false;
+
     public static void init() {
+        if (hasInitialized) return;
+
         KickApi.class.getClassLoader().setPackageAssertionStatus("co.casterlabs.sdk.kick", true);
+        hasInitialized = true;
     }
 
     public static String parseResponsiveImage(JsonElement e) {
