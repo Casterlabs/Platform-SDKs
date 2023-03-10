@@ -11,6 +11,6 @@ public interface KickChatListener {
 
     default void onChat(KickChatEvent event) {}
 
-    void onReaction(KickReactionEvent event);
+    default void onReaction(KickReactionEvent event) {}
 
 }
