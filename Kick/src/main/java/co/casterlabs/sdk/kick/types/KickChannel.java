@@ -15,10 +15,10 @@ import lombok.ToString;
 @ToString
 @JsonClass(exposeAll = true)
 public class KickChannel {
+
     private long id;
 
-    @JsonField("user_id")
-    private long userId;
+    private KickUser user;
 
     private String slug;
 
