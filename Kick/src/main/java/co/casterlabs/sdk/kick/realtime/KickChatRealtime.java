@@ -13,22 +13,22 @@ import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.element.JsonObject;
 import co.casterlabs.rakurai.json.serialization.JsonParseException;
 import co.casterlabs.sdk.kick.KickApi;
-import co.casterlabs.sdk.kick.types.KickChannel;
 import lombok.Getter;
 import lombok.NonNull;
 import xyz.e3ndr.fastloggingframework.logging.FastLogger;
 
-public class KickRealtime implements Closeable {
+public class KickChatRealtime implements Closeable {
     private final FastLogger logger;
-    private final @Getter long channelId;
-    private final @Getter long chatId;
+    private final KickChannelListener listener;
+
+    private final @Getter long chatRoomId;
 
     private Pusher pusher;
 
-    public KickRealtime(@NonNull KickChannel channel) {
-        this.channelId = channel.getId();
-        this.chatId = channel.getChatRoomId();
-        this.logger = new FastLogger("Kick Realtime: " + this.channelId);
+    public KickChatRealtime(long chatRoomId, @NonNull KickChannelListener listener) {
+        this.chatRoomId = chatRoomId;
+        this.listener = listener;
+        this.logger = new FastLogger("Kick Chat Realtime: " + this.chatRoomId);
     }
 
     public void connect() {
@@ -41,40 +41,52 @@ public class KickRealtime implements Closeable {
             @Override
             public void onConnectionStateChange(ConnectionStateChange change) {
                 logger.debug("Connection state: %s", change.getCurrentState());
+                switch (change.getCurrentState()) {
+                    case CONNECTED:
+                        listener.onOpen();
+                        break;
+
+                    case DISCONNECTED:
+                        listener.onClose();
+                        break;
+
+                    default:
+                        break;
+                }
             }
 
             @Override
             public void onError(String message, String code, Exception e) {
-                System.out.println("There was a problem connecting!");
-                logger.debug("Connection error: %s %s\n%s", code, message, e);
+                logger.severe("Connection error: %s %s\n%s", code, message, e);
             }
         }, ConnectionState.ALL);
 
-        this.pusher.subscribe("channel." + this.channelId)
-            .bindGlobal((PusherEvent event) -> {
-                try {
-                    String type = event.getEventName();
-                    String data = event.getData();
-                    this.onEvent(type, Rson.DEFAULT.fromJson(data, JsonObject.class));
-                } catch (JsonParseException e) {
-                    this.logger.exception(e);
-                }
-            });
-
-        this.pusher.subscribe("chatrooms." + this.chatId)
-            .bindGlobal((PusherEvent event) -> {
-                try {
-                    String type = event.getEventName();
-                    String data = event.getData();
-                    this.onEvent(type, Rson.DEFAULT.fromJson(data, JsonObject.class));
-                } catch (JsonParseException e) {
-                    this.logger.exception(e);
-                }
-            });
+        this.pusher.subscribe("chatrooms." + this.chatRoomId)
+            .bindGlobal(this::onEvent);
     }
 
-    private void onEvent(String type, JsonObject data) {
-        this.logger.debug("%s: %s", type, data);
+    private void onEvent(PusherEvent event) {
+        try {
+            String type = event.getEventName();
+            JsonObject data = Rson.DEFAULT.fromJson(event.getData(), JsonObject.class);
+            this.logger.debug("%s: %s", type, data);
+
+            switch (type) {
+                case "App\\Events\\ChatMessageSentEvent": {
+                    return;
+                }
+
+                case "App\\Events\\ChatMessageReact": {
+                    return;
+                }
+
+                default:
+                    this.logger.warn("Unrecognized type: %s", type);
+                    return;
+            }
+        } catch (JsonParseException e) {
+            this.logger.exception(e);
+        }
     }
 
     public boolean isOpen() {
