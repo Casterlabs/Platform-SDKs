@@ -5,7 +5,7 @@ import java.io.IOException;
 import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.web.ApiException;
 import co.casterlabs.apiutil.web.WebRequest;
-import co.casterlabs.sdk.kick.KickApi;
+import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.sdk.kick.types.KickChannel;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -25,7 +25,7 @@ public class KickGetChannelRequest extends WebRequest<KickChannel> {
             null
         );
 
-        return KickApi.RSON.fromJson(response, KickChannel.class);
+        return Rson.DEFAULT.fromJson(response, KickChannel.class);
     }
 
 }

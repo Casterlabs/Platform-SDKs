@@ -1,15 +1,11 @@
 package co.casterlabs.sdk.kick;
 
-import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.element.JsonElement;
 import co.casterlabs.rakurai.json.element.JsonObject;
 
 public class KickApi {
     public static final String PUSHER_CLUSTER = "us2";
     public static final String PUSHER_KEY = "eb1d5f283081a78b932c";
-
-    public static final Rson RSON = new Rson.Builder()
-        .build();
 
     private static boolean hasInitialized = false;
 
