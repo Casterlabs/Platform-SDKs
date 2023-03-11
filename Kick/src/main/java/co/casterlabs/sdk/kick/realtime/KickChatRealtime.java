@@ -101,7 +101,7 @@ public class KickChatRealtime implements Closeable {
             }
 
             default:
-                this.logger.warn("Unrecognized type: %s", type);
+                this.logger.warn("Unrecognized type: %s %s", type, data);
                 return;
         }
     }
