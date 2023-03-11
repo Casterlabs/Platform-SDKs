@@ -9,9 +9,13 @@ import com.pusher.client.connection.ConnectionEventListener;
 import com.pusher.client.connection.ConnectionState;
 import com.pusher.client.connection.ConnectionStateChange;
 
+import co.casterlabs.rakurai.json.Rson;
+import co.casterlabs.rakurai.json.element.JsonObject;
 import co.casterlabs.sdk.kick.KickApi;
+import co.casterlabs.sdk.kick.realtime.types.KickRaidEvent;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.SneakyThrows;
 import xyz.e3ndr.fastloggingframework.logging.FastLogger;
 
 public class KickChannelRealtime implements Closeable {
@@ -73,6 +77,7 @@ public class KickChannelRealtime implements Closeable {
         this.holdThread.start();
     }
 
+    @SneakyThrows
     private void onEvent(PusherEvent event) {
         String type = event.getEventName();
         String data = event.getData();
@@ -85,6 +90,12 @@ public class KickChannelRealtime implements Closeable {
 
             case "App\\Events\\StopStreamBroadcast":
                 this.listener.onChannelLive(false);
+                return;
+
+            case "App\\Events\\FollowersUpdated":
+                this.listener.onChannelLive(false);
+                JsonObject json = Rson.DEFAULT.fromJson(data, JsonObject.class);
+                this.listener.onFollowersCountUpdate(json.getNumber("followersCount").intValue());
                 return;
 
             default:

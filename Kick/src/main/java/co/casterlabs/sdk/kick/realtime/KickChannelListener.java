@@ -8,4 +8,6 @@ public interface KickChannelListener {
 
     default void onChannelLive(boolean isLive) {}
 
+    default void onFollowersCountUpdate(int newFollowersCount) {}
+
 }
