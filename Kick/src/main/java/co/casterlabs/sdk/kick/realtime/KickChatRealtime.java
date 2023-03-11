@@ -93,10 +93,15 @@ public class KickChatRealtime implements Closeable {
 
             case "App\\Events\\ChatMessageReact": {
                 JsonObject json = Rson.DEFAULT.fromJson(data, JsonObject.class);
-
                 this.listener.onReaction(
                     Rson.DEFAULT.fromJson(json.get("data"), KickReactionEvent.class)
                 );
+                return;
+            }
+
+            case "App\\Events\\ChatMessageDeletedEvent": {
+                JsonObject json = Rson.DEFAULT.fromJson(data, JsonObject.class);
+                this.listener.onDeleted(json.getObject("deletedMessage").getString("id"));
                 return;
             }
 

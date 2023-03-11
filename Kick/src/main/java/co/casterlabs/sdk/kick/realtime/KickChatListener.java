@@ -13,4 +13,6 @@ public interface KickChatListener {
 
     default void onReaction(KickReactionEvent event) {}
 
+    default void onDeleted(String messageId) {}
+
 }
