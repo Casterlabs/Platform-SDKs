@@ -98,6 +98,12 @@ public class KickChannelRealtime implements Closeable {
                 this.listener.onFollowersCountUpdate(json.getNumber("followersCount").intValue());
                 return;
 
+            case "App\\Events\\StreamHostedEvent":
+                this.listener.onRaid(
+                    Rson.DEFAULT.fromJson(data, KickRaidEvent.class)
+                );
+                return;
+
             default:
                 this.logger.warn("Unrecognized type: %s %s", type, data);
                 return;
