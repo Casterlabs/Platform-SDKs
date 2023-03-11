@@ -22,7 +22,7 @@ public class KickEmote {
     }
 
     public String getAsChatEmote() {
-        return String.format("[emote:%%s]", this.id, this.name);
+        return String.format("[emote:%s:%s]", this.id, this.name);
     }
 
 }
