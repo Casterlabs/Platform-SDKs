@@ -85,13 +85,13 @@ public class YoutubeChatScraper {
         YoutubeChatScraper.targetLocation = targetLocation;
         targetLocation.mkdirs();
 
+        execute("npm", "i", "youtube-chat").waitFor();
+
         final File wrapperFile = new File(targetLocation, "wrapper.mjs");
         wrapperFile.delete();
 
-        execute("npm", "i", "youtube-chat").waitFor();
-
         Files.copy(
-            YoutubeChatScraper.class.getClassLoader().getResourceAsStream("wrapper.mjs"),
+            YoutubeChatScraper.class.getClassLoader().getResourceAsStream("youtube-sdk/wrapper.mjs"),
             wrapperFile.toPath()
         );
 

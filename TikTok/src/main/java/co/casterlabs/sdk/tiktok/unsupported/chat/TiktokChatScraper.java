@@ -155,16 +155,15 @@ public class TiktokChatScraper {
         TiktokChatScraper.targetLocation = targetLocation;
         targetLocation.mkdirs();
 
+        execute("npm", "i", "tiktok-live-connector").waitFor();
+
         final File wrapperFile = new File(targetLocation, "wrapper.mjs");
         wrapperFile.delete();
 
-        execute("npm", "i", "tiktok-live-connector").waitFor();
-
         Files.copy(
-            TiktokChatScraper.class.getClassLoader().getResourceAsStream("wrapper.mjs"),
+            TiktokChatScraper.class.getClassLoader().getResourceAsStream("tiktok-sdk/wrapper.mjs"),
             wrapperFile.toPath()
         );
-
     }
 
     private static Process execute(String... cmd) throws IOException {
