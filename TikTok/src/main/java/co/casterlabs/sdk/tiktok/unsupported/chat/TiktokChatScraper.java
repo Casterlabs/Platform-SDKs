@@ -19,6 +19,8 @@ import co.casterlabs.sdk.tiktok.unsupported.chat.types.TiktokScrapeSubscriptionE
 import co.casterlabs.sdk.tiktok.unsupported.chat.types.TiktokScrapeTreasureChestEvent;
 import co.casterlabs.sdk.tiktok.unsupported.chat.types.TiktokScrapeViewersEvent;
 import lombok.NonNull;
+import xyz.e3ndr.fastloggingframework.logging.FastLogger;
+import xyz.e3ndr.fastloggingframework.logging.LogLevel;
 
 public class TiktokChatScraper {
     private static final boolean isRunningOnWindows = System.getProperty("os.name", "").contains("Windows");
@@ -35,7 +37,7 @@ public class TiktokChatScraper {
                     JsonObject packet = Rson.DEFAULT.fromJson(in.nextLine(), JsonObject.class);
                     String type = packet.getString("type");
 
-                    System.out.println(packet);
+                    FastLogger.logStatic(LogLevel.DEBUG, packet);
 
                     switch (type) {
 
