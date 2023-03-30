@@ -163,8 +163,8 @@ Replace `_VERSION` with the latest commit in this repo and make sure to add the 
   
   ```xml
     <dependency>
-        <groupId>co.casterlabs.Commons</groupId>
-        <artifactId>Platform</artifactId>
+        <groupId>co.casterlabs.Platform-SDKs</groupId>
+        <artifactId>Kick</artifactId>
         <version>_VERSION</version>
     </dependency>
   ```
@@ -175,7 +175,7 @@ Replace `_VERSION` with the latest commit in this repo and make sure to add the 
   
   ```gradle
 	dependencies {
-        implementation 'co.casterlabs:Commons.Platform:_VERSION'
+        implementation 'co.casterlabs:Platform-SDKs.Kick:_VERSION'
 	}
   ```
 </details>
@@ -184,7 +184,7 @@ Replace `_VERSION` with the latest commit in this repo and make sure to add the 
   <summary>SBT</summary>
   
   ```
-libraryDependencies += "co.casterlabs.Commons" % "Platform" % "_VERSION"
+libraryDependencies += "co.casterlabs.Platform-SDKs" % "Kick" % "_VERSION"
   ```
 </details>
 
@@ -192,7 +192,7 @@ libraryDependencies += "co.casterlabs.Commons" % "Platform" % "_VERSION"
   <summary>Leiningen</summary>
   
   ```
-:dependencies [[co.casterlabs.Commons/Platform "_VERSION"]]	
+:dependencies [[co.casterlabs.Platform-SDKs/Kick "_VERSION"]]	
   ```
 </details>
 
