@@ -13,7 +13,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public abstract class WebRequest<T> {
-    private static final OkHttpClient client = new OkHttpClient();
+    protected static final OkHttpClient client = new OkHttpClient();
 
     public Promise<T> sendAsync() {
         return new Promise<>(this::send);
