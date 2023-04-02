@@ -1,8 +1,5 @@
 package co.casterlabs.sdk.trovo;
 
-import co.casterlabs.sdk.trovo.requests.TrovoGetChannelInfoRequest;
-import co.casterlabs.sdk.trovo.requests.data.TrovoChannelInfo;
-
 public class Test {
 
     // https://open.trovo.live/page/login.html?client_id=47d7f05d03a222e3d470537020c1d1c1&response_type=code&scope=channel_details_self+manage_messages&redirect_uri=https%3A%2F%2Fcasterlabs.co/auth&state=statedata
@@ -15,12 +12,14 @@ public class Test {
 
 //        System.out.println(TrovoAuth.authorize("bb05be04b17cf8c29049b2455aa7eed0", redirectUri, clientId, clientSecret));
 
-        TrovoAuth userAuth = new TrovoAuth(clientId, clientSecret, refreshToken);
+//        System.out.println(TrovoSpell.knownSpells);
 
-        System.out.println(userAuth.getScope());
-
-        TrovoChannelInfo info = new TrovoGetChannelInfoRequest(userAuth).send();
-        System.out.println(info);
+//        TrovoAuth userAuth = new TrovoAuth(clientId, clientSecret, refreshToken);
+//
+//        System.out.println(userAuth.getScope());
+//
+//        TrovoChannelInfo info = new TrovoGetChannelInfoRequest(userAuth).send();
+//        System.out.println(info);
     }
 
 }

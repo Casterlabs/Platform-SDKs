@@ -1,0 +1,296 @@
+[
+    {
+        "currency": "ELIXIR",
+        "cost": 5000,
+        "name": "Let's Travel",
+        "image": "https://img.trovo.live/imgupload/shop/20230317_f1stav9fjoe.webp"
+    },
+    {
+        "currency": "MANA",
+        "cost": 1000,
+        "name": "St. Patrick",
+        "image": "https://img.trovo.live/imgupload/shop/20210312_3guy27m840u.png"
+    },
+    {
+        "currency": "ELIXIR",
+        "cost": 5,
+        "name": "T-egg",
+        "image": "https://img.trovo.live/imgupload/shop/20210401_8g7rowckhdegg.webp"
+    },
+    {
+        "currency": "ELIXIR",
+        "cost": 50,
+        "name": "Love Core",
+        "image": "https://img.trovo.live/imgupload/shop/20220824_uipbk2q20ra.webp"
+    },
+    {
+        "currency": "ELIXIR",
+        "cost": 100,
+        "name": "Easter Egg",
+        "image": "https://img.trovo.live/imgupload/shop/20210331_57h1vs5a74g.webp"
+    },
+    {
+        "currency": "ELIXIR",
+        "cost": 300,
+        "name": "Bunny Egg",
+        "image": "https://img.trovo.live/imgupload/shop/20220419_ad4hl4sxzcg,20220419_ad4hl4sxzcg.webp"
+    },
+    {
+        "currency": "ELIXIR",
+        "cost": 500,
+        "name": "Bunny",
+        "image": "https://img.trovo.live/imgupload/shop/20210331_95cudt89k7gum.webp"
+    },
+    {
+        "currency": "ELIXIR",
+        "cost": 2000,
+        "name": "Party Up",
+        "image": "https://img.trovo.live/imgupload/shop/20221128_5ysehlg7v17.webp"
+    },
+    {
+        "currency": "ELIXIR",
+        "cost": 5000,
+        "name": "Leon's Prank",
+        "image": "https://img.trovo.live/imgupload/shop/20210324_71x7zbojxag.webp"
+    },
+    {
+        "currency": "ELIXIR",
+        "cost": 80,
+        "name": "Fate Gacha",
+        "image": "https://img.trovo.live/imgupload/shop/20220824_eggpbsf6du6.webp"
+    },
+    {
+        "currency": "ELIXIR",
+        "cost": 7000,
+        "name": "Lucky Capsule",
+        "image": "https://img.trovo.live/imgupload/shop/20220726_80po53hzmsd.webp"
+    },
+    {
+        "currency": "ELIXIR",
+        "cost": 50,
+        "name": "Full Heart",
+        "image": "https://img.trovo.live/imgupload/shop/20220520_yrcgb4dg0uo,20220520_yrcgb4dg0uo.webp"
+    },
+    {
+        "currency": "ELIXIR",
+        "cost": 6000,
+        "name": "Cash Gun Max",
+        "image": "https://img.trovo.live/imgupload/shop/20221128_1jylkqr6swd.webp"
+    },
+    {
+        "currency": "MANA",
+        "cost": 100,
+        "name": "Stay Safe",
+        "image": "https://static.trovo.live/imgupload/shop/20200421_tyxzwfzebxbhelmet.png"
+    },
+    {
+        "currency": "MANA",
+        "cost": 500,
+        "name": "On Fire",
+        "image": "https://static.trovo.live/imgupload/shop/20200610_4ig5dz712a20200610_i74sm6yafscannon2.png"
+    },
+    {
+        "currency": "ELIXIR",
+        "cost": 5,
+        "name": "Rose",
+        "image": "https://static.trovo.live/imgupload/shop/20200509_qnxz9b28xqt.webp"
+    },
+    {
+        "currency": "ELIXIR",
+        "cost": 800,
+        "name": "Punch K.O.",
+        "image": "https://img.trovo.live/imgupload/shop/20230303_yrexjwt1l2.webp"
+    },
+    {
+        "currency": "ELIXIR",
+        "cost": 1500,
+        "name": "Tank GG",
+        "image": "https://img.trovo.live/imgupload/shop/20230303_4kggu0hus6t.webp"
+    },
+    {
+        "currency": "ELIXIR",
+        "cost": 5,
+        "name": "Space Fuel",
+        "image": "https://img.trovo.live/imgupload/shop/20220822_6gcqzhqnp3q.webp"
+    },
+    {
+        "currency": "ELIXIR",
+        "cost": 10,
+        "name": "HYPE",
+        "image": "https://static.trovo.live/imgupload/shop/20200509_gmi66m2kh9f.webp"
+    },
+    {
+        "currency": "ELIXIR",
+        "cost": 30,
+        "name": "Tetris Love",
+        "image": "https://img.trovo.live/imgupload/shop/20220607_8wb10qwrh0x,20220607_8wb10qwrh0x.webp"
+    },
+    {
+        "currency": "ELIXIR",
+        "cost": 50,
+        "name": "Bravo!",
+        "image": "https://img.trovo.live/imgupload/shop/20220331_vwolxc9ff6b,20220331_vwolxc9ff6b.webp"
+    },
+    {
+        "currency": "ELIXIR",
+        "cost": 100,
+        "name": "Winner",
+        "image": "https://static.trovo.live/imgupload/shop/20200501_jk9npzs4735winner.webp"
+    },
+    {
+        "currency": "ELIXIR",
+        "cost": 300,
+        "name": "EZ",
+        "image": "https://static.trovo.live/imgupload/shop/20200902_acv79khxt9.webp"
+    },
+    {
+        "currency": "ELIXIR",
+        "cost": 500,
+        "name": "Shiny Uni",
+        "image": "https://static.trovo.live/imgupload/shop/20200509_9fikzpgc2ne.webp"
+    },
+    {
+        "currency": "ELIXIR",
+        "cost": 1000,
+        "name": "Cash Bang",
+        "image": "https://static.trovo.live/imgupload/shop/20200509_fxbh9hgmtt7.webp"
+    },
+    {
+        "currency": "ELIXIR",
+        "cost": 2000,
+        "name": "Top1",
+        "image": "https://static.trovo.live/imgupload/shop/20200902_8g1v6js5h5ptop1.webp"
+    },
+    {
+        "currency": "ELIXIR",
+        "cost": 5000,
+        "name": "Super Good",
+        "image": "https://img.trovo.live/imgupload/shop/20210302_pcidahysz1esupergood.webp"
+    },
+    {
+        "currency": "ELIXIR",
+        "cost": 5000,
+        "name": "Champagne",
+        "image": "https://img.trovo.live/imgupload/shop/20220601_56xir1jsali,20220601_56xir1jsali.webp"
+    },
+    {
+        "currency": "ELIXIR",
+        "cost": 10,
+        "name": "T-shield",
+        "image": "https://img.trovo.live/imgupload/shop/20220624_0h1b3skadl8a,20220624_0h1b3skadl8a.webp"
+    },
+    {
+        "currency": "ELIXIR",
+        "cost": 100,
+        "name": "Fireball",
+        "image": "https://img.trovo.live/imgupload/shop/20220624_voptl5oprr,20220624_voptl5oprr.webp"
+    },
+    {
+        "currency": "ELIXIR",
+        "cost": 200,
+        "name": "Defend",
+        "image": "https://img.trovo.live/imgupload/shop/20220624_xhpif1vj9d,20220624_xhpif1vj9d.webp"
+    },
+    {
+        "currency": "ELIXIR",
+        "cost": 1000,
+        "name": "Combo!",
+        "image": "https://img.trovo.live/imgupload/shop/20220624_u1a1qerzd9n,20220624_u1a1qerzd9n.webp"
+    },
+    {
+        "currency": "ELIXIR",
+        "cost": 5000,
+        "name": "SkillBIG",
+        "image": "https://img.trovo.live/imgupload/shop/20220624_jw0vyi96had,20220624_jw0vyi96had.webp"
+    },
+    {
+        "currency": "ELIXIR",
+        "cost": 50,
+        "name": "Melody",
+        "image": "https://img.trovo.live/imgupload/shop/20220725_em3t7imopyu.webp"
+    },
+    {
+        "currency": "ELIXIR",
+        "cost": 300,
+        "name": "Rock Attack",
+        "image": "https://img.trovo.live/imgupload/shop/20220725_ssyutl0wjon.webp"
+    },
+    {
+        "currency": "ELIXIR",
+        "cost": 1000,
+        "name": "Healing Kiss",
+        "image": "https://img.trovo.live/imgupload/shop/20220725_s63drgdgynp.webp"
+    },
+    {
+        "currency": "ELIXIR",
+        "cost": 3000,
+        "name": "Angelic Shield",
+        "image": "https://img.trovo.live/imgupload/shop/20220725_js19o12gzno.webp"
+    },
+    {
+        "currency": "ELIXIR",
+        "cost": 500,
+        "name": "Ace Excalibur",
+        "image": "https://img.trovo.live/imgupload/shop/20221025_vokipebz3.png"
+    },
+    {
+        "currency": "ELIXIR",
+        "cost": 3000,
+        "name": "ACE Mecha",
+        "image": "https://img.trovo.live/imgupload/shop/20221020_7x6xncl0p4d.png"
+    },
+    {
+        "currency": "ELIXIR",
+        "cost": 7000,
+        "name": "Conquered",
+        "image": "https://img.trovo.live/imgupload/shop/20221020_byepl3w5bua.gif"
+    },
+    {
+        "currency": "ELIXIR",
+        "cost": 5,
+        "name": "Ace Rose",
+        "image": "https://img.trovo.live/imgupload/shop/20230306_na23oqd8sra.webp"
+    },
+    {
+        "currency": "ELIXIR",
+        "cost": 10,
+        "name": "Ace Lime",
+        "image": "https://img.trovo.live/imgupload/shop/20230306_8zg76xrtfzv.webp"
+    },
+    {
+        "currency": "ELIXIR",
+        "cost": 200,
+        "name": "24K Clap",
+        "image": "https://img.trovo.live/imgupload/shop/20230306_parbzd92ncm.webp"
+    },
+    {
+        "currency": "ELIXIR",
+        "cost": 1500,
+        "name": "Ace Violin",
+        "image": "https://img.trovo.live/imgupload/shop/20230306_3caf8ox6sy.webp"
+    },
+    {
+        "currency": "ELIXIR",
+        "cost": 2000,
+        "name": "Gold Card",
+        "image": "https://img.trovo.live/imgupload/shop/20230307_i6vvrpwqmvf.webp"
+    },
+    {
+        "currency": "ELIXIR",
+        "cost": 3500,
+        "name": "Dr. Leon Walk",
+        "image": "https://img.trovo.live/imgupload/shop/20230307_0z9orf9dl1kd.webp"
+    },
+    {
+        "currency": "ELIXIR",
+        "cost": 6000,
+        "name": "Ace Treasure",
+        "image": "https://img.trovo.live/imgupload/shop/20230307_9oavmjefjke.webp"
+    },
+    {
+        "currency": "ELIXIR",
+        "cost": 10000,
+        "name": "Luxury Party",
+        "image": "https://img.trovo.live/imgupload/shop/20230307_b10ihywrkd9.webp"
+    }
+]
