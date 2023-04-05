@@ -13,7 +13,17 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public abstract class WebRequest<T> {
-    protected static final OkHttpClient client = new OkHttpClient();
+    public static final OkHttpClient client = new OkHttpClient.Builder()
+        .addNetworkInterceptor(
+            (chain) -> chain.proceed(
+                chain // OkHttp bug.
+                    .request()
+                    .newBuilder()
+                    .removeHeader("Accept-Encoding")
+                    .build()
+            )
+        )
+        .build();
 
     public Promise<T> sendAsync() {
         return new Promise<>(this::send);
