@@ -12,6 +12,7 @@ import co.casterlabs.rakurai.json.TypeToken;
 import co.casterlabs.rakurai.json.element.JsonArray;
 import co.casterlabs.rakurai.json.element.JsonElement;
 import co.casterlabs.rakurai.json.element.JsonObject;
+import co.casterlabs.sdk.kick.KickApi;
 import co.casterlabs.sdk.kick.types.KickEmote;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -27,7 +28,7 @@ public class KickGetChannelEmotesRequest extends WebRequest<List<KickEmote>> {
 
         String response = WebRequest.sendHttpRequest(
             new Request.Builder()
-                .url("https://kick.com/emotes/" + this.slug),
+                .url(KickApi.API_BASE_URL + "/emotes/" + this.slug),
             null
         );
         JsonArray sets = Rson.DEFAULT.fromJson(response, JsonArray.class);

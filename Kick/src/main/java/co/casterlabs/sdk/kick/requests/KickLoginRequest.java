@@ -11,6 +11,7 @@ import co.casterlabs.apiutil.web.ApiException;
 import co.casterlabs.apiutil.web.WebRequest;
 import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.element.JsonObject;
+import co.casterlabs.sdk.kick.KickApi;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import okhttp3.MediaType;
@@ -35,7 +36,7 @@ public class KickLoginRequest extends WebRequest<String> {
         JsonObject tokenProvider = Rson.DEFAULT.fromJson(
             WebRequest.sendHttpRequest(
                 new Request.Builder()
-                    .url("https://kick.com/kick-token-provider"),
+                    .url(KickApi.API_BASE_URL + "/kick-token-provider"),
                 null
             ),
             JsonObject.class
@@ -54,7 +55,7 @@ public class KickLoginRequest extends WebRequest<String> {
             Response response = client
                 .newCall(
                     new Request.Builder()
-                        .url("https://kick.com/login")
+                        .url(KickApi.API_BASE_URL + "/login")
                         .post(RequestBody.create(loginPayload.toString().getBytes(StandardCharsets.UTF_8), MediaType.get("application/json")))
                         .build()
                 ).execute()) {

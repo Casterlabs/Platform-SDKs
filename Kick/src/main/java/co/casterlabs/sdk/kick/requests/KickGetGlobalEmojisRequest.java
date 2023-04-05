@@ -10,6 +10,7 @@ import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.web.ApiException;
 import co.casterlabs.apiutil.web.WebRequest;
 import co.casterlabs.rakurai.json.Rson;
+import co.casterlabs.sdk.kick.KickApi;
 import co.casterlabs.sdk.kick.types.KickEmoji;
 import lombok.experimental.Accessors;
 import okhttp3.Request;
@@ -45,7 +46,7 @@ public class KickGetGlobalEmojisRequest extends WebRequest<List<KickEmoji>> {
     private static String getAppScriptUrl() throws IOException {
         String homepage = WebRequest.sendHttpRequest(
             new Request.Builder()
-                .url("https://kick.com"),
+                .url(KickApi.API_BASE_URL),
             null
         );
 

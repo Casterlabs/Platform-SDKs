@@ -6,6 +6,7 @@ import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.web.ApiException;
 import co.casterlabs.apiutil.web.WebRequest;
 import co.casterlabs.rakurai.json.Rson;
+import co.casterlabs.sdk.kick.KickApi;
 import co.casterlabs.sdk.kick.types.KickChannel;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -21,7 +22,7 @@ public class KickGetChannelRequest extends WebRequest<KickChannel> {
 
         String response = WebRequest.sendHttpRequest(
             new Request.Builder()
-                .url("https://kick.com/api/v1/channels/" + this.slug),
+                .url(KickApi.API_BASE_URL + "/api/v1/channels/" + this.slug),
             null
         );
 
