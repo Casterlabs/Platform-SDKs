@@ -18,26 +18,27 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 
 @Accessors(chain = true)
-public class KickSendChatMessageRequest extends AuthenticatedWebRequest<Void, KickAuth> {
+public class KickDeleteChatMessageRequest extends AuthenticatedWebRequest<Void, KickAuth> {
     private @Setter long chatRoomId = -1;
-    private @Setter String message;
+    private @Setter String messageId;
 
-    public KickSendChatMessageRequest(@NonNull KickAuth auth) {
+    public KickDeleteChatMessageRequest(@NonNull KickAuth auth) {
         super(auth);
     }
 
     @Override
     protected Void execute() throws ApiException, ApiAuthException, IOException {
-        assert this.chatRoomId != -1 : "You must specify a chat channel to send the message to.";
-        assert this.message != null : "You must specify a message to send.";
+        assert this.chatRoomId != -1 : "You must specify a chat channel.";
+        assert this.messageId != null : "You must specify a message ID to delete.";
 
         JsonObject payload = new JsonObject()
-            .put("chatroom_id", this.chatRoomId)
-            .put("message", this.message);
+            .put("id", this.messageId)
+            .put("deleted", true)
+            .put("chatroom_id", this.chatRoomId);
 
         WebRequest.sendHttpRequest(
             new Request.Builder()
-                .url(KickApi.API_BASE_URL + "/api/v1/chat-messages")
+                .url(KickApi.API_BASE_URL + "/api/v1/chat-messages/" + this.messageId)
                 .post(RequestBody.create(payload.toString().getBytes(StandardCharsets.UTF_8), MediaType.parse("application/json")))
                 .header("Accept", "application/json"),
             this.auth
