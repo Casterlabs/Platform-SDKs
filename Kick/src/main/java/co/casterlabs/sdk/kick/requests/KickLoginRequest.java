@@ -1,7 +1,6 @@
 package co.casterlabs.sdk.kick.requests;
 
 import java.io.IOException;
-import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 
 import org.jetbrains.annotations.Nullable;
@@ -36,50 +35,49 @@ public class KickLoginRequest extends WebRequest<String> {
         JsonObject tokenProvider = Rson.DEFAULT.fromJson(
             WebRequest.sendHttpRequest(
                 new Request.Builder()
-                    .url(KickApi.API_BASE_URL + "/kick-token-provider"),
+                    .url(KickApi.API_BASE_URL + "/kick-token-provider")
+                    .header("Accept", "application/json"),
                 null
             ),
             JsonObject.class
         );
 
+        // We're using the mobile login method. This seems fine as the mobile app uses
+        // the same API as desktop, and I am yet to find an endpoint that the mobile
+        // token can't authorize.
         JsonObject loginPayload = new JsonObject()
+            .put("isMobileRequest", true)
             .put("email", this.username)
             .put("password", this.password)
-            .put("one_time_password", this.oneTimePassword)
 
             // Token Provider Stuff
             .put(tokenProvider.getString("nameFieldName"), "")
             .put(tokenProvider.getString("validFromFieldName"), tokenProvider.get("encryptedValidFrom"));
 
+        if (this.oneTimePassword != null) {
+            loginPayload.put("one_time_password", this.oneTimePassword);
+        }
+
         try (
             Response response = client
                 .newCall(
                     new Request.Builder()
-                        .url(KickApi.API_BASE_URL + "/login")
-                        .post(RequestBody.create(loginPayload.toString().getBytes(StandardCharsets.UTF_8), MediaType.get("application/json")))
+                        .url(KickApi.API_BASE_URL + "/mobile/login")
+                        .post(RequestBody.create(loginPayload.toString().getBytes(StandardCharsets.UTF_8), MediaType.parse("application/json")))
+                        .header("Accept", "application/json")
                         .build()
                 ).execute()) {
-            if (response.code() != 204) {
-                String responseBody = response.body().string();
-                if (responseBody.contains("2fa_required")) {
-                    throw new ApiException("2FA");
-                }
+            JsonObject body = Rson.DEFAULT.fromJson(response.body().string(), JsonObject.class);
 
-                throw new ApiAuthException(responseBody);
+            if (body.containsKey("2fa_required") && body.getBoolean("2fa_required")) {
+                throw new ApiException("2FA");
             }
 
-            // Login successful, get the cookies.
-            for (String setCookieHeader : response.headers("Set-Cookie")) {
-                // We're looking for "kick_session-.......;"
-                if (!setCookieHeader.startsWith("kick_session=")) continue;
-
-                String token = setCookieHeader.substring("kick_session=".length(), setCookieHeader.indexOf(';'));
-                token = URLDecoder.decode(token, "UTF-8"); // Will be url-encoded.
-
-                return token;
+            if (body.containsKey("message")) {
+                throw new ApiException(body.getString("message"));
             }
 
-            throw new ApiException("No cookie header returned that matches what we're looking for.");
+            return body.getString("token");
         }
     }
 
