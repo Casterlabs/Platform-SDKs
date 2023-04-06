@@ -60,7 +60,7 @@ public class KickChannel {
     private long chatRoomId;
 
     @JsonDeserializationMethod("chatroom")
-    private void $deserialize_chatroomImage(JsonElement e) {
+    private void $deserialize_chatroomId(JsonElement e) {
         this.chatRoomId = e.getAsObject().getNumber("id").longValue();
     }
 
