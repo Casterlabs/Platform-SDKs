@@ -93,7 +93,6 @@ public class KickChannelRealtime implements Closeable {
                 return;
 
             case "App\\Events\\FollowersUpdated":
-                this.listener.onChannelLive(false);
                 JsonObject json = Rson.DEFAULT.fromJson(data, JsonObject.class);
                 this.listener.onFollowersCountUpdate(json.getNumber("followersCount").intValue());
                 return;
