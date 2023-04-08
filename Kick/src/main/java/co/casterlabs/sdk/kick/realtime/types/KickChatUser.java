@@ -80,6 +80,15 @@ public class KickChatUser {
         if (this.isVerified) {
             badges.add("https://raw.githubusercontent.com/Casterlabs/Platform-SDKs/main/Kick/Badges/Other/verified.svg");
         }
+        if (this.isSuperAdmin) {
+            badges.add("https://raw.githubusercontent.com/Casterlabs/Platform-SDKs/main/Kick/Badges/Other/isSuperAdmin.svg");
+        }
+        if (this.isFounder) {
+            badges.add("https://raw.githubusercontent.com/Casterlabs/Platform-SDKs/main/Kick/Badges/Other/is_founder.svg");
+        }
+        if (this.username.equalsIgnoreCase("TrainwrecksTV")) {
+            badges.add("https://raw.githubusercontent.com/Casterlabs/Platform-SDKs/main/Kick/Badges/Other/TrainwrecksTV.svg");
+        }
 
         return badges;
     }
