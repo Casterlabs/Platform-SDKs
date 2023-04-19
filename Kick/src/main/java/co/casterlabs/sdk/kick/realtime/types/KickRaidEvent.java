@@ -9,6 +9,6 @@ import lombok.ToString;
 @JsonClass(exposeAll = true)
 public class KickRaidEvent {
     private KickRaidMessage message;
-    private KickChatUser user;
+    private KickChatSender user;
 
 }

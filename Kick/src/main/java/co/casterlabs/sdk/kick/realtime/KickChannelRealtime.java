@@ -10,7 +10,6 @@ import com.pusher.client.connection.ConnectionState;
 import com.pusher.client.connection.ConnectionStateChange;
 
 import co.casterlabs.rakurai.json.Rson;
-import co.casterlabs.rakurai.json.element.JsonObject;
 import co.casterlabs.sdk.kick.KickApi;
 import co.casterlabs.sdk.kick.realtime.types.KickRaidEvent;
 import lombok.Getter;
@@ -92,10 +91,10 @@ public class KickChannelRealtime implements Closeable {
                 this.listener.onChannelLive(false);
                 return;
 
-            case "App\\Events\\FollowersUpdated":
-                JsonObject json = Rson.DEFAULT.fromJson(data, JsonObject.class);
-                this.listener.onFollowersCountUpdate(json.getNumber("followersCount").intValue());
-                return;
+//            case "App\\Events\\FollowersUpdated":
+//                JsonObject json = Rson.DEFAULT.fromJson(data, JsonObject.class);
+//                this.listener.onFollowersCountUpdate(json.getNumber("followersCount").intValue());
+//                return;
 
             case "App\\Events\\StreamHostedEvent":
                 this.listener.onRaid(

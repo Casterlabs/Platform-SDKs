@@ -13,7 +13,6 @@ import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.element.JsonObject;
 import co.casterlabs.sdk.kick.KickApi;
 import co.casterlabs.sdk.kick.realtime.types.KickChatEvent;
-import co.casterlabs.sdk.kick.realtime.types.KickReactionEvent;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.SneakyThrows;
@@ -91,17 +90,9 @@ public class KickChatRealtime implements Closeable {
                 );
                 return;
 
-            case "App\\Events\\ChatMessageReact": {
+            case "App\\Events\\MessageDeletedEvent": {
                 JsonObject json = Rson.DEFAULT.fromJson(data, JsonObject.class);
-                this.listener.onReaction(
-                    Rson.DEFAULT.fromJson(json.get("data"), KickReactionEvent.class)
-                );
-                return;
-            }
-
-            case "App\\Events\\ChatMessageDeletedEvent": {
-                JsonObject json = Rson.DEFAULT.fromJson(data, JsonObject.class);
-                this.listener.onDeleted(json.getObject("deletedMessage").getString("id"));
+                this.listener.onDeleted(json.getObject("message").getString("id"));
                 return;
             }
 
