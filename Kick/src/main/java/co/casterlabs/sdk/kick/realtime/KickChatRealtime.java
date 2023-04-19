@@ -65,7 +65,7 @@ public class KickChatRealtime implements Closeable {
             }
         }, ConnectionState.ALL);
 
-        this.pusher.subscribe("chatrooms." + this.chatRoomId)
+        this.pusher.subscribe("chatrooms." + this.chatRoomId + ".v2")
             .bindGlobal(this::onEvent);
 
         this.holdThread = new Thread(() -> {
