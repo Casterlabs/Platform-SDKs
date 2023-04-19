@@ -84,7 +84,7 @@ public class KickChatRealtime implements Closeable {
         this.logger.debug("%s: %s", type, data);
 
         switch (type) {
-            case "App\\Events\\ChatMessageSentEvent":
+            case "App\\Events\\ChatMessageEvent":
                 this.listener.onChat(
                     Rson.DEFAULT.fromJson(data, KickChatEvent.class)
                 );
