@@ -32,12 +32,12 @@ public class KickSendChatMessageRequest extends AuthenticatedWebRequest<Void, Ki
         assert this.message != null : "You must specify a message to send.";
 
         JsonObject payload = new JsonObject()
-            .put("type", "message")
+            .put("chatroom_id", this.chatRoomId)
             .put("message", this.message);
 
         WebRequest.sendHttpRequest(
             new Request.Builder()
-                .url(KickApi.API_BASE_URL + "/api/v2/messages/send/" + this.chatRoomId)
+                .url(KickApi.API_BASE_URL + "/api/v1/chat-messages")
                 .post(RequestBody.create(payload.toString().getBytes(StandardCharsets.UTF_8), MediaType.parse("application/json")))
                 .header("Accept", "application/json"),
             this.auth
