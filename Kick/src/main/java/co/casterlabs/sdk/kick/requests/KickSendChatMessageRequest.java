@@ -33,7 +33,7 @@ public class KickSendChatMessageRequest extends AuthenticatedWebRequest<Void, Ki
 
         JsonObject payload = new JsonObject()
             .put("type", "message")
-            .put("content", this.message);
+            .put("message", this.message);
 
         WebRequest.sendHttpRequest(
             new Request.Builder()
