@@ -14,4 +14,6 @@ public interface KickChannelListener {
 
     default void onRaid(KickRaidEvent raidEvent) {}
 
+    default void onRaidTarget(String slug) {}
+
 }
