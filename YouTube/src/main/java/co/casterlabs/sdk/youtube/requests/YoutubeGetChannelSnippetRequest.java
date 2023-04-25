@@ -87,6 +87,8 @@ public class YoutubeGetChannelSnippetRequest extends AuthenticatedWebRequest<You
                 snippet.put("id", item.get("id"));
 
                 return YoutubeApi.RSON.fromJson(snippet, YoutubeChannelSnippet.class);
+            } else if (response.code() == 401) {
+                throw new ApiAuthException(body);
             } else {
                 throw new ApiException(body);
             }

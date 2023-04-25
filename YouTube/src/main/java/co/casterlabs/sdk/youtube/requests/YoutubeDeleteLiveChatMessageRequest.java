@@ -39,6 +39,8 @@ public class YoutubeDeleteLiveChatMessageRequest extends AuthenticatedWebRequest
 
             if (response.isSuccessful()) {
                 return null;
+            } else if (response.code() == 401) {
+                throw new ApiAuthException(body);
             } else {
                 throw new ApiException(body);
             }

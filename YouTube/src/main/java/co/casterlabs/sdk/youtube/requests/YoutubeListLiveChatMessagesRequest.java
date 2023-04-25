@@ -50,6 +50,8 @@ public class YoutubeListLiveChatMessagesRequest extends AuthenticatedWebRequest<
                 json.put("isHistorical", this.pageToken == null);
 
                 return YoutubeApi.RSON.fromJson(json, YoutubeLiveChatMessagesList.class);
+            } else if (response.code() == 401) {
+                throw new ApiAuthException(body);
             } else {
                 throw new ApiException(body);
             }

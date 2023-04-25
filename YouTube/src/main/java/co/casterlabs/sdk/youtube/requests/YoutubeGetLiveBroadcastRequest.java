@@ -79,6 +79,8 @@ public class YoutubeGetLiveBroadcastRequest extends AuthenticatedWebRequest<Yout
                     .put("id", item.getString("id"));
 
                 return YoutubeApi.RSON.fromJson(item, YoutubeLiveBroadcastData.class);
+            } else if (response.code() == 401) {
+                throw new ApiAuthException(body);
             } else {
                 throw new ApiException(body);
             }

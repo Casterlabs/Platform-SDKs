@@ -58,6 +58,8 @@ public class YoutubeSearchForLiveBroadcastSnippet extends AuthenticatedWebReques
                     snippet,
                     YoutubeLiveBroadcastData.LiveBroadcastSnippet.class
                 );
+            } else if (response.code() == 401) {
+                throw new ApiAuthException(body);
             } else {
                 throw new ApiException(body);
             }
