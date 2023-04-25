@@ -15,7 +15,6 @@ import co.casterlabs.sdk.youtube.YoutubeAuth;
 import co.casterlabs.sdk.youtube.types.YoutubeChannelSnippet;
 import lombok.NonNull;
 import okhttp3.Response;
-import xyz.e3ndr.fastloggingframework.logging.FastLogger;
 
 public class YoutubeGetChannelSnippetRequest extends AuthenticatedWebRequest<YoutubeChannelSnippet, YoutubeAuth> {
     private int queryMode = -1; // id, handle, mine
@@ -81,7 +80,6 @@ public class YoutubeGetChannelSnippetRequest extends AuthenticatedWebRequest<You
 
             if (response.isSuccessful()) {
                 JsonObject json = Rson.DEFAULT.fromJson(body, JsonObject.class);
-                FastLogger.logStatic(json);
                 if (!json.containsKey("items")) {
                     throw new ApiException("Not found.");
                 }
