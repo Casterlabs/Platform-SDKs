@@ -9,3 +9,4 @@
 
 # Common
 target/
+*Test.java
