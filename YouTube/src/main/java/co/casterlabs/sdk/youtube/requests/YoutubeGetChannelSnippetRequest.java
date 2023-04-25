@@ -15,9 +15,10 @@ import co.casterlabs.sdk.youtube.YoutubeAuth;
 import co.casterlabs.sdk.youtube.types.YoutubeChannelSnippet;
 import lombok.NonNull;
 import okhttp3.Response;
+import xyz.e3ndr.fastloggingframework.logging.FastLogger;
 
 public class YoutubeGetChannelSnippetRequest extends AuthenticatedWebRequest<YoutubeChannelSnippet, YoutubeAuth> {
-    private int queryMode = -1; // id, username, mine
+    private int queryMode = -1; // id, handle, mine
     private String queryData = null;
 
     public YoutubeGetChannelSnippetRequest(@NonNull YoutubeAuth auth) {
@@ -30,9 +31,14 @@ public class YoutubeGetChannelSnippetRequest extends AuthenticatedWebRequest<You
         return this;
     }
 
-    public YoutubeGetChannelSnippetRequest byUsername(@NonNull String username) {
+    public YoutubeGetChannelSnippetRequest byHandle(@NonNull String username) {
+        if (username.startsWith("@")) {
+            username = username.substring(1);
+        }
+
         this.queryMode = 1;
         this.queryData = username;
+
         return this;
     }
 
@@ -75,6 +81,11 @@ public class YoutubeGetChannelSnippetRequest extends AuthenticatedWebRequest<You
 
             if (response.isSuccessful()) {
                 JsonObject json = Rson.DEFAULT.fromJson(body, JsonObject.class);
+                FastLogger.logStatic(json);
+                if (!json.containsKey("items")) {
+                    throw new ApiException("Not found.");
+                }
+
                 JsonArray items = json.getArray("items");
 
                 if (items.isEmpty()) {
