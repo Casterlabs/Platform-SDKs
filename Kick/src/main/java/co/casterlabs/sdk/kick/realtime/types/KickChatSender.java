@@ -4,7 +4,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import co.casterlabs.rakurai.json.annotating.JsonClass;
-import co.casterlabs.sdk.kick.realtime.types.KickChatSender.Identity.Badge;
 import lombok.Getter;
 import lombok.ToString;
 import xyz.e3ndr.fastloggingframework.logging.FastLogger;
@@ -29,13 +28,14 @@ public class KickChatSender {
         private String color;
         private List<Badge> badges;
 
-        @Getter
-        @ToString
-        @JsonClass(exposeAll = true)
-        public static class Badge {
-            private String type;
-            private String text;
-        }
+    }
+
+    @Getter
+    @ToString
+    @JsonClass(exposeAll = true)
+    public static class Badge {
+        private String type;
+        private String text;
     }
 
     /**
