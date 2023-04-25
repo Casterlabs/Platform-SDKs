@@ -72,7 +72,11 @@ public class YoutubeChatHelper {
             Thread.sleep(list.getPollingIntervalMillis());
         } catch (ApiException e) {
             this.shouldLoop = false;
-            if (e.getMessage().contains("The live chat that you are trying to retrieve cannot be found. Check the value of the request's")) {
+
+            String message = e.getMessage();
+
+            if (message.contains("The live chat that you are trying to retrieve cannot be found.") ||
+                message.contains("The live chat is no longer live.")) {
                 listener.onClose();
             } else {
                 listener.onError(e);
