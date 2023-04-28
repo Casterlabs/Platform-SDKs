@@ -15,4 +15,6 @@ public interface KickChatListener {
 
     default void onRaid(KickRaidEvent event) {}
 
+    default void onClear() {}
+
 }
