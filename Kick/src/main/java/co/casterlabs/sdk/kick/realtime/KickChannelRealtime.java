@@ -84,6 +84,11 @@ public class KickChannelRealtime implements Closeable {
         this.logger.debug("%s: %s", type, data);
 
         switch (type) {
+            case "App\\Events\\ChannelSubscriptionEvent":
+            case "App\\Events\\LuckyUsersWhoGotGiftSubscriptionsEvent":
+            case "App\\Events\\GiftsLeaderboardUpdated":
+                return;
+
             case "App\\Events\\StreamerIsLive":
                 this.listener.onChannelLive(true);
                 return;
@@ -92,21 +97,23 @@ public class KickChannelRealtime implements Closeable {
                 this.listener.onChannelLive(false);
                 return;
 
-            case "App\\Events\\FollowersUpdated":
-//                JsonObject json = Rson.DEFAULT.fromJson(data, JsonObject.class);
-//                this.listener.onFollowersCountUpdate(json.getNumber("followersCount").intValue());
+            case "App\\Events\\FollowersUpdated": {
+                JsonObject json = Rson.DEFAULT.fromJson(data, JsonObject.class);
+                this.listener.onFollowersCountUpdate(json.getNumber("followersCount").intValue());
                 return;
+            }
 
-            case "App\\Events\\StreamHostEvent ":
+            case "App\\Events\\StreamHostEvent":
                 this.listener.onRaid(
                     Rson.DEFAULT.fromJson(data, KickRaidEvent.class)
                 );
                 return;
 
-            case "App\\Events\\ChatMoveToSupportedChannelEvent":
+            case "App\\Events\\ChatMoveToSupportedChannelEvent": {
                 JsonObject json = Rson.DEFAULT.fromJson(data, JsonObject.class);
                 this.listener.onRaidTarget(json.getString("slug"));
                 return;
+            }
 
             default:
                 this.logger.warn("Unrecognized type: %s %s", type, data);

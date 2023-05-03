@@ -107,14 +107,20 @@ public class KickPrivateChannelRealtime implements Closeable {
 
         switch (type) {
 
+            case "App\\Events\\NewSubscriberUpdatedEvent":
             case "App\\Events\\StartStream":
+            case "App\\Events\\StopStreamBroadcast":
                 return;
+
+            // TODO:
+            // App\Events\NewActivityFeedEvent
+            // {"channel_id":1234,"type":"new_subscriber","username":"xxxx","metadata":[],"created_at":0}
+            // App\Events\NewActivityFeedEvent
+            // {"channel_id":1234,"type":"gift","username":"xxxx","metadata":{"quantity":123},"created_at":0}
 
             case "App\\Events\\FollowersUpdatedForChannelOwner":
                 JsonObject json = Rson.DEFAULT.fromJson(data, JsonObject.class);
-                if (!json.get("username").isJsonNull()) {
-                    this.listener.onFollow(json.getString("username"), json.getBoolean("followed"));
-                }
+                this.listener.onFollow(json.getString("username"), json.getBoolean("followed"));
                 this.listener.onFollowersCountUpdate(json.getNumber("followersCount").intValue());
                 return;
 

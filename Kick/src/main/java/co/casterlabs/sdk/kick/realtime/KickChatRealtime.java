@@ -91,6 +91,21 @@ public class KickChatRealtime implements Closeable {
                 );
                 return;
 
+            case "App\\Events\\SubscriptionEvent": {
+                JsonObject json = Rson.DEFAULT.fromJson(data, JsonObject.class);
+                this.listener.onSubscription(json.getString("username"), json.getNumber("months").intValue());
+                return;
+            }
+
+            case "App\\Events\\GiftedSubscriptionsEvent": {
+                JsonObject json = Rson.DEFAULT.fromJson(data, JsonObject.class);
+                String gifter = json.getString("gifter_username");
+                String[] giftRecipients = Rson.DEFAULT.fromJson(json.get("gifted_usernames"), String[].class);
+
+                this.listener.onGiftSubscriptions(giftRecipients, gifter);
+                return;
+            }
+
             case "App\\Events\\MessageDeletedEvent": {
                 JsonObject json = Rson.DEFAULT.fromJson(data, JsonObject.class);
                 this.listener.onDeleted(json.getObject("message").getString("id"));

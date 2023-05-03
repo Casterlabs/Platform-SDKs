@@ -17,4 +17,8 @@ public interface KickChatListener {
 
     default void onClear() {}
 
+    default void onSubscription(String username, int months) {}
+
+    default void onGiftSubscriptions(String[] giftRecipients, String gifter) {}
+
 }
