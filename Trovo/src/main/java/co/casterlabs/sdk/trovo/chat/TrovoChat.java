@@ -154,7 +154,7 @@ public class TrovoChat implements Closeable {
                     if (listener != null) {
                         JsonObject data = message.getObject("data");
 
-                        if (data.get("chats").isJsonNull()) {
+                        if (!data.containsKey("chats") || data.get("chats").isJsonNull()) {
                             return;
                         }
 
