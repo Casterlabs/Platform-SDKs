@@ -97,7 +97,7 @@ public class KickChatRealtime implements Closeable {
                 return;
             }
 
-            case "App\\Events\\ChroomClearEvent":
+            case "App\\Events\\ChatroomClearEvent":
                 this.listener.onClear();
                 return;
 
