@@ -116,7 +116,7 @@ public class KickChatRealtime implements Closeable {
                 this.listener.onClear();
                 return;
 
-            case "App\\Events\\StreamHostEvent ":
+            case "App\\Events\\StreamHostEvent":
                 this.listener.onRaid(
                     Rson.DEFAULT.fromJson(data, KickRaidEvent.class)
                 );
