@@ -6,8 +6,6 @@ public interface KickPrivateChannelListener {
 
     default void onClose() {}
 
-    default void onFollowersCountUpdate(int newFollowersCount) {}
-
     default void onFollow(String username, boolean isFollowing) {}
 
 }

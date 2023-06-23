@@ -87,6 +87,7 @@ public class KickChannelRealtime implements Closeable {
             case "App\\Events\\ChannelSubscriptionEvent":
             case "App\\Events\\LuckyUsersWhoGotGiftSubscriptionsEvent":
             case "App\\Events\\GiftsLeaderboardUpdated":
+            case "App\\Events\\FollowersUpdated":
                 return;
 
             case "App\\Events\\StreamerIsLive":
@@ -96,12 +97,6 @@ public class KickChannelRealtime implements Closeable {
             case "App\\Events\\StopStreamBroadcast":
                 this.listener.onChannelLive(false);
                 return;
-
-            case "App\\Events\\FollowersUpdated": {
-                JsonObject json = Rson.DEFAULT.fromJson(data, JsonObject.class);
-                this.listener.onFollowersCountUpdate(json.getNumber("followersCount").intValue());
-                return;
-            }
 
             case "App\\Events\\StreamHostEvent":
                 this.listener.onRaid(

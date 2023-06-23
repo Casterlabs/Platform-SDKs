@@ -10,8 +10,6 @@ public interface KickChannelListener {
 
     default void onChannelLive(boolean isLive) {}
 
-    default void onFollowersCountUpdate(int newFollowersCount) {}
-
     default void onRaid(KickRaidEvent raidEvent) {}
 
     default void onRaidTarget(String slug) {}
