@@ -1,26 +1,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>co.casterlabs</groupId>
-	<artifactId>Platform-SDKs</artifactId>
-	<version>2.0.0</version>
-	<packaging>pom</packaging>
+	<artifactId>YouNow</artifactId>
 
-	<modules>
-		<module>_Base</module>
-
-		<module>Caffeine</module>
-		<module>Twitch</module>
-		<module>Trovo</module>
-		<module>Zoho</module>
-		<module>Glimesh</module>
-		<module>Brime</module>
-		<module>YouTube</module>
-		<module>TikTok</module>
-		<module>DLive</module>
-		<module>Theta</module>
-		<module>Kick</module>
-		<module>YouNow</module>
-	</modules>
+	<parent>
+		<groupId>co.casterlabs</groupId>
+		<artifactId>Platform-SDKs</artifactId>
+		<version>2.0.0</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -29,6 +16,24 @@
 
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>3.2.1</version>
+				<executions>
+					<execution>
+						<id>shade</id>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<shadedArtifactAttached>true</shadedArtifactAttached>
+					<finalName>${project.name}</finalName>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -59,17 +64,17 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<version>1.18.12</version>
-			<scope>provided</scope>
+			<groupId>co.casterlabs</groupId>
+			<artifactId>_Base</artifactId>
+			<version>${project.parent.version}</version>
+			<scope>compile</scope>
 		</dependency>
+
 		<dependency>
-			<!-- For Eclipse users -->
-			<groupId>org.jetbrains</groupId>
-			<artifactId>annotations</artifactId>
-			<version>20.1.0</version>
-			<scope>provided</scope>
+			<groupId>com.squareup.okhttp3</groupId>
+			<artifactId>okhttp</artifactId>
+			<version>4.10.0</version>
+			<scope>compile</scope>
 		</dependency>
 	</dependencies>
 </project>
