@@ -1,9 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18">
-	<g clip-path="url(#clip0_5681_210749)">
-		<path fill="#FFAE00" d="M0 13.5L4.5 18H13.5L18 13.5V4.5L13.5 0H4.5L0 4.5V13.5Z" />
-		<path fill="#FFD273" d="M12.375 2.25H5.625L4.5 0L0 4.5L2.25 5.625V12.375L5.625 15.75H12.375L15.75 12.375V5.625L12.375 2.25Z" />
-		<path fill="black" d="M11.8125 12.375V3.375H7.3125L5.0625 5.625V7.875H7.3125V12.375H5.0625V14.625H14.0625V12.375H11.8125Z" />
-		<path fill="#663D00" d="M7.3125 10.125V12.375H5.0625V14.625H7.3125L11.8125 10.125V5.625L7.3125 10.125Z" />
-		<path fill="#663D00" d="M5.0625 7.875L9.5625 3.375H7.3125L5.0625 5.625V7.875Z" />
-	</g>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" x="0px" y="0px" viewBox="0 0 16 16" xml:space="preserve" width="16" height="16">
+	<linearGradient id="badge-founder-gradient" gradientUnits="userSpaceOnUse" x1="7.874" y1="20.2333" x2="8.1274" y2="-0.3467" gradientTransform="matrix(1 0 0 -1 0 18)">
+		<stop offset="0" style="stop-color: rgb(255, 201, 0);"></stop>
+		<stop offset="0.99" style="stop-color: rgb(255, 149, 0);"></stop>
+	</linearGradient>
+	<path d=" M14.6,4V2.7h-1.3V1.4H12V0H4v1.4H2.7v1.3H1.3V4H0v8h1.3v1.3h1.4v1.3H4V16h8v-1.4h1.3v-1.3h1.3V12H16V4H14.6z M9.9,12.9H6.7V6.4H4.5 V5.2h1V4.1h1v-1h3.4V12.9z" style="fill-rule: evenodd; clip-rule: evenodd; fill: url(&quot;#badge-founder-gradient&quot;);"></path>
 </svg>

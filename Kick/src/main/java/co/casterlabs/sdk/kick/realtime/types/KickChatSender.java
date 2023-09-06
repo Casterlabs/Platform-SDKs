@@ -78,6 +78,11 @@ public class KickChatSender {
                     badges.add("https://raw.githubusercontent.com/Casterlabs/Platform-SDKs/main/Kick/Badges/subscriber.svg");
                     break;
 
+                case "sub_gifter":
+                    // TODO detect if they are gifter level 1 or 2.
+                    badges.add("https://raw.githubusercontent.com/Casterlabs/Platform-SDKs/main/Kick/Badges/sub_gifter_1.svg");
+                    break;
+
                 default:
                     FastLogger.logStatic(LogLevel.WARNING, "Unknown badge type: %s ('%s')", badge.type, badge.text);
                     break;
