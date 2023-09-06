@@ -19,7 +19,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @JsonClass(exposeAll = true)
 public class HelixFollower {
-    @JsonField("from_id")
+    @JsonField("user_id")
     private @NonNull String id;
 
     @JsonField("followed_at")

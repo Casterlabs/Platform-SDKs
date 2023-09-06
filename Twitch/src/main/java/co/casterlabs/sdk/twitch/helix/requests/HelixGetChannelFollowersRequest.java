@@ -13,7 +13,7 @@ import co.casterlabs.rakurai.json.element.JsonObject;
 import co.casterlabs.sdk.twitch.HttpUtil;
 import co.casterlabs.sdk.twitch.TwitchApi;
 import co.casterlabs.sdk.twitch.helix.TwitchHelixAuth;
-import co.casterlabs.sdk.twitch.helix.requests.HelixGetUserFollowersRequest.HelixFollowersResult;
+import co.casterlabs.sdk.twitch.helix.requests.HelixGetChannelFollowersRequest.HelixFollowersResult;
 import co.casterlabs.sdk.twitch.helix.types.HelixFollower;
 import co.casterlabs.sdk.twitch.helix.types.HelixUser;
 import lombok.AllArgsConstructor;
@@ -25,16 +25,16 @@ import lombok.experimental.Accessors;
 import okhttp3.Response;
 
 @Accessors(chain = true)
-public class HelixGetUserFollowersRequest extends AuthenticatedWebRequest<HelixFollowersResult, TwitchHelixAuth> {
+public class HelixGetChannelFollowersRequest extends AuthenticatedWebRequest<HelixFollowersResult, TwitchHelixAuth> {
     private @Setter boolean getAll = false;
     private @Setter int first = 20;
     private @Setter @NonNull String id;
 
-    public HelixGetUserFollowersRequest(@NonNull TwitchHelixAuth auth) {
+    public HelixGetChannelFollowersRequest(@NonNull TwitchHelixAuth auth) {
         super(auth);
     }
 
-    public HelixGetUserFollowersRequest setUser(@NonNull HelixUser user) {
+    public HelixGetChannelFollowersRequest setUser(@NonNull HelixUser user) {
         this.id = user.getId();
         return this;
     }
@@ -48,7 +48,7 @@ public class HelixGetUserFollowersRequest extends AuthenticatedWebRequest<HelixF
 
         String after = "";
         do {
-            String url = String.format("https://api.twitch.tv/helix/users/follows?first=%d&to_id=%s&after=%s", this.first, this.id, after);
+            String url = String.format("https://api.twitch.tv/helix/channels/followers?first=%d&broadcaster_id=%s&after=%s", this.first, this.id, after);
 
             try (Response response = HttpUtil.sendHttpGet(url, null, this.auth)) {
                 JsonObject json = TwitchApi.RSON.fromJson(response.body().string(), JsonObject.class);
