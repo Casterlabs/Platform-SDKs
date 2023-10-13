@@ -1,4 +1,4 @@
-package co.casterlabs.sdk.twitch.thirdparty.requests;
+package co.casterlabs.sdk.twitch.thirdparty;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -8,11 +8,14 @@ import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.web.ApiException;
 import co.casterlabs.apiutil.web.WebRequest;
 import co.casterlabs.rakurai.json.Rson;
+import co.casterlabs.rakurai.json.annotating.JsonClass;
 import co.casterlabs.rakurai.json.element.JsonArray;
 import co.casterlabs.rakurai.json.element.JsonElement;
 import co.casterlabs.rakurai.json.element.JsonObject;
 import co.casterlabs.sdk.twitch.HttpUtil;
-import co.casterlabs.sdk.twitch.thirdparty.types.TwitchGame;
+import co.casterlabs.sdk.twitch.thirdparty.ThirdPartyGetAllGamesRequest.TwitchGame;
+import lombok.Getter;
+import lombok.ToString;
 import okhttp3.Response;
 
 /**
@@ -48,6 +51,27 @@ public class ThirdPartyGetAllGamesRequest extends WebRequest<List<TwitchGame>> {
                 throw new ApiException("Unable to get all games: " + response.body().string());
             }
         }
+    }
+
+    @Getter
+    @ToString
+    @JsonClass(exposeAll = true)
+    public static class TwitchGame {
+        private String id;
+        private String name;
+        private String boxArtUrl;
+
+        public TwitchGame(String id, String name) {
+            this.id = id;
+            this.name = name;
+
+            // We gotta make the box art url ourselves.
+            final int width = 288;
+            final int height = 384;
+
+            this.boxArtUrl = "https://static-cdn.jtvnw.net/ttv-boxart/" + this.id + "_IGDB-" + width + "x" + height + ".jpg";
+        }
+
     }
 
 }
