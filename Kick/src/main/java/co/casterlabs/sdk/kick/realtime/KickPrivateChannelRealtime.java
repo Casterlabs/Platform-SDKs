@@ -18,7 +18,6 @@ import co.casterlabs.sdk.kick.KickAuth;
 import co.casterlabs.sdk.kick.requests.KickGetPusherTokenRequest;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.SneakyThrows;
 import xyz.e3ndr.fastloggingframework.logging.FastLogger;
 
 public class KickPrivateChannelRealtime implements Closeable {
@@ -99,33 +98,36 @@ public class KickPrivateChannelRealtime implements Closeable {
         this.holdThread.start();
     }
 
-    @SneakyThrows
     private void onEvent(PusherEvent event) {
         String type = event.getEventName();
         String data = event.getData();
         this.logger.debug("%s: %s", type, data);
 
-        switch (type) {
+        try {
+            switch (type) {
 
-            case "App\\Events\\NewSubscriberUpdatedEvent":
-            case "App\\Events\\StartStream":
-            case "App\\Events\\StopStreamBroadcast":
-                return;
+                case "App\\Events\\NewSubscriberUpdatedEvent":
+                case "App\\Events\\StartStream":
+                case "App\\Events\\StopStreamBroadcast":
+                    return;
 
-            // TODO:
-            // App\Events\NewActivityFeedEvent
-            // {"channel_id":1234,"type":"new_subscriber","username":"xxxx","metadata":[],"created_at":0}
-            // App\Events\NewActivityFeedEvent
-            // {"channel_id":1234,"type":"gift","username":"xxxx","metadata":{"quantity":123},"created_at":0}
+                // TODO:
+                // App\Events\NewActivityFeedEvent
+                // {"channel_id":1234,"type":"new_subscriber","username":"xxxx","metadata":[],"created_at":0}
+                // App\Events\NewActivityFeedEvent
+                // {"channel_id":1234,"type":"gift","username":"xxxx","metadata":{"quantity":123},"created_at":0}
 
-            case "App\\Events\\FollowersUpdatedForChannelOwner":
-                JsonObject json = Rson.DEFAULT.fromJson(data, JsonObject.class);
-                this.listener.onFollow(json.getString("username"), json.getBoolean("followed"));
-                return;
+                case "App\\Events\\FollowersUpdatedForChannelOwner":
+                    JsonObject json = Rson.DEFAULT.fromJson(data, JsonObject.class);
+                    this.listener.onFollow(json.getString("username"), json.getBoolean("followed"));
+                    return;
 
-            default:
-                this.logger.warn("Unrecognized type: %s %s", type, data);
-                return;
+                default:
+                    this.logger.warn("Unrecognized type: %s %s", type, data);
+                    return;
+            }
+        } catch (Throwable e) {
+            this.logger.severe("An error occurred whilst handling event: %s %s\n%s", type, data, e);
         }
     }
 

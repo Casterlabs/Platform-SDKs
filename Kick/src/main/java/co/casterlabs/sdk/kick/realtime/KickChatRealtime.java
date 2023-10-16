@@ -16,7 +16,6 @@ import co.casterlabs.sdk.kick.realtime.types.KickChatEvent;
 import co.casterlabs.sdk.kick.realtime.types.KickRaidEvent;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.SneakyThrows;
 import xyz.e3ndr.fastloggingframework.logging.FastLogger;
 
 public class KickChatRealtime implements Closeable {
@@ -78,53 +77,56 @@ public class KickChatRealtime implements Closeable {
         this.holdThread.start();
     }
 
-    @SneakyThrows
     private void onEvent(PusherEvent event) {
         String type = event.getEventName();
         String data = event.getData();
         this.logger.debug("%s: %s", type, data);
 
-        switch (type) {
-            case "App\\Events\\ChatMessageEvent":
-                this.listener.onChat(
-                    Rson.DEFAULT.fromJson(data, KickChatEvent.class)
-                );
-                return;
+        try {
+            switch (type) {
+                case "App\\Events\\ChatMessageEvent":
+                    this.listener.onChat(
+                        Rson.DEFAULT.fromJson(data, KickChatEvent.class)
+                    );
+                    return;
 
-            case "App\\Events\\SubscriptionEvent": {
-                JsonObject json = Rson.DEFAULT.fromJson(data, JsonObject.class);
-                this.listener.onSubscription(json.getString("username"), json.getNumber("months").intValue());
-                return;
+                case "App\\Events\\SubscriptionEvent": {
+                    JsonObject json = Rson.DEFAULT.fromJson(data, JsonObject.class);
+                    this.listener.onSubscription(json.getString("username"), json.getNumber("months").intValue());
+                    return;
+                }
+
+                case "App\\Events\\GiftedSubscriptionsEvent": {
+                    JsonObject json = Rson.DEFAULT.fromJson(data, JsonObject.class);
+                    String gifter = json.getString("gifter_username");
+                    String[] giftRecipients = Rson.DEFAULT.fromJson(json.get("gifted_usernames"), String[].class);
+
+                    this.listener.onGiftSubscriptions(giftRecipients, gifter);
+                    return;
+                }
+
+                case "App\\Events\\MessageDeletedEvent": {
+                    JsonObject json = Rson.DEFAULT.fromJson(data, JsonObject.class);
+                    this.listener.onDeleted(json.getObject("message").getString("id"));
+                    return;
+                }
+
+                case "App\\Events\\ChatroomClearEvent":
+                    this.listener.onClear();
+                    return;
+
+                case "App\\Events\\StreamHostEvent":
+                    this.listener.onRaid(
+                        Rson.DEFAULT.fromJson(data, KickRaidEvent.class)
+                    );
+                    return;
+
+                default:
+                    this.logger.warn("Unrecognized type: %s %s", type, data);
+                    return;
             }
-
-            case "App\\Events\\GiftedSubscriptionsEvent": {
-                JsonObject json = Rson.DEFAULT.fromJson(data, JsonObject.class);
-                String gifter = json.getString("gifter_username");
-                String[] giftRecipients = Rson.DEFAULT.fromJson(json.get("gifted_usernames"), String[].class);
-
-                this.listener.onGiftSubscriptions(giftRecipients, gifter);
-                return;
-            }
-
-            case "App\\Events\\MessageDeletedEvent": {
-                JsonObject json = Rson.DEFAULT.fromJson(data, JsonObject.class);
-                this.listener.onDeleted(json.getObject("message").getString("id"));
-                return;
-            }
-
-            case "App\\Events\\ChatroomClearEvent":
-                this.listener.onClear();
-                return;
-
-            case "App\\Events\\StreamHostEvent":
-                this.listener.onRaid(
-                    Rson.DEFAULT.fromJson(data, KickRaidEvent.class)
-                );
-                return;
-
-            default:
-                this.logger.warn("Unrecognized type: %s %s", type, data);
-                return;
+        } catch (Throwable e) {
+            this.logger.severe("An error occurred whilst handling event: %s %s\n%s", type, data, e);
         }
     }
 

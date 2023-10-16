@@ -15,7 +15,6 @@ import co.casterlabs.sdk.kick.KickApi;
 import co.casterlabs.sdk.kick.realtime.types.KickRaidEvent;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.SneakyThrows;
 import xyz.e3ndr.fastloggingframework.logging.FastLogger;
 
 public class KickChannelRealtime implements Closeable {
@@ -77,42 +76,45 @@ public class KickChannelRealtime implements Closeable {
         this.holdThread.start();
     }
 
-    @SneakyThrows
     private void onEvent(PusherEvent event) {
         String type = event.getEventName();
         String data = event.getData();
         this.logger.debug("%s: %s", type, data);
 
-        switch (type) {
-            case "App\\Events\\ChannelSubscriptionEvent":
-            case "App\\Events\\LuckyUsersWhoGotGiftSubscriptionsEvent":
-            case "App\\Events\\GiftsLeaderboardUpdated":
-            case "App\\Events\\FollowersUpdated":
-                return;
+        try {
+            switch (type) {
+                case "App\\Events\\ChannelSubscriptionEvent":
+                case "App\\Events\\LuckyUsersWhoGotGiftSubscriptionsEvent":
+                case "App\\Events\\GiftsLeaderboardUpdated":
+                case "App\\Events\\FollowersUpdated":
+                    return;
 
-            case "App\\Events\\StreamerIsLive":
-                this.listener.onChannelLive(true);
-                return;
+                case "App\\Events\\StreamerIsLive":
+                    this.listener.onChannelLive(true);
+                    return;
 
-            case "App\\Events\\StopStreamBroadcast":
-                this.listener.onChannelLive(false);
-                return;
+                case "App\\Events\\StopStreamBroadcast":
+                    this.listener.onChannelLive(false);
+                    return;
 
-            case "App\\Events\\StreamHostEvent":
-                this.listener.onRaid(
-                    Rson.DEFAULT.fromJson(data, KickRaidEvent.class)
-                );
-                return;
+                case "App\\Events\\StreamHostEvent":
+                    this.listener.onRaid(
+                        Rson.DEFAULT.fromJson(data, KickRaidEvent.class)
+                    );
+                    return;
 
-            case "App\\Events\\ChatMoveToSupportedChannelEvent": {
-                JsonObject json = Rson.DEFAULT.fromJson(data, JsonObject.class);
-                this.listener.onRaidTarget(json.getString("slug"));
-                return;
+                case "App\\Events\\ChatMoveToSupportedChannelEvent": {
+                    JsonObject json = Rson.DEFAULT.fromJson(data, JsonObject.class);
+                    this.listener.onRaidTarget(json.getString("slug"));
+                    return;
+                }
+
+                default:
+                    this.logger.warn("Unrecognized type: %s %s", type, data);
+                    return;
             }
-
-            default:
-                this.logger.warn("Unrecognized type: %s %s", type, data);
-                return;
+        } catch (Throwable e) {
+            this.logger.severe("An error occurred whilst handling event: %s %s\n%s", type, data, e);
         }
     }
 
