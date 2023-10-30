@@ -7,6 +7,7 @@ import co.casterlabs.sdk.youtube.types.YoutubeLiveChatMessagesList;
 import co.casterlabs.sdk.youtube.types.livechat.YoutubeLiveChatEvent;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 
 public class YoutubeChatHelper {
     private @Getter String liveChatId;
@@ -16,6 +17,8 @@ public class YoutubeChatHelper {
     private Thread thread;
     private boolean shouldLoop = true;
     private String paginationToken = null;
+
+    private @Setter double pollingMultiple = 1;
 
     public YoutubeChatHelper(@NonNull String liveChatId, @NonNull YoutubeAuth auth, @NonNull YoutubeChatListener listener) {
         this.liveChatId = liveChatId;
@@ -39,37 +42,42 @@ public class YoutubeChatHelper {
                 .setPageToken(this.paginationToken)
                 .send();
 
+            long referencePoint = Long.MAX_VALUE;
+
             if (list.isHistorical()) {
                 this.listener.onHistory(list.getEvents());
             } else {
-                // New thread for the easing code, since messages are polled.
-                new Thread(() -> {
-                    try {
-                        long referencePoint = Long.MAX_VALUE;
+                try {
+                    for (YoutubeLiveChatEvent event : list.getEvents()) {
+                        // Get the timestamp of the event, compare it to the last message timestamp,
+                        // then wait for the difference to help ease the sudden influx of messages.
+                        // This atmost delays messages by 2s and is normally ~1s.
+                        long publishedAt = event.getEvent().getPublishedAt().toEpochMilli();
+                        long timeBetweenPollAndPublish = publishedAt - referencePoint;
+                        referencePoint = publishedAt;
 
-                        for (YoutubeLiveChatEvent event : list.getEvents()) {
-                            // Get the timestamp of the event, compare it to the last message timestamp,
-                            // then wait for the difference to help ease the sudden influx of messages.
-                            // This atmost delays messages by 2s and is normally ~1s.
-                            long publishedAt = event.getEvent().getPublishedAt().toEpochMilli();
-                            long timeBetweenPollAndPublish = publishedAt - referencePoint;
-                            referencePoint = publishedAt;
-
-                            if (timeBetweenPollAndPublish > 0) {
-                                Thread.sleep(timeBetweenPollAndPublish);
-                            }
-
-                            this.listener.onEvent(event);
+                        if (timeBetweenPollAndPublish > 0) {
+                            Thread.sleep(timeBetweenPollAndPublish);
                         }
-                    } catch (Throwable t) {
-                        this.shouldLoop = false;
-                        listener.onError(t);
+
+                        this.listener.onEvent(event);
                     }
-                }).start();
+                } catch (Throwable t) {
+                    this.shouldLoop = false;
+                    listener.onError(t);
+                }
             }
 
             this.paginationToken = list.getNextPageToken();
-            Thread.sleep(list.getPollingIntervalMillis());
+
+            long desiredInterval = (long) (list.getPollingIntervalMillis() * this.pollingMultiple);
+            long elapsed = System.currentTimeMillis() - referencePoint;
+
+            desiredInterval -= elapsed;
+
+            if (desiredInterval > 0) {
+                Thread.sleep(desiredInterval);
+            }
         } catch (ApiException e) {
             this.shouldLoop = false;
 
