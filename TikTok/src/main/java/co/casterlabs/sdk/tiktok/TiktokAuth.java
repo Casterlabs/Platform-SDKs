@@ -10,7 +10,7 @@ import lombok.SneakyThrows;
 import okhttp3.Request.Builder;
 
 public class TiktokAuth extends OAuthProvider {
-    private static final String TOKEN_ENDPOINT = "https://www.tiktok.com/auth/authorize";
+    private static final String TOKEN_ENDPOINT = "https://www.tiktok.com/v2/auth/authorize";
     private static final OAuthStrategy STRATEGY = new TiktokOAuthStrategy();
 
     public TiktokAuth(@NonNull String clientId, @NonNull String clientSecret, @NonNull String refreshToken, @NonNull String redirectUri) throws ApiAuthException {
