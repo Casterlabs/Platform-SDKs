@@ -19,7 +19,7 @@ public class KickChatReplyMeta {
     @ToString
     @JsonClass(exposeAll = true)
     public static class OriginalSender {
-        private String id;
+        private long id;
         private String username;
     }
 
