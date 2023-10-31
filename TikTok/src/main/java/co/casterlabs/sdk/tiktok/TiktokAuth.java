@@ -13,8 +13,8 @@ public class TiktokAuth extends OAuthProvider {
     private static final String TOKEN_ENDPOINT = "https://www.tiktok.com/v2/auth/authorize";
     private static final OAuthStrategy STRATEGY = new TiktokOAuthStrategy();
 
-    public TiktokAuth(@NonNull String clientId, @NonNull String clientSecret, @NonNull String refreshToken, @NonNull String redirectUri) throws ApiAuthException {
-        super(STRATEGY, clientId, clientSecret, refreshToken, redirectUri);
+    public TiktokAuth(@NonNull String clientId, @NonNull String clientSecret, @NonNull String refreshToken) throws ApiAuthException {
+        super(STRATEGY, clientId, clientSecret, refreshToken, "");
     }
 
     @SneakyThrows

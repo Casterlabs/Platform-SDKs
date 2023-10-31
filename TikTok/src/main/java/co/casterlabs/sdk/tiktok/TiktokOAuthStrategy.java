@@ -1,10 +1,9 @@
 package co.casterlabs.sdk.tiktok;
 
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Map.Entry;
 
 import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.auth.OAuthProvider.OAuthResponse;
@@ -12,15 +11,15 @@ import co.casterlabs.apiutil.auth.OAuthStrategy;
 import co.casterlabs.apiutil.web.WebRequest;
 import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.element.JsonObject;
-import okhttp3.MediaType;
+import okhttp3.FormBody;
 import okhttp3.Request;
-import okhttp3.RequestBody;
+import xyz.e3ndr.fastloggingframework.logging.FastLogger;
 
 public class TiktokOAuthStrategy implements OAuthStrategy {
 
     @Override
     public OAuthResponse codeGrant(String _1, String code, String redirectUri, String clientId, String clientSecret) throws ApiAuthException {
-        String url = "https://open.tiktokapis.com/v2/oauth/token";
+        String url = "https://open.tiktokapis.com/v2/oauth/token/";
 
         Map<String, String> body = new HashMap<>();
         body.put("grant_type", "authorization_code");
@@ -34,7 +33,7 @@ public class TiktokOAuthStrategy implements OAuthStrategy {
             checkAndThrow(json);
 
             return Rson.DEFAULT.fromJson(
-                json.getObject("data"),
+                json,
                 OAuthResponse.class
             );
         } catch (IOException e) {
@@ -44,21 +43,20 @@ public class TiktokOAuthStrategy implements OAuthStrategy {
 
     @Override
     public OAuthResponse refresh(String _1, String refreshToken, String redirectUri, String clientId, String clientSecret) throws ApiAuthException {
-        String url = "https://open.tiktokapis.com/v2/oauth/token";
+        String url = "https://open.tiktokapis.com/v2/oauth/token/";
 
         Map<String, String> body = new HashMap<>();
         body.put("grant_type", "refresh_token");
         body.put("refresh_token", refreshToken);
         body.put("client_key", clientId);
         body.put("client_secret", clientSecret);
-//        body.put("redirect_uri", redirectUri);
 
         try {
             JsonObject json = sendAuthHttp(body, url);
             checkAndThrow(json);
 
             OAuthResponse data = Rson.DEFAULT.fromJson(
-                json.getObject("data"),
+                json,
                 OAuthResponse.class
             );
 
@@ -68,23 +66,20 @@ public class TiktokOAuthStrategy implements OAuthStrategy {
         }
     }
 
-    @SuppressWarnings("deprecation")
     protected static JsonObject sendAuthHttp(Map<String, String> body, String url) throws IOException {
+        FormBody.Builder form = new FormBody.Builder();
+        for (Entry<String, String> entry : body.entrySet()) {
+            form.addEncoded(entry.getKey(), entry.getValue());
+        }
+
         String response = WebRequest.sendHttpRequest(
             new Request.Builder()
                 .url(url)
-                .post(
-                    RequestBody.create(
-                        body
-                            .entrySet()
-                            .stream()
-                            .map((e) -> URLEncoder.encode(e.getKey()) + "=" + URLEncoder.encode(e.getValue()))
-                            .collect(Collectors.joining("&")),
-                        MediaType.get("application/x-www-form-urlencoded")
-                    )
-                ),
+                .post(form.build()),
             null
         );
+
+        FastLogger.logStatic(response);
 
         return Rson.DEFAULT.fromJson(response, JsonObject.class);
     }
