@@ -13,7 +13,6 @@ import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.element.JsonObject;
 import okhttp3.FormBody;
 import okhttp3.Request;
-import xyz.e3ndr.fastloggingframework.logging.FastLogger;
 
 public class TiktokOAuthStrategy implements OAuthStrategy {
 
@@ -78,8 +77,6 @@ public class TiktokOAuthStrategy implements OAuthStrategy {
                 .post(form.build()),
             null
         );
-
-        FastLogger.logStatic(response);
 
         return Rson.DEFAULT.fromJson(response, JsonObject.class);
     }
