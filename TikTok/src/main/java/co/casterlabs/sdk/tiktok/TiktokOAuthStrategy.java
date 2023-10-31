@@ -2,6 +2,7 @@ package co.casterlabs.sdk.tiktok;
 
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -20,13 +21,13 @@ public class TiktokOAuthStrategy implements OAuthStrategy {
     @Override
     public OAuthResponse codeGrant(String _1, String code, String redirectUri, String clientId, String clientSecret) throws ApiAuthException {
         String url = "https://open.tiktokapis.com/v2/oauth/token";
-        Map<String, String> body = Map.of(
-            "grant_type", "authorization_code",
-            "code", code,
-            "client_key", clientId,
-            "client_secret", clientSecret,
-            "redirect_uri", redirectUri
-        );
+
+        Map<String, String> body = new HashMap<>();
+        body.put("grant_type", "authorization_code");
+        body.put("code", code);
+        body.put("client_key", clientId);
+        body.put("client_secret", clientSecret);
+        body.put("redirect_uri", redirectUri);
 
         try {
             JsonObject json = sendAuthHttp(body, url);
@@ -45,13 +46,12 @@ public class TiktokOAuthStrategy implements OAuthStrategy {
     public OAuthResponse refresh(String _1, String refreshToken, String redirectUri, String clientId, String clientSecret) throws ApiAuthException {
         String url = "https://open.tiktokapis.com/v2/oauth/token";
 
-        Map<String, String> body = Map.of(
-            "grant_type", "refresh_token",
-            "refresh_token", refreshToken,
-            "client_key", clientId,
-            "client_secret", clientSecret,
-            "redirect_uri", redirectUri
-        );
+        Map<String, String> body = new HashMap<>();
+        body.put("grant_type", "refresh_token");
+        body.put("refresh_token", refreshToken);
+        body.put("client_key", clientId);
+        body.put("client_secret", clientSecret);
+//        body.put("redirect_uri", redirectUri);
 
         try {
             JsonObject json = sendAuthHttp(body, url);
