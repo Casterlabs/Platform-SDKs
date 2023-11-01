@@ -42,12 +42,12 @@ public class YoutubeChatHelper {
                 .setPageToken(this.paginationToken)
                 .send();
 
-            long referencePoint = Long.MAX_VALUE;
-
             if (list.isHistorical()) {
                 this.listener.onHistory(list.getEvents());
             } else {
                 try {
+                    long referencePoint = Long.MAX_VALUE;
+
                     for (YoutubeLiveChatEvent event : list.getEvents()) {
                         // Get the timestamp of the event, compare it to the last message timestamp,
                         // then wait for the difference to help ease the sudden influx of messages.
@@ -69,15 +69,7 @@ public class YoutubeChatHelper {
             }
 
             this.paginationToken = list.getNextPageToken();
-
-            long desiredInterval = (long) (list.getPollingIntervalMillis() * this.pollingMultiple);
-            long elapsed = System.currentTimeMillis() - referencePoint;
-
-            desiredInterval -= elapsed;
-
-            if (desiredInterval > 0) {
-                Thread.sleep(desiredInterval);
-            }
+            Thread.sleep((long) (list.getPollingIntervalMillis() * this.pollingMultiple));
         } catch (ApiException e) {
             this.shouldLoop = false;
 
