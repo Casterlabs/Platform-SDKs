@@ -15,7 +15,7 @@ import lombok.experimental.Accessors;
 import okhttp3.Request;
 
 @Accessors(chain = true)
-public class KickGetPollRequest extends WebRequest<KickPoll> {
+public class KickGetActivePollRequest extends WebRequest<KickPoll> {
     private @Setter String channelSlug;
 
     @Override
