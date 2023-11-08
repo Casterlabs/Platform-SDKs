@@ -1,6 +1,7 @@
 package co.casterlabs.sdk.kick.realtime;
 
 import co.casterlabs.sdk.kick.realtime.types.KickChatEvent;
+import co.casterlabs.sdk.kick.realtime.types.KickPollUpdateEvent;
 import co.casterlabs.sdk.kick.realtime.types.KickRaidEvent;
 
 public interface KickChatListener {
@@ -21,4 +22,9 @@ public interface KickChatListener {
 
     default void onGiftSubscriptions(String[] giftRecipients, String gifter) {}
 
+    default void onPollUpdate(KickPollUpdateEvent event) {}
+
+    default void onPollDelete() {}
+
+    default void onUserBanned(String slug) {}
 }

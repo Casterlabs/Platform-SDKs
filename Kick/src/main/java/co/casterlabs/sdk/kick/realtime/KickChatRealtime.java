@@ -13,6 +13,7 @@ import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.element.JsonObject;
 import co.casterlabs.sdk.kick.KickApi;
 import co.casterlabs.sdk.kick.realtime.types.KickChatEvent;
+import co.casterlabs.sdk.kick.realtime.types.KickPollUpdateEvent;
 import co.casterlabs.sdk.kick.realtime.types.KickRaidEvent;
 import lombok.Getter;
 import lombok.NonNull;
@@ -120,6 +121,24 @@ public class KickChatRealtime implements Closeable {
                         Rson.DEFAULT.fromJson(data, KickRaidEvent.class)
                     );
                     return;
+
+                case "App\\Events\\PollUpdateEvent": {
+                    JsonObject json = Rson.DEFAULT.fromJson(data, JsonObject.class);
+                    this.listener.onPollUpdate(
+                        Rson.DEFAULT.fromJson(json.get("poll"), KickPollUpdateEvent.class)
+                    );
+                    return;
+                }
+
+                case "App\\Events\\PollDeleteEvent":
+                    this.listener.onPollDelete();
+                    return;
+
+                case "App\\Events\\UserBannedEvent": {
+                    JsonObject json = Rson.DEFAULT.fromJson(data, JsonObject.class);
+                    this.listener.onUserBanned(json.getObject("user").getString("slug"));
+                    return;
+                }
 
                 default:
                     this.logger.warn("Unrecognized type: %s %s", type, data);
