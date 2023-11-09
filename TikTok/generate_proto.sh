@@ -1,0 +1,1 @@
+protoc -I=./proto --java_out=./src/main/java webcast.proto data.proto enums.proto

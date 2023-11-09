@@ -89,5 +89,11 @@
 			<version>1.5.3</version>
 			<scope>compile</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.google.protobuf</groupId>
+			<artifactId>protobuf-java</artifactId>
+			<version>3.24.1</version>
+			<scope>compile</scope>
+		</dependency>
 	</dependencies>
 </project>
