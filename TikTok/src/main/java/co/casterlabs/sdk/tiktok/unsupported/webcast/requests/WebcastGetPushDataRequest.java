@@ -6,8 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.jetbrains.annotations.Nullable;
-
 import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.web.ApiException;
 import co.casterlabs.apiutil.web.AuthenticatedWebRequest;
@@ -21,11 +19,10 @@ import okhttp3.Request;
 
 @Setter
 @Accessors(chain = true)
-public class WebcastWebcastFetchRequest extends AuthenticatedWebRequest<WebcastResponse, WebcastCookies> {
+public class WebcastGetPushDataRequest extends AuthenticatedWebRequest<WebcastResponse, WebcastCookies> {
     private String roomId;
-    private @Nullable WebcastResponse cursor;
 
-    public WebcastWebcastFetchRequest(@NonNull WebcastCookies auth) {
+    public WebcastGetPushDataRequest(@NonNull WebcastCookies auth) {
         super(auth);
     }
 
@@ -37,11 +34,6 @@ public class WebcastWebcastFetchRequest extends AuthenticatedWebRequest<WebcastR
         query.put("api_key", WebcastConstants.TIKTOK_SIGN_URL_API_KEY);
         query.put("room_id", this.roomId);
         query.put("uuc", "1");
-
-        if (this.cursor != null) {
-            query.put("cursor", this.cursor.getCursor());
-            query.put("internal_ext", this.cursor.getInternalExt());
-        }
 
         byte[] signedUrlResponse = this.auth.sendHttpRequestBytes(
             new Request.Builder()
