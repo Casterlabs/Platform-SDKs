@@ -24,7 +24,7 @@ public abstract class WebcastCookies extends AuthProvider {
     private List<Cookie> cookies = new LinkedList<>();
 
     private final OkHttpClient client = new OkHttpClient.Builder()
-        .connectTimeout(5, TimeUnit.SECONDS)
+        .readTimeout(5, TimeUnit.SECONDS)
         .cookieJar(new CookieJar() {
             @Override
             public void saveFromResponse(HttpUrl url, List<Cookie> newCookies) {
