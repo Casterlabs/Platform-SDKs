@@ -88,7 +88,7 @@
 		<dependency>
 			<groupId>co.casterlabs.Commons</groupId>
 			<artifactId>Async</artifactId>
-			<version>1.6.0</version>
+			<version>2c5d65a</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
