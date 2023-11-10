@@ -8,37 +8,41 @@ import java.util.stream.Collectors;
 
 import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.web.ApiException;
-import co.casterlabs.apiutil.web.AuthenticatedWebRequest;
-import co.casterlabs.sdk.tiktok.unsupported.webcast.WebcastConstants;
-import co.casterlabs.sdk.tiktok.unsupported.webcast.WebcastCookies;
+import co.casterlabs.apiutil.web.WebRequest;
 import co.casterlabs.sdk.tiktok.unsupported.webcast.proto.webcast.WebcastResponse;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.Response;
 
 @Setter
 @Accessors(chain = true)
-public class WebcastGetPushDataRequest extends AuthenticatedWebRequest<WebcastResponse, WebcastCookies> {
-    private String roomId;
+public class WebcastGetIMFetchEulerstreamRequest extends WebRequest<WebcastResponse> {
+    private static final OkHttpClient client = new OkHttpClient();
 
-    public WebcastGetPushDataRequest(@NonNull WebcastCookies auth) {
-        super(auth);
-    }
+    /**
+     * https://github.com/isaackogan/TikTokLive/wiki/All-About-Signatures
+     */
+    public static String EULERSTREAM_API_URL = "https://tiktok.eulerstream.com";
+
+    private String roomId;
+    private String apiKey = "";
 
     @SuppressWarnings("deprecation")
     @Override
     protected WebcastResponse execute() throws ApiException, ApiAuthException, IOException {
         Map<String, String> query = new HashMap<>();
         query.put("client", "Casterlabs TiktokApiJava");
-        query.put("api_key", WebcastConstants.TIKTOK_SIGN_URL_API_KEY);
+        query.put("api_key", this.apiKey);
         query.put("room_id", this.roomId);
         query.put("uuc", "1");
 
-        byte[] signedUrlResponse = this.auth.sendHttpRequestBytes(
+        byte[] imResponse = sendHttpRequestBytes(
             new Request.Builder()
                 .url(
-                    WebcastConstants.TIKTOK_SIGN_URL + "/webcast/fetch?" +
+                    EULERSTREAM_API_URL + "/webcast/fetch?" +
                         query
                             .entrySet()
                             .stream()
@@ -47,7 +51,19 @@ public class WebcastGetPushDataRequest extends AuthenticatedWebRequest<WebcastRe
                 )
         );
 
-        return WebcastResponse.parseFrom(signedUrlResponse);
+        try {
+            return WebcastResponse.parseFrom(imResponse);
+        } catch (Throwable t) {
+            throw new IOException(new String(imResponse), t);
+        }
+    }
+
+    private static byte[] sendHttpRequestBytes(@NonNull Request.Builder builder) throws IOException {
+        try (Response response = client.newCall(
+            builder.build()
+        ).execute()) {
+            return response.body().bytes();
+        }
     }
 
 }
