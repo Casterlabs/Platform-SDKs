@@ -1,15 +1,13 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>_Base</artifactId>
 
-    <parent>
-        <groupId>co.casterlabs</groupId>
-	    <artifactId>Platform-SDKs</artifactId>
-	    <version>2.0.0</version>
-        <relativePath>../pom.xml</relativePath>
-    </parent>
+	<parent>
+		<groupId>co.casterlabs</groupId>
+		<artifactId>Platform-SDKs</artifactId>
+		<version>2.0.0</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -63,14 +61,18 @@
 			</plugin>
 		</plugins>
 	</build>
-	
+
 	<repositories>
+		<repository>
+			<id>casterlabs-maven</id>
+			<url>https://repo.casterlabs.co/maven</url>
+		</repository>
 		<repository>
 			<id>jitpack.io</id>
 			<url>https://jitpack.io</url>
 		</repository>
 	</repositories>
-	
+
 	<dependencies>
 		<dependency>
 			<groupId>com.squareup.okhttp3</groupId>
@@ -86,15 +88,15 @@
 		</dependency>
 
 		<dependency>
-			<groupId>co.casterlabs.Commons</groupId>
-			<artifactId>Async</artifactId>
-			<version>2c5d65a</version>
+			<groupId>co.casterlabs.commons</groupId>
+			<artifactId>async</artifactId>
+			<version>1.6.1</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>co.casterlabs</groupId>
-			<artifactId>Rson</artifactId>
-			<version>1.17.8</version>
+			<artifactId>rson</artifactId>
+			<version>1.17.9</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
