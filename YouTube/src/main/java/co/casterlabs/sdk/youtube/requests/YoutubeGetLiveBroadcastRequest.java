@@ -24,9 +24,9 @@ public class YoutubeGetLiveBroadcastRequest extends AuthenticatedWebRequest<Yout
         super(auth);
     }
 
-    public YoutubeGetLiveBroadcastRequest byId(@NonNull String channelId) {
+    public YoutubeGetLiveBroadcastRequest byId(@NonNull String videoId) {
         this.queryMode = 0;
-        this.queryData = channelId;
+        this.queryData = videoId;
         return this;
     }
 
