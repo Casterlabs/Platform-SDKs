@@ -104,6 +104,15 @@ public abstract class WebcastCookies extends AuthProvider {
         return this;
     }
 
+    public void login(@NonNull String sessionId) {
+        this.cookies.add(
+            Cookie.parse(
+                HttpUrl.parse(WebcastConstants.TIKTOK_WEBCAST_URL),
+                "sessionid=" + sessionId
+            )
+        );
+    }
+
     @SuppressWarnings("deprecation")
     public String getClientParams() {
         return this.clientParams
