@@ -36,13 +36,13 @@ public class WebcastSendMessageRequest extends AuthenticatedWebRequest<Void, Web
             "&emotes_with_index" +
             "&content=" + URLEncoder.encode(this.message);
 
-        System.out.println(
-            this.auth.sendHttpRequest(
-                new Request.Builder()
-                    .url(url)
-                    .post(RequestBody.create("", null))
-            )
+//        System.out.println(
+        this.auth.sendHttpRequest(
+            new Request.Builder()
+                .url(url)
+                .post(RequestBody.create("", null))
         );
+//        );
 
         return null;
     }
