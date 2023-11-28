@@ -5,12 +5,13 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.util.concurrent.ThreadLocalRandom;
 
+import lombok.SneakyThrows;
+
 public class ExponentialBackoff {
     // @formatter:off
     private static final long RESET_TIME = MINUTES.toMillis(1);
-    private static final long MAX        = SECONDS.toMillis(5);
+    private static final long MAX        = SECONDS.toMillis(8);
     private static final long INCREMENT  = /* millis */    500;
-    private static final long INSTANT    = /* millis */    100;
     private static final long JITTER     = /* millis */    150;
     // @formatter:on
 
@@ -23,7 +24,7 @@ public class ExponentialBackoff {
         if ((now - this.lastRequest) > RESET_TIME) {
             this.lastRequest = now;
             this.wait = 0;
-            return INSTANT + ThreadLocalRandom.current().nextLong(0, JITTER); // We should "instantly" attempt a reconnect.
+            return ThreadLocalRandom.current().nextLong(0, JITTER); // We should "instantly" attempt.
         }
 
         this.lastRequest = now;
@@ -32,7 +33,12 @@ public class ExponentialBackoff {
             this.wait += INCREMENT;
         }
 
-        return this.wait + ThreadLocalRandom.current().nextLong(0, JITTER);
+        return this.wait + ThreadLocalRandom.current().nextLong(0, JITTER); // We should wait (+ jitter).
+    }
+
+    @SneakyThrows
+    public void waitSleep() {
+        Thread.sleep(this.getWaitTime());
     }
 
 }

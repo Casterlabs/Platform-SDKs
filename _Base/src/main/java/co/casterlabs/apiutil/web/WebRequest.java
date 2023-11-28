@@ -1,11 +1,14 @@
 package co.casterlabs.apiutil.web;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.jetbrains.annotations.Nullable;
 
 import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.auth.AuthProvider;
+import co.casterlabs.apiutil.ratelimit.ExponentialBackoff;
 import co.casterlabs.commons.async.Promise;
 import lombok.NonNull;
 import okhttp3.OkHttpClient;
@@ -24,6 +27,8 @@ public abstract class WebRequest<T> {
             )
         )
         .build();
+
+    private static final Map<String, ExponentialBackoff> ratelimiterCache = new HashMap<>();
 
     public Promise<T> sendAsync() {
         return new Promise<>(this::send);
@@ -48,9 +53,28 @@ public abstract class WebRequest<T> {
             }
         }
 
-        try (Response response = client.newCall(builder.build()).execute()) {
-            return response.body().string();
+        while (true) {
+            try (Response response = client.newCall(builder.build()).execute()) {
+                if (response.code() == 429 || response.code() == 420) {
+                    response.close(); // Do this before a long wait.
+                    ratelimitDomain(builder.getUrl$okhttp().host());
+                    continue; // Try again.
+                }
+
+                return response.body().string();
+            }
         }
+    }
+
+    public static void ratelimitDomain(@NonNull String domain) {
+        ExponentialBackoff backoff = ratelimiterCache.get(domain);
+
+        if (backoff == null) {
+            backoff = new ExponentialBackoff();
+            ratelimiterCache.put(domain, backoff);
+        }
+
+        backoff.waitSleep();
     }
 
 }
