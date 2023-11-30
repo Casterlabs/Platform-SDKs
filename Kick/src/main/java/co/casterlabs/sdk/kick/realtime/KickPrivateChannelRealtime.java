@@ -106,21 +106,36 @@ public class KickPrivateChannelRealtime implements Closeable {
         try {
             switch (type) {
 
-                case "App\\Events\\NewSubscriberUpdatedEvent":
                 case "App\\Events\\StartStream":
                 case "App\\Events\\StopStreamBroadcast":
                     return;
 
-                // TODO:
-                // App\Events\NewActivityFeedEvent
-                // {"channel_id":1234,"type":"new_subscriber","username":"xxxx","metadata":[],"created_at":0}
-                // App\Events\NewActivityFeedEvent
-                // {"channel_id":1234,"type":"gift","username":"xxxx","metadata":{"quantity":123},"created_at":0}
-
-                case "App\\Events\\FollowersUpdatedForChannelOwner":
+                case "App\\Events\\FollowersUpdatedForChannelOwner": {
                     JsonObject json = Rson.DEFAULT.fromJson(data, JsonObject.class);
                     this.listener.onFollow(json.getString("username"), json.getBoolean("followed"));
                     return;
+                }
+
+                case "App\\Events\\NewActivityFeedEvent": {
+                    JsonObject json = Rson.DEFAULT.fromJson(data, JsonObject.class);
+
+                    switch (json.getString("type")) {
+                        case "new_subscriber":
+                            this.listener.onSubscription(json.getString("username"), 1);
+                            return;
+
+                        case "gift":
+                            this.listener.onGiftSubscriptions(
+                                json.getString("username"),
+                                json.getObject("metadata").getNumber("quantity").intValue()
+                            );
+                            return;
+
+                        default:
+                            this.logger.warn("Unrecognized NewActivityFeedEvent type: %s %s", type, data);
+                            return;
+                    }
+                }
 
                 default:
                     this.logger.warn("Unrecognized type: %s %s", type, data);
