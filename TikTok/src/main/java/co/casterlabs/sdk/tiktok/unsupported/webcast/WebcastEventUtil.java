@@ -21,7 +21,7 @@ public class WebcastEventUtil {
         }
     }
 
-    public static void broadcastEvent(Object listener, Object event) throws InvocationTargetException {
+    public static boolean broadcastEvent(Object listener, Object event) throws InvocationTargetException {
         for (Method method : listener.getClass().getMethods()) {
             if (!method.isAnnotationPresent(WebcastEventHandler.class)) continue;
 
@@ -31,11 +31,12 @@ public class WebcastEventUtil {
 
             try {
                 method.invoke(listener, event);
-                return;
+                return true;
             } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
                 throw new InvocationTargetException(e);
             }
         }
+        return false;
     }
 
 }
