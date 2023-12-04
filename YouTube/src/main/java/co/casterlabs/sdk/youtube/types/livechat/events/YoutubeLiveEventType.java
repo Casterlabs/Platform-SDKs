@@ -22,7 +22,7 @@ public enum YoutubeLiveEventType {
     TOMBSTONE(YoutubeLiveTombstoneEvent.class),
     USER_BANNED_EVENT(YoutubeLiveUserBannedEvent.class),
     MEMBERSHIP_GIFTING_EVENT(YoutubeLiveMembershipGiftingEvent.class),
-    GIFT_MEMBERSHIP_RECEIVED_EVENT(YoutubeLiveChatEndedEvent.class),
+    GIFT_MEMBERSHIP_RECEIVED_EVENT(YoutubeLiveGiftMembershipReceivedEvent.class),
     ;
 
     private Class<? extends YoutubeLiveEvent> clazz;
