@@ -74,13 +74,12 @@ public class YoutubeChatHelper {
             this.shouldLoop = false;
 
             String message = e.getMessage();
-
-            if (message.contains("The live chat that you are trying to retrieve cannot be found.") ||
-                message.contains("The live chat is no longer live.")) {
-                listener.onClose();
-            } else {
+            if (!message.contains("The live chat that you are trying to retrieve cannot be found.") &&
+                !message.contains("The live chat is no longer live.")) {
                 listener.onError(e);
             }
+
+            listener.onClose();
         } catch (Throwable t) {
             this.shouldLoop = false;
             listener.onError(t);
