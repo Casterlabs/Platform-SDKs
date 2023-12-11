@@ -63,26 +63,23 @@ public class YoutubeChatHelper {
                         this.listener.onEvent(event);
                     }
                 } catch (Throwable t) {
-                    this.shouldLoop = false;
-                    listener.onError(t);
+                    this.listener.onError(t);
                 }
             }
 
             this.paginationToken = list.getNextPageToken();
             Thread.sleep((long) (list.getPollingIntervalMillis() * this.pollingMultiple));
         } catch (ApiException e) {
-            this.shouldLoop = false;
-
             String message = e.getMessage();
-            if (!message.contains("The live chat that you are trying to retrieve cannot be found.") &&
-                !message.contains("The live chat is no longer live.")) {
-                listener.onError(e);
+            if (message.contains("The live chat that you are trying to retrieve cannot be found.") ||
+                message.contains("The live chat is no longer live.")) {
+                this.shouldLoop = false;
+                this.listener.onClose();
+            } else {
+                this.listener.onError(e);
             }
-
-            listener.onClose();
         } catch (Throwable t) {
-            this.shouldLoop = false;
-            listener.onError(t);
+            this.listener.onError(t);
         }
     }
 
