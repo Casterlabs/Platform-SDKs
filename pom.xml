@@ -14,6 +14,7 @@
 		<module>TikTok</module>
 		<module>DLive</module>
 		<module>Kick</module>
+		<module>Noice</module>
 	</modules>
 
 	<properties>
