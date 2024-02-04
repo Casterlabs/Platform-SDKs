@@ -18,6 +18,9 @@ public class KickStreamInfo {
     @JsonField("subcategoryId")
     private long category;
 
+    @JsonField("subcategoryName")
+    private String categoryName;
+
     private String title;
 
 }
