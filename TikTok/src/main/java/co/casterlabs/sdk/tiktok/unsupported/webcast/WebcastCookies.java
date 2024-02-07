@@ -45,20 +45,11 @@ public abstract class WebcastCookies extends AuthProvider {
         this.setLanguage("en-US");
     }
 
-    protected void parseTTCookie(String cookie) {
-        this.cookies.add(
-            Cookie.parse(
-                HttpUrl.parse(WebcastConstants.TIKTOK_WEBCAST_URL),
-                cookie
-            )
-        );
-    }
-
     protected void regenerateClientParams() {
         this.clientParams.clear();
         String[] userAgentSplit = this.userAgent.split("/", 2);
 
-//        this.clientParams.put("aid", "1988");
+        this.clientParams.put("aid", "1988");
 //        this.clientParams.put("app_language", "<>");
         this.clientParams.put("app_name", "tiktok_web");
 //        this.clientParams.put("browser_language", "<>");
@@ -68,8 +59,8 @@ public abstract class WebcastCookies extends AuthProvider {
         this.clientParams.put("browser_version", userAgentSplit[1]);
         this.clientParams.put("cookie_enabled", "true");
 //        this.clientParams.put("cursor", "");
-//        this.clientParams.put("debug", "false");
-//        this.clientParams.put("device_id", "");
+        this.clientParams.put("debug", "false");
+        this.clientParams.put("device_id", "");
         this.clientParams.put("device_platform", "web");
         this.clientParams.put("did_rule", "3");
         this.clientParams.put("fetch_rule", "1");
@@ -84,7 +75,7 @@ public abstract class WebcastCookies extends AuthProvider {
         this.clientParams.put("is_fullscreen", "false");
         this.clientParams.put("is_page_visible", "true");
         this.clientParams.put("last_rtt", "0");
-//        this.clientParams.put("live_id", "12");
+        this.clientParams.put("live_id", "12");
         this.clientParams.put("msToken", "");
         this.clientParams.put("resp_content_type", "protobuf");
         this.clientParams.put("referer", "https://www.tiktok.com/");
@@ -125,7 +116,7 @@ public abstract class WebcastCookies extends AuthProvider {
     public String getCookie() {
         return this.cookies
             .stream()
-            .map((c) -> c.toString())
+            .map((c) -> c.name() + "=" + c.value())
             .collect(Collectors.joining("; "));
     }
 
