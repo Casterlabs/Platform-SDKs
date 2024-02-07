@@ -22,13 +22,15 @@ import okhttp3.Response;
 public abstract class WebcastCookies extends AuthProvider {
 
     private List<Cookie> cookies = new LinkedList<>();
+    private List<Cookie> forcedCookies = new LinkedList<>();
 
     private final OkHttpClient client = new OkHttpClient.Builder()
         .readTimeout(5, TimeUnit.SECONDS)
         .cookieJar(new CookieJar() {
             @Override
             public void saveFromResponse(HttpUrl url, List<Cookie> newCookies) {
-                cookies = newCookies;
+                cookies = new LinkedList<>(newCookies);
+                cookies.addAll(forcedCookies);
             }
 
             @Override
@@ -49,7 +51,7 @@ public abstract class WebcastCookies extends AuthProvider {
         this.clientParams.clear();
         String[] userAgentSplit = this.userAgent.split("/", 2);
 
-        this.clientParams.put("aid", "1988");
+//        this.clientParams.put("aid", "1988");
 //        this.clientParams.put("app_language", "<>");
         this.clientParams.put("app_name", "tiktok_web");
 //        this.clientParams.put("browser_language", "<>");
@@ -59,8 +61,8 @@ public abstract class WebcastCookies extends AuthProvider {
         this.clientParams.put("browser_version", userAgentSplit[1]);
         this.clientParams.put("cookie_enabled", "true");
 //        this.clientParams.put("cursor", "");
-        this.clientParams.put("debug", "false");
-        this.clientParams.put("device_id", "");
+//        this.clientParams.put("debug", "false");
+//        this.clientParams.put("device_id", "");
         this.clientParams.put("device_platform", "web");
         this.clientParams.put("did_rule", "3");
         this.clientParams.put("fetch_rule", "1");
@@ -75,7 +77,7 @@ public abstract class WebcastCookies extends AuthProvider {
         this.clientParams.put("is_fullscreen", "false");
         this.clientParams.put("is_page_visible", "true");
         this.clientParams.put("last_rtt", "0");
-        this.clientParams.put("live_id", "12");
+//        this.clientParams.put("live_id", "12");
         this.clientParams.put("msToken", "");
         this.clientParams.put("resp_content_type", "protobuf");
         this.clientParams.put("referer", "https://www.tiktok.com/");
@@ -95,13 +97,20 @@ public abstract class WebcastCookies extends AuthProvider {
         return this;
     }
 
-    public void login(@NonNull String sessionId) {
-        this.cookies.add(
+    public void login(@NonNull String sidGuard) {
+        this.forcedCookies.add(
             Cookie.parse(
                 HttpUrl.parse(WebcastConstants.TIKTOK_WEBCAST_URL),
-                "sessionid=" + sessionId
+                "sessionid=" + sidGuard.substring(0, sidGuard.indexOf('|'))
             )
         );
+        this.forcedCookies.add(
+            Cookie.parse(
+                HttpUrl.parse(WebcastConstants.TIKTOK_WEBCAST_URL),
+                "sid_guard=" + sidGuard
+            )
+        );
+        this.cookies.addAll(this.forcedCookies);
     }
 
     @SuppressWarnings("deprecation")
