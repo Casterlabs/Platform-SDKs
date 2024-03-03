@@ -41,8 +41,7 @@ public class YoutubeGetLiveBroadcastRequest extends AuthenticatedWebRequest<Yout
         assert this.queryMode != -1 : "You must specify a query either by ID or mine.";
 
         String url = "https://youtube.googleapis.com/youtube/v3/liveBroadcasts"
-            + "?part=snippet,status"
-            + "&broadcastStatus=all";
+            + "?part=snippet,status";
 
         switch (this.queryMode) {
             case 0: {
@@ -55,7 +54,7 @@ public class YoutubeGetLiveBroadcastRequest extends AuthenticatedWebRequest<Yout
                     throw new ApiAuthException("You must use user auth when requesting `mine()`");
                 }
 
-                url += "&mine=true";
+                url += "&broadcastStatus=all&mine=true";
                 break;
             }
         }
