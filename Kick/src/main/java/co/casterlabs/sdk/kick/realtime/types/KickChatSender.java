@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import co.casterlabs.rakurai.json.annotating.JsonClass;
+import co.casterlabs.sdk.kick.types.KickChannel.SubscriberBadge;
 import lombok.Getter;
 import lombok.ToString;
 import xyz.e3ndr.fastloggingframework.logging.FastLogger;
@@ -36,12 +37,20 @@ public class KickChatSender {
     public static class Badge {
         private String type;
         private String text;
+        private int count = -1;
     }
 
     /**
      * @return a list of URLs with SVG images.
      */
     public List<String> getBadgeUrls() {
+        return this.getBadgeUrls(new SubscriberBadge[0]);
+    }
+
+    /**
+     * @return a list of URLs with SVG images.
+     */
+    public List<String> getBadgeUrls(SubscriberBadge[] channelSubscriberBadges) {
         List<String> badges = new LinkedList<>();
 
         for (Badge badge : this.identity.badges) {
@@ -74,9 +83,16 @@ public class KickChatSender {
                     badges.add("https://raw.githubusercontent.com/Casterlabs/Platform-SDKs/main/Kick/Badges/staff.svg");
                     break;
 
-                case "subscriber":
-                    badges.add("https://raw.githubusercontent.com/Casterlabs/Platform-SDKs/main/Kick/Badges/subscriber.svg");
+                case "subscriber": {
+                    String url = "https://raw.githubusercontent.com/Casterlabs/Platform-SDKs/main/Kick/Badges/subscriber.svg";
+                    for (SubscriberBadge custom : channelSubscriberBadges) {
+                        if (badge.count >= custom.getMonths()) {
+                            url = custom.getImageURL();
+                        }
+                    }
+                    badges.add(url);
                     break;
+                }
 
                 case "sub_gifter":
                     // TODO detect if they are gifter level 1 or 2.

@@ -51,6 +51,9 @@ public class KickChannel {
     @JsonExclude
     private boolean isVerified;
 
+    @JsonField("subscriber_badges")
+    private SubscriberBadge[] subscriberBadges = {};
+
     @JsonDeserializationMethod("verified")
     private void $deserialize_verified(JsonElement e) {
         this.isVerified = !e.isJsonNull(); // Null means not verified.
@@ -62,6 +65,19 @@ public class KickChannel {
     @JsonDeserializationMethod("chatroom")
     private void $deserialize_chatroomId(JsonElement e) {
         this.chatRoomId = e.getAsObject().getNumber("id").longValue();
+    }
+
+    @Getter
+    @ToString
+    @JsonClass(exposeAll = true)
+    public static class SubscriberBadge {
+        private int id;
+        private int months;
+
+        public String getImageURL() {
+            return String.format("https://files.kick.com/channel_subscriber_badges/%d/original", this.id);
+        }
+
     }
 
 }
