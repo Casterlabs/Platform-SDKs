@@ -25,6 +25,24 @@
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>3.2.1</version>
+				<executions>
+					<execution>
+						<id>shade</id>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<shadedArtifactAttached>true</shadedArtifactAttached>
+					<finalName>${project.name}</finalName>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.8.1</version>
 				<configuration>
@@ -55,7 +73,7 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.18.12</version>
+			<version>1.18.32</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
