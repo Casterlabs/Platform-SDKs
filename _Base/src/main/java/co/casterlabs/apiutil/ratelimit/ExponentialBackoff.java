@@ -24,7 +24,7 @@ public class ExponentialBackoff {
         if ((now - this.lastRequest) > RESET_TIME) {
             this.lastRequest = now;
             this.wait = 0;
-            return ThreadLocalRandom.current().nextLong(0, JITTER); // We should "instantly" attempt.
+            return ThreadLocalRandom.current().nextLong(JITTER, JITTER * 2); // We should "instantly" attempt.
         }
 
         this.lastRequest = now;
