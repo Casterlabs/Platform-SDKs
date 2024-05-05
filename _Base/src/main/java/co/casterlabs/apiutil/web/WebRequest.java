@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
 import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.auth.AuthProvider;
 import co.casterlabs.apiutil.ratelimit.ExponentialBackoff;
-import co.casterlabs.commons.async.Promise;
+import co.casterlabs.commons.async.promise.Promise;
 import lombok.NonNull;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;

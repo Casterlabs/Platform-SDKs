@@ -83,26 +83,26 @@
 		<dependency>
 			<groupId>org.java-websocket</groupId>
 			<artifactId>Java-WebSocket</artifactId>
-			<version>1.5.3</version>
+			<version>1.5.6</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>co.casterlabs.commons</groupId>
 			<artifactId>async</artifactId>
-			<version>1.6.1</version>
+			<version>1.7.0</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>co.casterlabs</groupId>
 			<artifactId>rson</artifactId>
-			<version>1.17.9</version>
+			<version>1.18.0</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.github.e3ndr</groupId>
 			<artifactId>FastLoggingFramework</artifactId>
-			<version>c6df5bb</version>
+			<version>1.12.1</version>
 			<scope>compile</scope>
 		</dependency>
 	</dependencies>
