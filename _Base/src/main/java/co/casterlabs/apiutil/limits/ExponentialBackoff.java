@@ -1,4 +1,4 @@
-package co.casterlabs.apiutil.ratelimit;
+package co.casterlabs.apiutil.limits;
 
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.SECONDS;

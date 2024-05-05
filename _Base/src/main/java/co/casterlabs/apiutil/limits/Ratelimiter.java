@@ -1,4 +1,4 @@
-package co.casterlabs.apiutil.ratelimit;
+package co.casterlabs.apiutil.limits;
 
 import java.util.HashMap;
 import java.util.Map;

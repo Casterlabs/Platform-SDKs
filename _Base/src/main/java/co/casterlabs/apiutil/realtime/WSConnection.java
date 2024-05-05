@@ -7,7 +7,7 @@ import java.net.URI;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
-import co.casterlabs.apiutil.ratelimit.ExponentialBackoff;
+import co.casterlabs.apiutil.limits.ExponentialBackoff;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import xyz.e3ndr.fastloggingframework.logging.FastLogger;
