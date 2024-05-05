@@ -6,6 +6,7 @@ import org.jetbrains.annotations.Nullable;
 
 import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.auth.AuthProvider;
+import co.casterlabs.apiutil.limits.Concurrency;
 import co.casterlabs.apiutil.limits.Ratelimiter;
 import co.casterlabs.commons.async.promise.Promise;
 import lombok.NonNull;
@@ -50,7 +51,7 @@ public abstract class WebRequest<T> {
         }
 
         while (true) {
-            try (Response response = client.newCall(builder.build()).execute()) {
+            try (Response response = Concurrency.execute(builder.getUrl$okhttp().host(), () -> client.newCall(builder.build()).execute())) {
                 if (response.code() == 429 || response.code() == 420) {
                     response.close(); // Do this before a long wait.
                     Ratelimiter.ratelimitTMR(builder.getUrl$okhttp().host());
@@ -58,6 +59,9 @@ public abstract class WebRequest<T> {
                 }
 
                 return response.body().string();
+            } catch (InterruptedException e) {
+                Thread.interrupted();
+                throw new IOException(e);
             }
         }
     }
