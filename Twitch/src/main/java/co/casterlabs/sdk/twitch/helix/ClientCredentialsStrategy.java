@@ -31,6 +31,7 @@ class ClientCredentialsStrategy implements OAuthStrategy {
             JsonObject json = sendAuthHttp(new JsonObject(), url);
             checkAndThrow(json);
 
+            System.out.println(json);
             // We need this field for ApiUtil.
             json.put("refresh_token", "CLIENT_CREDENTIALS");
 
@@ -46,8 +47,7 @@ class ClientCredentialsStrategy implements OAuthStrategy {
         return WebRequest.sendHttpRequest(
             HttpRequest.newBuilder()
                 .uri(URI.create(url))
-                .POST(BodyPublishers.ofString(body.toString()))
-                .header("Content-Type", "application/json"),
+                .POST(BodyPublishers.noBody()),
             RsonBodyHandler.of(JsonObject.class),
             null
         ).body();
