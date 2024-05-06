@@ -1,13 +1,18 @@
 package co.casterlabs.sdk.twitch.helix;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URLEncoder;
+import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.BodyPublishers;
 import java.util.ArrayList;
 import java.util.List;
 
 import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.auth.OAuthProvider.OAuthResponse;
 import co.casterlabs.apiutil.auth.OAuthStrategy;
+import co.casterlabs.apiutil.web.RsonBodyHandler;
+import co.casterlabs.apiutil.web.WebRequest;
 import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.element.JsonArray;
 import co.casterlabs.rakurai.json.element.JsonElement;
@@ -43,9 +48,8 @@ class RefreshTokenStrategy extends OAuthStrategy.Default {
         );
 
         try {
-            JsonObject json = sendAuthHttp(new JsonObject(), url);
+            JsonObject json = sendAuthHttp(url);
             checkAndThrow(json);
-
             fix(json);
 
             OAuthResponse data = Rson.DEFAULT.fromJson(json, OAuthResponse.class);
@@ -54,6 +58,16 @@ class RefreshTokenStrategy extends OAuthStrategy.Default {
         } catch (IOException e) {
             throw new ApiAuthException(e);
         }
+    }
+
+    private static JsonObject sendAuthHttp(String url) throws IOException {
+        return WebRequest.sendHttpRequest(
+            HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .POST(BodyPublishers.noBody()),
+            RsonBodyHandler.of(JsonObject.class),
+            null
+        ).body();
     }
 
     private static final void fix(JsonObject data) {

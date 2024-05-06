@@ -28,10 +28,9 @@ class ClientCredentialsStrategy implements OAuthStrategy {
         );
 
         try {
-            JsonObject json = sendAuthHttp(new JsonObject(), url);
+            JsonObject json = sendAuthHttp(url);
             checkAndThrow(json);
 
-            System.out.println(json);
             // We need this field for ApiUtil.
             json.put("refresh_token", "CLIENT_CREDENTIALS");
 
@@ -43,7 +42,7 @@ class ClientCredentialsStrategy implements OAuthStrategy {
         }
     }
 
-    protected static JsonObject sendAuthHttp(JsonObject body, String url) throws IOException {
+    private static JsonObject sendAuthHttp(String url) throws IOException {
         return WebRequest.sendHttpRequest(
             HttpRequest.newBuilder()
                 .uri(URI.create(url))
