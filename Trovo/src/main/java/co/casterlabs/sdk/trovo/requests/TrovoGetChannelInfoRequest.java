@@ -1,23 +1,23 @@
 package co.casterlabs.sdk.trovo.requests;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.BodyPublishers;
 
 import org.jetbrains.annotations.Nullable;
 
 import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.web.ApiException;
 import co.casterlabs.apiutil.web.AuthenticatedWebRequest;
+import co.casterlabs.apiutil.web.RsonBodyHandler;
 import co.casterlabs.apiutil.web.WebRequest;
-import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.element.JsonObject;
 import co.casterlabs.sdk.trovo.TrovoAuth;
 import co.casterlabs.sdk.trovo.requests.data.TrovoChannelInfo;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import okhttp3.MediaType;
-import okhttp3.Request;
-import okhttp3.RequestBody;
 
 @Setter
 @NonNull
@@ -34,29 +34,27 @@ public class TrovoGetChannelInfoRequest extends AuthenticatedWebRequest<TrovoCha
 
     @Override
     protected TrovoChannelInfo execute() throws ApiException, ApiAuthException, IOException {
-        Request.Builder request = new Request.Builder();
+        HttpRequest.Builder request = HttpRequest.newBuilder();
 
         if (this.channelId == null) {
             assert !this.auth.isApplicationAuth() : "You cannot use application auth to request self info. Set a channel id or use user auth.";
 
-            request.url(SELF_URL);
+            request.uri(URI.create(SELF_URL));
         } else {
             JsonObject body = new JsonObject()
                 .put("channel_id", this.channelId);
 
             request
-                .url(URL)
-                .post(
-                    RequestBody.create(
-                        body.toString(),
-                        MediaType.get("application/json")
-                    )
-                );
+                .uri(URI.create(URL))
+                .POST(BodyPublishers.ofString(body.toString()))
+                .header("Content-Type", "application/json");
         }
 
-        String response = WebRequest.sendHttpRequest(request, this.auth);
-
-        return Rson.DEFAULT.fromJson(response, TrovoChannelInfo.class);
+        return WebRequest.sendHttpRequest(
+            request,
+            RsonBodyHandler.of(TrovoChannelInfo.class),
+            this.auth
+        ).body();
     }
 
 }

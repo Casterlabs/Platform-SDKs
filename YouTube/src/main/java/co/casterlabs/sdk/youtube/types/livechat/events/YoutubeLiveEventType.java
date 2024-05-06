@@ -1,9 +1,9 @@
 package co.casterlabs.sdk.youtube.types.livechat.events;
 
+import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.element.JsonObject;
 import co.casterlabs.rakurai.json.serialization.JsonParseException;
 import co.casterlabs.rakurai.json.validation.JsonValidationException;
-import co.casterlabs.sdk.youtube.YoutubeApi;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 
@@ -43,7 +43,7 @@ public enum YoutubeLiveEventType {
         // Grab the class, deserialize it, and return it.
         YoutubeLiveEventType type = YoutubeLiveEventType.parseType(json.get("type").getAsString());
 
-        return (T) YoutubeApi.RSON.fromJson(json, type.clazz);
+        return (T) Rson.DEFAULT.fromJson(json, type.clazz);
     }
 
     public static YoutubeLiveEventType parseType(@NonNull String type) {

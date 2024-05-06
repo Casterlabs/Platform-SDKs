@@ -1,18 +1,21 @@
 package co.casterlabs.sdk.youtube;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpRequest;
+
+import org.unbescape.uri.UriEscape;
 
 import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.auth.AuthProvider;
+import co.casterlabs.apiutil.web.ApiException;
+import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.annotating.JsonClass;
 import co.casterlabs.rakurai.json.annotating.JsonField;
 import co.casterlabs.rakurai.json.element.JsonObject;
-import co.casterlabs.rakurai.json.serialization.JsonParseException;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
-import okhttp3.Request.Builder;
-import okhttp3.Response;
 
 public class YoutubeAuth extends AuthProvider {
     private @Getter String apiKey;
@@ -40,15 +43,14 @@ public class YoutubeAuth extends AuthProvider {
     }
 
     @Override
-    protected void authenticateRequest0(@NonNull Builder request) {
+    protected void authenticateRequest0(@NonNull HttpRequest.Builder request) {
         if (!this.isApplicationAuth()) {
-            request.addHeader("Authorization", "Bearer " + this.accessToken);
+            request.header("Authorization", "Bearer " + this.accessToken);
         }
 
         // Inject the client key.
-        String url = request.getUrl$okhttp().toString();
-
-        request.url(url + "&key=" + this.apiKey);
+        String url = request.build().uri().toString();
+        request.uri(URI.create(url + "&key=" + this.apiKey));
     }
 
     @Override
@@ -59,26 +61,25 @@ public class YoutubeAuth extends AuthProvider {
                     + "&refresh_token=%s"
                     + "&client_id=%s"
                     + "&client_secret=%s",
-                HttpUtil.encodeURIComponent(this.refreshToken),
-                HttpUtil.encodeURIComponent(this.clientId),
-                HttpUtil.encodeURIComponent(this.clientSecret)
+                UriEscape.escapeUriQueryParam(this.refreshToken),
+                UriEscape.escapeUriQueryParam(this.clientId),
+                UriEscape.escapeUriQueryParam(this.clientSecret)
             );
 
-            try (Response response = HttpUtil.sendHttp(form, "https://oauth2.googleapis.com/token", null, "application/x-www-form-urlencoded")) {
-                String body = response.body().string();
-
-                JsonObject json = YoutubeApi.RSON.fromJson(body, JsonObject.class);
-
+            try {
+                JsonObject json = YoutubeHttpUtil.insert(form, "application/x-www-form-urlencoded", "https://oauth2.googleapis.com/token", null);
                 if (json.containsKey("error")) {
-                    throw new ApiAuthException(body);
+                    throw new ApiAuthException(json.toString());
                 } else {
-                    AuthResponse data = YoutubeApi.RSON.fromJson(json, AuthResponse.class);
+                    AuthResponse data = Rson.DEFAULT.fromJson(json, AuthResponse.class);
 
                     this.accessToken = data.accessToken;
                     this.expiresIn = data.expiresIn;
                     this.lastRefresh = System.currentTimeMillis();
                 }
-            } catch (IOException e) {
+            } catch (ApiAuthException e) {
+                throw e;
+            } catch (IOException | ApiException e) {
                 throw new ApiAuthException(e);
             }
         }
@@ -105,24 +106,23 @@ public class YoutubeAuth extends AuthProvider {
                 + "&redirect_uri=%s"
                 + "&client_id=%s"
                 + "&client_secret=%s",
-            HttpUtil.encodeURIComponent(code),
-            HttpUtil.encodeURIComponent(redirectUri),
-            HttpUtil.encodeURIComponent(clientId),
-            HttpUtil.encodeURIComponent(clientSecret)
+            UriEscape.escapeUriQueryParam(code),
+            UriEscape.escapeUriQueryParam(redirectUri),
+            UriEscape.escapeUriQueryParam(clientId),
+            UriEscape.escapeUriQueryParam(clientSecret)
         );
 
-        try (Response response = HttpUtil.sendHttp(form, "https://oauth2.googleapis.com/token", null, "application/x-www-form-urlencoded")) {
-            String body = response.body().string();
-
-            JsonObject json = YoutubeApi.RSON.fromJson(body, JsonObject.class);
-
+        try {
+            JsonObject json = YoutubeHttpUtil.insert(form, "application/x-www-form-urlencoded", "https://oauth2.googleapis.com/token", null);
             if (json.containsKey("error")) {
-                throw new ApiAuthException(body);
+                throw new ApiAuthException(json.toString());
             } else {
-                return YoutubeApi.RSON.fromJson(json, AuthResponse.class);
+                return Rson.DEFAULT.fromJson(json, AuthResponse.class);
             }
-        } catch (JsonParseException e) {
-            throw new IOException(e); // :^)
+        } catch (ApiAuthException e) {
+            throw e;
+        } catch (IOException | ApiException e) {
+            throw new ApiAuthException(e);
         }
     }
 
@@ -136,10 +136,10 @@ public class YoutubeAuth extends AuthProvider {
                 + "&prompt=consent"
                 + "&access_type=offline"
                 + "&client_id=%s",
-            HttpUtil.encodeURIComponent(scope),
-            HttpUtil.encodeURIComponent(state),
-            HttpUtil.encodeURIComponent(redirectUri),
-            HttpUtil.encodeURIComponent(clientId)
+            UriEscape.escapeUriQueryParam(scope),
+            UriEscape.escapeUriQueryParam(state),
+            UriEscape.escapeUriQueryParam(redirectUri),
+            UriEscape.escapeUriQueryParam(clientId)
         );
     }
 

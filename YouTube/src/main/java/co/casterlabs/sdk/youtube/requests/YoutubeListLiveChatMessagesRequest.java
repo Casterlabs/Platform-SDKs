@@ -3,20 +3,19 @@ package co.casterlabs.sdk.youtube.requests;
 import java.io.IOException;
 
 import org.jetbrains.annotations.Nullable;
+import org.unbescape.uri.UriEscape;
 
 import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.web.ApiException;
 import co.casterlabs.apiutil.web.AuthenticatedWebRequest;
+import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.element.JsonObject;
-import co.casterlabs.rakurai.json.serialization.JsonParseException;
-import co.casterlabs.sdk.youtube.HttpUtil;
-import co.casterlabs.sdk.youtube.YoutubeApi;
 import co.casterlabs.sdk.youtube.YoutubeAuth;
+import co.casterlabs.sdk.youtube.YoutubeHttpUtil;
 import co.casterlabs.sdk.youtube.types.YoutubeLiveChatMessagesList;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import okhttp3.Response;
 
 @Accessors(chain = true)
 public class YoutubeListLiveChatMessagesRequest extends AuthenticatedWebRequest<YoutubeLiveChatMessagesList, YoutubeAuth> {
@@ -35,29 +34,15 @@ public class YoutubeListLiveChatMessagesRequest extends AuthenticatedWebRequest<
             + "?part=snippet%2CauthorDetails"
             + "&profileImageSize=88"
 //            + "&maxResults=2000"
-            + "&liveChatId=" + HttpUtil.encodeURIComponent(this.liveChatId);
+            + "&liveChatId=" + UriEscape.escapeUriQueryParam(this.liveChatId);
 
         if (this.pageToken != null) {
-            url += "&pageToken=" + HttpUtil.encodeURIComponent(this.pageToken);
+            url += "&pageToken=" + UriEscape.escapeUriQueryParam(this.pageToken);
         }
 
-        try (Response response = HttpUtil.sendHttpGet(url, this.auth)) {
-            String body = response.body().string();
-
-            if (response.isSuccessful()) {
-                JsonObject json = YoutubeApi.RSON.fromJson(body, JsonObject.class);
-
-                json.put("isHistorical", this.pageToken == null);
-
-                return YoutubeApi.RSON.fromJson(json, YoutubeLiveChatMessagesList.class);
-            } else if (response.code() == 401) {
-                throw new ApiAuthException(body);
-            } else {
-                throw new ApiException(body);
-            }
-        } catch (JsonParseException e) {
-            throw new ApiException(e);
-        }
+        JsonObject json = YoutubeHttpUtil.list(url, this.auth);
+        json.put("isHistorical", this.pageToken == null);
+        return Rson.DEFAULT.fromJson(json, YoutubeLiveChatMessagesList.class);
     }
 
 }

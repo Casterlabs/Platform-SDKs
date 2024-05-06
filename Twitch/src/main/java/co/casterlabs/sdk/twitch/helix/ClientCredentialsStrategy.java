@@ -1,16 +1,17 @@
 package co.casterlabs.sdk.twitch.helix;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.BodyPublishers;
 
 import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.auth.OAuthProvider.OAuthResponse;
 import co.casterlabs.apiutil.auth.OAuthStrategy;
+import co.casterlabs.apiutil.web.RsonBodyHandler;
 import co.casterlabs.apiutil.web.WebRequest;
 import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.element.JsonObject;
-import okhttp3.MediaType;
-import okhttp3.Request;
-import okhttp3.RequestBody;
 
 class ClientCredentialsStrategy implements OAuthStrategy {
 
@@ -42,19 +43,14 @@ class ClientCredentialsStrategy implements OAuthStrategy {
     }
 
     protected static JsonObject sendAuthHttp(JsonObject body, String url) throws IOException {
-        String response = WebRequest.sendHttpRequest(
-            new Request.Builder()
-                .url(url)
-                .post(
-                    RequestBody.create(
-                        body.toString(),
-                        MediaType.get("application/json")
-                    )
-                ),
+        return WebRequest.sendHttpRequest(
+            HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .POST(BodyPublishers.ofString(body.toString()))
+                .header("Content-Type", "application/json"),
+            RsonBodyHandler.of(JsonObject.class),
             null
-        );
-
-        return Rson.DEFAULT.fromJson(response, JsonObject.class);
+        ).body();
     }
 
     protected static void checkAndThrow(JsonObject body) throws ApiAuthException {

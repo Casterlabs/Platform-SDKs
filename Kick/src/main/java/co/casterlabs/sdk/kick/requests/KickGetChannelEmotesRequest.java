@@ -1,11 +1,14 @@
 package co.casterlabs.sdk.kick.requests;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpRequest;
 import java.util.LinkedList;
 import java.util.List;
 
 import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.web.ApiException;
+import co.casterlabs.apiutil.web.RsonBodyHandler;
 import co.casterlabs.apiutil.web.WebRequest;
 import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.TypeToken;
@@ -16,7 +19,6 @@ import co.casterlabs.sdk.kick.KickApi;
 import co.casterlabs.sdk.kick.types.KickEmote;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import okhttp3.Request;
 
 @Accessors(chain = true)
 public class KickGetChannelEmotesRequest extends WebRequest<List<KickEmote>> {
@@ -26,14 +28,14 @@ public class KickGetChannelEmotesRequest extends WebRequest<List<KickEmote>> {
     protected List<KickEmote> execute() throws ApiException, ApiAuthException, IOException {
         assert this.slug != null : "You must specify a slug to query for.";
 
-        String response = WebRequest.sendHttpRequest(
-            new Request.Builder()
-                .url(KickApi.API_BASE_URL + "/emotes/" + this.slug),
+        JsonArray sets = WebRequest.sendHttpRequest(
+            HttpRequest.newBuilder()
+                .uri(URI.create(KickApi.API_BASE_URL + "/emotes/" + this.slug)),
+            RsonBodyHandler.of(JsonArray.class),
             null
-        );
-        JsonArray sets = Rson.DEFAULT.fromJson(response, JsonArray.class);
-        List<KickEmote> emotes = new LinkedList<>();
+        ).body();
 
+        List<KickEmote> emotes = new LinkedList<>();
         for (JsonElement e : sets) {
             JsonObject set = e.getAsObject();
 
@@ -45,7 +47,6 @@ public class KickGetChannelEmotesRequest extends WebRequest<List<KickEmote>> {
                 )
             );
         }
-
         return emotes;
     }
 

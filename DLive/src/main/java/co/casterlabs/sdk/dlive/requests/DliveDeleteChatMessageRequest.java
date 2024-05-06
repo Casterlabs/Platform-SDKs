@@ -6,6 +6,7 @@ import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.web.ApiException;
 import co.casterlabs.apiutil.web.AuthenticatedWebRequest;
 import co.casterlabs.sdk.dlive.DliveAuth;
+import co.casterlabs.sdk.dlive.DliveHttpUtil;
 import co.casterlabs.rakurai.json.element.JsonString;
 import lombok.NonNull;
 import lombok.Setter;

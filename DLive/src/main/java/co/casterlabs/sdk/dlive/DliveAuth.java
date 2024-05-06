@@ -1,13 +1,13 @@
 package co.casterlabs.sdk.dlive;
 
 import java.io.IOException;
+import java.net.http.HttpRequest;
 
 import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.auth.OAuthProvider;
 import co.casterlabs.apiutil.auth.OAuthStrategy;
 import lombok.NonNull;
 import lombok.SneakyThrows;
-import okhttp3.Request.Builder;
 
 public class DliveAuth extends OAuthProvider {
     private static final String TOKEN_ENDPOINT = "https://dlive.tv/o/token";
@@ -24,8 +24,8 @@ public class DliveAuth extends OAuthProvider {
 
     @SneakyThrows
     @Override
-    protected void authenticateRequest0(@NonNull Builder request) {
-        request.addHeader("Authorization", this.getAccessToken());
+    protected void authenticateRequest0(@NonNull HttpRequest.Builder request) {
+        request.header("Authorization", this.getAccessToken());
     }
 
     @Override

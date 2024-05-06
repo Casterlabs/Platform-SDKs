@@ -1,13 +1,13 @@
 package co.casterlabs.sdk.tiktok;
 
 import java.io.IOException;
+import java.net.http.HttpRequest;
 
 import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.auth.OAuthProvider;
 import co.casterlabs.apiutil.auth.OAuthStrategy;
 import lombok.NonNull;
 import lombok.SneakyThrows;
-import okhttp3.Request.Builder;
 
 public class TiktokAuth extends OAuthProvider {
     private static final String TOKEN_ENDPOINT = "https://www.tiktok.com/v2/auth/authorize";
@@ -19,8 +19,8 @@ public class TiktokAuth extends OAuthProvider {
 
     @SneakyThrows
     @Override
-    protected void authenticateRequest0(@NonNull Builder request) {
-        request.addHeader("Authorization", "Bearer " + this.getAccessToken());
+    protected void authenticateRequest0(@NonNull HttpRequest.Builder request) {
+        request.header("Authorization", "Bearer " + this.getAccessToken());
     }
 
     @Override

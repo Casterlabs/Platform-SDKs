@@ -1,12 +1,15 @@
 package co.casterlabs.sdk.trovo.requests;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.BodyPublishers;
 
 import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.web.ApiException;
 import co.casterlabs.apiutil.web.AuthenticatedWebRequest;
+import co.casterlabs.apiutil.web.RsonBodyHandler;
 import co.casterlabs.apiutil.web.WebRequest;
-import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.annotating.JsonClass;
 import co.casterlabs.rakurai.json.annotating.JsonField;
 import co.casterlabs.rakurai.json.element.JsonObject;
@@ -17,9 +20,6 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-import okhttp3.MediaType;
-import okhttp3.Request;
-import okhttp3.RequestBody;
 
 @Setter
 @NonNull
@@ -54,19 +54,14 @@ public class TrovoSendChatCommandRequest extends AuthenticatedWebRequest<SendCha
             .put("command", this.command)
             .put("channel_id", this.channelId);
 
-        String response = WebRequest.sendHttpRequest(
-            new Request.Builder()
-                .url(URL)
-                .post(
-                    RequestBody.create(
-                        body.toString(),
-                        MediaType.get("application/json")
-                    )
-                ),
+        return WebRequest.sendHttpRequest(
+            HttpRequest.newBuilder()
+                .uri(URI.create(URL))
+                .POST(BodyPublishers.ofString(body.toString()))
+                .header("Content-Type", "application/json"),
+            RsonBodyHandler.of(SendChatCommandResult.class),
             this.auth
-        );
-
-        return Rson.DEFAULT.fromJson(response, SendChatCommandResult.class);
+        ).body();
     }
 
     @Getter

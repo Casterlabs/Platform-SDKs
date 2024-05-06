@@ -1,5 +1,6 @@
 package co.casterlabs.apiutil.auth;
 
+import java.net.http.HttpRequest;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -11,7 +12,6 @@ import co.casterlabs.rakurai.json.annotating.JsonField;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
-import okhttp3.Request;
 
 public abstract class OAuthProvider extends AuthProvider {
     protected final Object lock = new Object();
@@ -113,11 +113,11 @@ public abstract class OAuthProvider extends AuthProvider {
     // Override.
 
     @Override
-    protected void authenticateRequest0(@NonNull Request.Builder request) {
+    protected void authenticateRequest0(@NonNull HttpRequest.Builder request) {
         if (!this.isApplicationAuth()) {
-            request.addHeader("Authorization", "Bearer " + this.accessToken);
+            request.header("Authorization", "Bearer " + this.accessToken);
         }
-        request.addHeader("Client-ID", this.clientId);
+        request.header("Client-ID", this.clientId);
     }
 
     @Override

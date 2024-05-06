@@ -1,18 +1,19 @@
 package co.casterlabs.sdk.kick;
 
+import java.net.http.HttpRequest;
+
 import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.auth.AuthProvider;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import okhttp3.Request;
 
 @AllArgsConstructor
 public class KickAuth extends AuthProvider {
     private @NonNull String token;
 
     @Override
-    protected void authenticateRequest0(@NonNull Request.Builder request) {
-        request.addHeader("Authorization", "Bearer " + this.token);
+    protected void authenticateRequest0(@NonNull HttpRequest.Builder request) {
+        request.header("Authorization", "Bearer " + this.token);
     }
 
     @Override

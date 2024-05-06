@@ -1,19 +1,20 @@
 package co.casterlabs.sdk.trovo;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.BodyPublishers;
 import java.util.List;
 
 import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.auth.OAuthProvider.OAuthResponse;
 import co.casterlabs.apiutil.auth.OAuthStrategy;
+import co.casterlabs.apiutil.web.RsonBodyHandler;
 import co.casterlabs.apiutil.web.WebRequest;
 import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.annotating.JsonClass;
 import co.casterlabs.rakurai.json.annotating.JsonField;
 import co.casterlabs.rakurai.json.element.JsonObject;
-import okhttp3.MediaType;
-import okhttp3.Request;
-import okhttp3.RequestBody;
 
 // Because it would be too hard to properly implement OAuth...
 class TrovoOAuthStrategy implements OAuthStrategy {
@@ -73,35 +74,28 @@ class TrovoOAuthStrategy implements OAuthStrategy {
     }
 
     private static JsonObject sendAuthHttp(JsonObject body, String url, String clientId) throws IOException {
-        String response = WebRequest.sendHttpRequest(
-            new Request.Builder()
-                .url(url)
+        return WebRequest.sendHttpRequest(
+            HttpRequest.newBuilder()
+                .uri(URI.create(url))
                 .header("Client-ID", clientId)
                 .header("Accept", "application/json")
-                .post(
-                    RequestBody.create(
-                        body.toString(),
-                        MediaType.get("application/json")
-                    )
-                ),
+                .POST(BodyPublishers.ofString(body.toString()))
+                .header("Content-Type", "application/json"),
+            RsonBodyHandler.of(JsonObject.class),
             null
-        );
-
-        return Rson.DEFAULT.fromJson(response, JsonObject.class);
+        ).body();
     }
 
     private static JsonObject sendAuthHttp(String url, String clientId, String accessToken) throws IOException {
-        String response = WebRequest.sendHttpRequest(
-            new Request.Builder()
-                .url(url)
+        return WebRequest.sendHttpRequest(
+            HttpRequest.newBuilder()
+                .uri(URI.create(url))
                 .header("Client-ID", clientId)
                 .header("Authorization", "OAuth " + accessToken)
-                .header("Accept", "application/json")
-                .get(),
+                .header("Accept", "application/json"),
+            RsonBodyHandler.of(JsonObject.class),
             null
-        );
-
-        return Rson.DEFAULT.fromJson(response, JsonObject.class);
+        ).body();
     }
 
     private static void checkAndThrow(JsonObject body) throws ApiAuthException {

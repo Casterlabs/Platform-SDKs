@@ -1,15 +1,18 @@
 package co.casterlabs.sdk.trovo;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpRequest;
 
 import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.auth.OAuthProvider;
 import co.casterlabs.apiutil.auth.OAuthStrategy;
 import co.casterlabs.apiutil.web.ApiException;
+import co.casterlabs.apiutil.web.RsonBodyHandler;
+import co.casterlabs.apiutil.web.WebRequest;
 import co.casterlabs.rakurai.json.element.JsonObject;
 import lombok.NonNull;
 import lombok.SneakyThrows;
-import okhttp3.Request;
 
 public class TrovoAuth extends OAuthProvider {
     private static final OAuthStrategy STRATEGY = new TrovoOAuthStrategy();
@@ -31,11 +34,11 @@ public class TrovoAuth extends OAuthProvider {
 
     @SneakyThrows
     @Override
-    protected void authenticateRequest0(@NonNull Request.Builder request) {
+    protected void authenticateRequest0(@NonNull HttpRequest.Builder request) {
         if (!this.isApplicationAuth()) {
-            request.addHeader("Authorization", "OAuth " + this.getAccessToken());
+            request.header("Authorization", "OAuth " + this.getAccessToken());
         }
-        request.addHeader("Client-ID", this.getClientId());
+        request.header("Client-ID", this.getClientId());
     }
 
     @Override
@@ -44,7 +47,11 @@ public class TrovoAuth extends OAuthProvider {
     }
 
     public JsonObject getChatToken() throws ApiAuthException, IOException, ApiException {
-        return HttpUtil.sendHttpGet(CHAT_TOKEN_URL, this);
+        return WebRequest.sendHttpRequest(
+            HttpRequest.newBuilder(URI.create(CHAT_TOKEN_URL)),
+            RsonBodyHandler.of(JsonObject.class),
+            this
+        ).body();
     }
 
     public static OAuthResponse authorize(String code, String redirectUri, String clientId, String clientSecret) throws IOException, ApiException, ApiAuthException {

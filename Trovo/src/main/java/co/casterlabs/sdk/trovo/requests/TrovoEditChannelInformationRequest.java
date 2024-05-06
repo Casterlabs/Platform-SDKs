@@ -1,6 +1,10 @@
 package co.casterlabs.sdk.trovo.requests;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.BodyPublishers;
+import java.net.http.HttpResponse.BodyHandlers;
 
 import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.web.ApiException;
@@ -12,9 +16,6 @@ import co.casterlabs.sdk.trovo.requests.data.TrovoAudienceType;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import okhttp3.MediaType;
-import okhttp3.Request;
-import okhttp3.RequestBody;
 
 @Setter
 @NonNull
@@ -49,14 +50,10 @@ public class TrovoEditChannelInformationRequest extends AuthenticatedWebRequest<
             .put("audi_type", this.audienceType.name());
 
         WebRequest.sendHttpRequest(
-            new Request.Builder()
-                .url(URL)
-                .post(
-                    RequestBody.create(
-                        body.toString(),
-                        MediaType.get("application/json")
-                    )
-                ),
+            HttpRequest.newBuilder(URI.create(URL))
+                .POST(BodyPublishers.ofString(body.toString()))
+                .header("Content-Type", "application/json"),
+            BodyHandlers.discarding(),
             this.auth
         );
 

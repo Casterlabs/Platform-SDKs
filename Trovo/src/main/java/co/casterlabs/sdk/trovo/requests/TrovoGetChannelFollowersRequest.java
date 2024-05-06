@@ -1,12 +1,14 @@
 package co.casterlabs.sdk.trovo.requests;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpRequest;
 import java.util.List;
 
 import co.casterlabs.apiutil.web.ApiException;
 import co.casterlabs.apiutil.web.AuthenticatedWebRequest;
+import co.casterlabs.apiutil.web.RsonBodyHandler;
 import co.casterlabs.apiutil.web.WebRequest;
-import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.annotating.JsonClass;
 import co.casterlabs.sdk.trovo.TrovoAuth;
 import co.casterlabs.sdk.trovo.requests.TrovoGetChannelFollowersRequest.TrovoGetChannelFollowersResponse;
@@ -16,7 +18,6 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-import okhttp3.Request;
 
 @Setter
 @NonNull
@@ -34,13 +35,11 @@ public class TrovoGetChannelFollowersRequest extends AuthenticatedWebRequest<Tro
     protected TrovoGetChannelFollowersResponse execute() throws IOException, ApiException {
         assert this.channelId != null : "You must set a channel id.";
 
-        String responseBody = WebRequest.sendHttpRequest(
-            new Request.Builder()
-                .url(String.format(URL, this.channelId)),
+        return WebRequest.sendHttpRequest(
+            HttpRequest.newBuilder(URI.create(String.format(URL, this.channelId))),
+            RsonBodyHandler.of(TrovoGetChannelFollowersResponse.class),
             this.auth
-        );
-
-        return Rson.DEFAULT.fromJson(responseBody, TrovoGetChannelFollowersResponse.class);
+        ).body();
     }
 
     @Getter

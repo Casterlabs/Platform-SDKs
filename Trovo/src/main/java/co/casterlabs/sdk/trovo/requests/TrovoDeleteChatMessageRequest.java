@@ -1,6 +1,9 @@
 package co.casterlabs.sdk.trovo.requests;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse.BodyHandlers;
 
 import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.web.ApiException;
@@ -10,7 +13,6 @@ import co.casterlabs.sdk.trovo.TrovoAuth;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import okhttp3.Request;
 
 @Setter
 @NonNull
@@ -34,9 +36,10 @@ public class TrovoDeleteChatMessageRequest extends AuthenticatedWebRequest<Void,
         assert !this.auth.isApplicationAuth() : "You must use user auth for this request.";
 
         WebRequest.sendHttpRequest(
-            new Request.Builder()
-                .url(String.format(URL, this.channelId, this.messageId, this.senderId))
-                .delete(),
+            HttpRequest.newBuilder()
+                .uri(URI.create(String.format(URL, this.channelId, this.messageId, this.senderId)))
+                .DELETE(),
+            BodyHandlers.discarding(),
             this.auth
         );
 

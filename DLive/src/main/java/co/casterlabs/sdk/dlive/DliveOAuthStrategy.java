@@ -1,18 +1,19 @@
 package co.casterlabs.sdk.dlive;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URLEncoder;
+import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.BodyPublishers;
+import java.util.Base64;
 
 import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.auth.OAuthProvider.OAuthResponse;
 import co.casterlabs.apiutil.auth.OAuthStrategy;
+import co.casterlabs.apiutil.web.RsonBodyHandler;
 import co.casterlabs.apiutil.web.WebRequest;
 import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.element.JsonObject;
-import okhttp3.Credentials;
-import okhttp3.MediaType;
-import okhttp3.Request;
-import okhttp3.RequestBody;
 
 @SuppressWarnings("deprecation")
 class DliveOAuthStrategy implements OAuthStrategy {
@@ -54,22 +55,17 @@ class DliveOAuthStrategy implements OAuthStrategy {
     }
 
     static JsonObject sendAuthHttp(JsonObject body, String url, String clientId, String clientSecret) throws IOException {
-        String credential = Credentials.basic(clientId, clientSecret);
+        String credential = "Basic " + Base64.getEncoder().encodeToString((clientId + ":" + clientSecret).getBytes());
 
-        String response = WebRequest.sendHttpRequest(
-            new Request.Builder()
-                .url(url)
+        return WebRequest.sendHttpRequest(
+            HttpRequest.newBuilder()
+                .uri(URI.create(url))
                 .header("Authorization", credential)
-                .post(
-                    RequestBody.create(
-                        body.toString(),
-                        MediaType.get("application/json")
-                    )
-                ),
+                .POST(BodyPublishers.ofString(body.toString()))
+                .header("Content-Type", "application/json"),
+            RsonBodyHandler.of(JsonObject.class),
             null
-        );
-
-        return Rson.DEFAULT.fromJson(response, JsonObject.class);
+        ).body();
     }
 
     static void checkAndThrow(JsonObject body) throws ApiAuthException {

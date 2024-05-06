@@ -1,11 +1,14 @@
 package co.casterlabs.sdk.trovo.requests;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpRequest;
 import java.util.List;
 
 import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.web.ApiException;
 import co.casterlabs.apiutil.web.AuthenticatedWebRequest;
+import co.casterlabs.apiutil.web.RsonBodyHandler;
 import co.casterlabs.apiutil.web.WebRequest;
 import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.TypeToken;
@@ -13,7 +16,6 @@ import co.casterlabs.rakurai.json.element.JsonObject;
 import co.casterlabs.sdk.trovo.TrovoAuth;
 import co.casterlabs.sdk.trovo.requests.data.TrovoGameCategory;
 import lombok.NonNull;
-import okhttp3.Request;
 
 public class TrovoGetGameCategoriesRequest extends AuthenticatedWebRequest<List<TrovoGameCategory>, TrovoAuth> {
     public static final String URL = "https://open-api.trovo.live/openplatform/categorys/top";
@@ -27,13 +29,11 @@ public class TrovoGetGameCategoriesRequest extends AuthenticatedWebRequest<List<
 
     @Override
     protected List<TrovoGameCategory> execute() throws ApiException, ApiAuthException, IOException {
-        String response = WebRequest.sendHttpRequest(
-            new Request.Builder()
-                .url(URL),
+        JsonObject json = WebRequest.sendHttpRequest(
+            HttpRequest.newBuilder(URI.create(URL)),
+            RsonBodyHandler.of(JsonObject.class),
             this.auth
-        );
-
-        JsonObject json = Rson.DEFAULT.fromJson(response, JsonObject.class);
+        ).body();
 
         return Rson.DEFAULT.fromJson(json.get("category_info"), LIST_TYPE);
     }

@@ -1,15 +1,17 @@
 package co.casterlabs.apiutil.auth;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URLEncoder;
+import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.BodyPublishers;
+import java.nio.charset.StandardCharsets;
 
 import co.casterlabs.apiutil.auth.OAuthProvider.OAuthResponse;
+import co.casterlabs.apiutil.web.RsonBodyHandler;
 import co.casterlabs.apiutil.web.WebRequest;
 import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.element.JsonObject;
-import okhttp3.MediaType;
-import okhttp3.Request;
-import okhttp3.RequestBody;
 
 public interface OAuthStrategy {
 
@@ -57,19 +59,14 @@ public interface OAuthStrategy {
         }
 
         protected static JsonObject sendAuthHttp(JsonObject body, String url) throws IOException {
-            String response = WebRequest.sendHttpRequest(
-                new Request.Builder()
-                    .url(url)
-                    .post(
-                        RequestBody.create(
-                            body.toString(),
-                            MediaType.get("application/json")
-                        )
-                    ),
+            return WebRequest.sendHttpRequest(
+                HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .POST(BodyPublishers.ofString(body.toString(), StandardCharsets.UTF_8))
+                    .header("Content-Type", "application/json"),
+                RsonBodyHandler.of(JsonObject.class),
                 null
-            );
-
-            return Rson.DEFAULT.fromJson(response, JsonObject.class);
+            ).body();
         }
 
         protected static void checkAndThrow(JsonObject body) throws ApiAuthException {

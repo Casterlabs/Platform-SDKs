@@ -1,7 +1,10 @@
 package co.casterlabs.sdk.kick.requests;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.net.URI;
+import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.BodyPublishers;
+import java.net.http.HttpResponse.BodyHandlers;
 
 import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.web.ApiException;
@@ -14,9 +17,6 @@ import co.casterlabs.sdk.kick.KickAuth;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import okhttp3.MediaType;
-import okhttp3.Request;
-import okhttp3.RequestBody;
 
 @Accessors(chain = true)
 public class KickCreatePollRequest extends AuthenticatedWebRequest<Void, KickAuth> {
@@ -45,10 +45,12 @@ public class KickCreatePollRequest extends AuthenticatedWebRequest<Void, KickAut
             .put("result_display_duration", this.resultDisplayDuration);
 
         WebRequest.sendHttpRequest(
-            new Request.Builder()
-                .url(KickApi.API_BASE_URL + "/api/v2/channels/" + this.channelSlug + "/polls")
-                .post(RequestBody.create(payload.toString().getBytes(StandardCharsets.UTF_8), MediaType.parse("application/json")))
+            HttpRequest.newBuilder()
+                .uri(URI.create(KickApi.API_BASE_URL + "/api/v2/channels/" + this.channelSlug + "/polls"))
+                .POST(BodyPublishers.ofString(payload.toString()))
+                .header("Content-Type", "application/json")
                 .header("Accept", "application/json"),
+            BodyHandlers.discarding(),
             this.auth
         );
 

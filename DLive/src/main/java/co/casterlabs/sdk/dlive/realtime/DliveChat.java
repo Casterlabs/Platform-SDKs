@@ -8,6 +8,10 @@ import org.java_websocket.handshake.ServerHandshake;
 import org.jetbrains.annotations.Nullable;
 
 import co.casterlabs.apiutil.auth.ApiAuthException;
+import co.casterlabs.rakurai.json.Rson;
+import co.casterlabs.rakurai.json.element.JsonElement;
+import co.casterlabs.rakurai.json.element.JsonObject;
+import co.casterlabs.rakurai.json.element.JsonString;
 import co.casterlabs.sdk.dlive.DliveApiJava;
 import co.casterlabs.sdk.dlive.DliveAuth;
 import co.casterlabs.sdk.dlive.realtime.events.DliveChatGift;
@@ -16,9 +20,6 @@ import co.casterlabs.sdk.dlive.realtime.events.DliveChatMessage;
 import co.casterlabs.sdk.dlive.realtime.events.DliveChatSubscription;
 import co.casterlabs.sdk.dlive.realtime.events._DliveChatDelete;
 import co.casterlabs.sdk.dlive.realtime.events._DliveChatFollow;
-import co.casterlabs.rakurai.json.element.JsonElement;
-import co.casterlabs.rakurai.json.element.JsonObject;
-import co.casterlabs.rakurai.json.element.JsonString;
 import lombok.NonNull;
 import lombok.Setter;
 import xyz.e3ndr.fastloggingframework.logging.FastLogger;
@@ -110,7 +111,7 @@ public class DliveChat implements Closeable {
             FastLogger.logStatic(LogLevel.TRACE, DEBUG_WS_RECIEVE, raw);
 
             try {
-                JsonObject payload = DliveApiJava.RSON.fromJson(raw, JsonObject.class);
+                JsonObject payload = Rson.DEFAULT.fromJson(raw, JsonObject.class);
 
                 switch (payload.getString("type")) {
                     case "connection_ack": {
@@ -134,12 +135,12 @@ public class DliveChat implements Closeable {
                             switch (item.getString("type")) {
 
                                 case "Message": {
-                                    listener.onMessage(DliveApiJava.RSON.fromJson(item, DliveChatMessage.class));
+                                    listener.onMessage(Rson.DEFAULT.fromJson(item, DliveChatMessage.class));
                                     break;
                                 }
 
                                 case "Gift": {
-                                    listener.onGift(DliveApiJava.RSON.fromJson(item, DliveChatGift.class));
+                                    listener.onGift(Rson.DEFAULT.fromJson(item, DliveChatGift.class));
                                     break;
                                 }
 
@@ -154,22 +155,22 @@ public class DliveChat implements Closeable {
                                 }
 
                                 case "Follow": {
-                                    listener.onFollow(DliveApiJava.RSON.fromJson(item, _DliveChatFollow.class).getSender());
+                                    listener.onFollow(Rson.DEFAULT.fromJson(item, _DliveChatFollow.class).getSender());
                                     break;
                                 }
 
                                 case "Subscription": {
-                                    listener.onSubscription(DliveApiJava.RSON.fromJson(item, DliveChatSubscription.class));
+                                    listener.onSubscription(Rson.DEFAULT.fromJson(item, DliveChatSubscription.class));
                                     break;
                                 }
 
                                 case "Delete": {
-                                    listener.onMessagesDelete(DliveApiJava.RSON.fromJson(item, _DliveChatDelete.class).getIds());
+                                    listener.onMessagesDelete(Rson.DEFAULT.fromJson(item, _DliveChatDelete.class).getIds());
                                     break;
                                 }
 
                                 case "Host": {
-                                    listener.onHost(DliveApiJava.RSON.fromJson(item, DliveChatHost.class));
+                                    listener.onHost(Rson.DEFAULT.fromJson(item, DliveChatHost.class));
                                     break;
                                 }
 

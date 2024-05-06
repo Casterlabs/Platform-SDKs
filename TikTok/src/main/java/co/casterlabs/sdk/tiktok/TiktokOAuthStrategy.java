@@ -1,18 +1,23 @@
 package co.casterlabs.sdk.tiktok;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.BodyPublishers;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+
 import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.auth.OAuthProvider.OAuthResponse;
 import co.casterlabs.apiutil.auth.OAuthStrategy;
+import co.casterlabs.apiutil.web.RsonBodyHandler;
 import co.casterlabs.apiutil.web.WebRequest;
 import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.element.JsonObject;
-import okhttp3.FormBody;
-import okhttp3.Request;
 
 public class TiktokOAuthStrategy implements OAuthStrategy {
 
@@ -66,19 +71,20 @@ public class TiktokOAuthStrategy implements OAuthStrategy {
     }
 
     protected static JsonObject sendAuthHttp(Map<String, String> body, String url) throws IOException {
-        FormBody.Builder form = new FormBody.Builder();
+        MultipartEntityBuilder form = MultipartEntityBuilder.create();
         for (Entry<String, String> entry : body.entrySet()) {
-            form.addEncoded(entry.getKey(), entry.getValue());
+            form.addTextBody(entry.getKey(), entry.getValue());
         }
 
-        String response = WebRequest.sendHttpRequest(
-            new Request.Builder()
-                .url(url)
-                .post(form.build()),
+        HttpEntity built = form.build();
+        return WebRequest.sendHttpRequest(
+            HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .POST(BodyPublishers.ofByteArray(built.getContent().readAllBytes()))
+                .header("Content-Type", built.getContentType().getValue()),
+            RsonBodyHandler.of(JsonObject.class),
             null
-        );
-
-        return Rson.DEFAULT.fromJson(response, JsonObject.class);
+        ).body();
     }
 
     protected static void checkAndThrow(JsonObject body) throws ApiAuthException {

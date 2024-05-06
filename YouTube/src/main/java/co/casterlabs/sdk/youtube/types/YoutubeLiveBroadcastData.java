@@ -5,13 +5,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.annotating.JsonClass;
 import co.casterlabs.rakurai.json.annotating.JsonDeserializationMethod;
 import co.casterlabs.rakurai.json.annotating.JsonExclude;
 import co.casterlabs.rakurai.json.element.JsonElement;
 import co.casterlabs.rakurai.json.serialization.JsonParseException;
 import co.casterlabs.rakurai.json.validation.JsonValidationException;
-import co.casterlabs.sdk.youtube.YoutubeApi;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -100,7 +100,7 @@ public class YoutubeLiveBroadcastData {
             for (Map.Entry<String, JsonElement> entry : e.getAsObject().entrySet()) {
                 thumbs.put(
                     entry.getKey(),
-                    YoutubeApi.RSON.fromJson(entry.getValue(), YoutubeThumbnail.class)
+                    Rson.DEFAULT.fromJson(entry.getValue(), YoutubeThumbnail.class)
                 );
             }
 

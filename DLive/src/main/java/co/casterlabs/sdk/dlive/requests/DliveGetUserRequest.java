@@ -5,11 +5,12 @@ import java.io.IOException;
 import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.web.ApiException;
 import co.casterlabs.apiutil.web.AuthenticatedWebRequest;
-import co.casterlabs.sdk.dlive.DliveApiJava;
-import co.casterlabs.sdk.dlive.DliveAuth;
-import co.casterlabs.sdk.dlive.types.DliveUser;
+import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.element.JsonObject;
 import co.casterlabs.rakurai.json.element.JsonString;
+import co.casterlabs.sdk.dlive.DliveAuth;
+import co.casterlabs.sdk.dlive.DliveHttpUtil;
+import co.casterlabs.sdk.dlive.types.DliveUser;
 import lombok.NonNull;
 
 public class DliveGetUserRequest extends AuthenticatedWebRequest<DliveUser, DliveAuth> {
@@ -40,7 +41,7 @@ public class DliveGetUserRequest extends AuthenticatedWebRequest<DliveUser, Dliv
 
         JsonObject response = DliveHttpUtil.sendHttp(String.format(QUERY, this.queryType, this.queryVariables), this.auth);
 
-        return DliveApiJava.RSON.fromJson(
+        return Rson.DEFAULT.fromJson(
             response
                 .getObject("data")
                 .get(this.queryType),

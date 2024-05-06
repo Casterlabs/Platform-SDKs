@@ -1,10 +1,16 @@
 package co.casterlabs.sdk.trovo;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import co.casterlabs.apiutil.web.WebRequest;
 import lombok.NonNull;
 
 public class EmoteCache {
@@ -12,7 +18,7 @@ public class EmoteCache {
     private static final String GLOBAL_EMOTE_FORMAT = "https://img.trovo.live/emotes/%s.png?imageView2/2/format/webp";
     private static final Pattern EMOTE_PATTERN = Pattern.compile(":[a-z_]+");
 
-    private Map<String, EmoteResult> emotes = new HashMap<>();
+    private Map<String, EmoteValidity> emotes = new HashMap<>();
     private String channelId;
 
     public EmoteCache() {}
@@ -33,18 +39,21 @@ public class EmoteCache {
             String emote = m.group();
             String name = emote.substring(1);
 
-            EmoteResult cachedResult = this.emotes.get(name);
+            EmoteValidity cachedResult = this.emotes.get(name);
 
             if (cachedResult == null) {
                 String formattedLink = this.formatLink(name);
+                EmoteValidity validity = getValidity(formattedLink);
 
-                if (HttpUtil.httpExists(formattedLink)) {
-                    this.emotes.put(name, EmoteResult.VALID);
+                if (validity == null) {
+                    continue; // It's busted. We'll check again later.
+                } else if (validity == EmoteValidity.VALID) {
+                    this.emotes.put(name, EmoteValidity.VALID);
                     messageEmotes.put(emote, formattedLink);
                 } else {
-                    this.emotes.put(name, EmoteResult.INVALID);
+                    this.emotes.put(name, EmoteValidity.INVALID);
                 }
-            } else if (cachedResult == EmoteResult.VALID) {
+            } else if (cachedResult == EmoteValidity.VALID) {
                 messageEmotes.put(emote, this.formatLink(name));
             }
         }
@@ -64,10 +73,22 @@ public class EmoteCache {
         }
     }
 
-    private static enum EmoteResult {
+    private static enum EmoteValidity {
         VALID,
         INVALID;
+    }
 
+    private static EmoteValidity getValidity(@NonNull String address) {
+        try {
+            HttpResponse<Void> response = WebRequest.sendHttpRequest(HttpRequest.newBuilder(URI.create(address)), BodyHandlers.discarding(), null);
+            if (response.statusCode() >= 200 && response.statusCode() <= 299) {
+                return EmoteValidity.VALID;
+            } else {
+                return EmoteValidity.INVALID;
+            }
+        } catch (IOException e) {
+            return null;
+        }
     }
 
 }

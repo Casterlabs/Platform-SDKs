@@ -2,19 +2,18 @@ package co.casterlabs.sdk.youtube.requests;
 
 import java.io.IOException;
 
+import org.unbescape.uri.UriEscape;
+
 import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.web.ApiException;
 import co.casterlabs.apiutil.web.AuthenticatedWebRequest;
 import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.element.JsonArray;
 import co.casterlabs.rakurai.json.element.JsonObject;
-import co.casterlabs.rakurai.json.serialization.JsonParseException;
-import co.casterlabs.sdk.youtube.HttpUtil;
-import co.casterlabs.sdk.youtube.YoutubeApi;
 import co.casterlabs.sdk.youtube.YoutubeAuth;
+import co.casterlabs.sdk.youtube.YoutubeHttpUtil;
 import co.casterlabs.sdk.youtube.types.YoutubeChannelSnippet;
 import lombok.NonNull;
-import okhttp3.Response;
 
 public class YoutubeGetChannelSnippetRequest extends AuthenticatedWebRequest<YoutubeChannelSnippet, YoutubeAuth> {
     private int queryMode = -1; // id, handle, mine
@@ -56,12 +55,12 @@ public class YoutubeGetChannelSnippetRequest extends AuthenticatedWebRequest<You
 
         switch (this.queryMode) {
             case 0: {
-                url += String.format("&id=%s", HttpUtil.encodeURIComponent(this.queryData));
+                url += String.format("&id=%s", UriEscape.escapeUriQueryParam(this.queryData));
                 break;
             }
 
             case 1: {
-                url += String.format("&forUsername=%s", HttpUtil.encodeURIComponent(this.queryData));
+                url += String.format("&forUsername=%s", UriEscape.escapeUriQueryParam(this.queryData));
                 break;
             }
 
@@ -75,35 +74,23 @@ public class YoutubeGetChannelSnippetRequest extends AuthenticatedWebRequest<You
             }
         }
 
-        try (Response response = HttpUtil.sendHttpGet(url, this.auth)) {
-            String body = response.body().string();
-
-            if (response.isSuccessful()) {
-                JsonObject json = Rson.DEFAULT.fromJson(body, JsonObject.class);
-                if (!json.containsKey("items")) {
-                    throw new ApiException("Not found.");
-                }
-
-                JsonArray items = json.getArray("items");
-
-                if (items.isEmpty()) {
-                    return null;
-                }
-
-                JsonObject item = items.getObject(0);
-
-                JsonObject snippet = item.getObject("snippet");
-                snippet.put("id", item.get("id"));
-
-                return YoutubeApi.RSON.fromJson(snippet, YoutubeChannelSnippet.class);
-            } else if (response.code() == 401) {
-                throw new ApiAuthException(body);
-            } else {
-                throw new ApiException(body);
-            }
-        } catch (JsonParseException e) {
-            throw new ApiException(e);
+        JsonObject json = YoutubeHttpUtil.list(url, this.auth);
+        if (!json.containsKey("items")) {
+            throw new ApiException("Not found.");
         }
+
+        JsonArray items = json.getArray("items");
+
+        if (items.isEmpty()) {
+            return null;
+        }
+
+        JsonObject item = items.getObject(0);
+
+        JsonObject snippet = item.getObject("snippet");
+        snippet.put("id", item.get("id"));
+
+        return Rson.DEFAULT.fromJson(snippet, YoutubeChannelSnippet.class);
     }
 
 }

@@ -1,11 +1,15 @@
 package co.casterlabs.sdk.trovo.requests;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.BodyPublishers;
 import java.util.List;
 
 import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.web.ApiException;
 import co.casterlabs.apiutil.web.AuthenticatedWebRequest;
+import co.casterlabs.apiutil.web.RsonBodyHandler;
 import co.casterlabs.apiutil.web.WebRequest;
 import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.TypeToken;
@@ -14,9 +18,6 @@ import co.casterlabs.rakurai.json.element.JsonObject;
 import co.casterlabs.sdk.trovo.TrovoAuth;
 import co.casterlabs.sdk.trovo.requests.data.TrovoUser;
 import lombok.NonNull;
-import okhttp3.MediaType;
-import okhttp3.Request;
-import okhttp3.RequestBody;
 
 public class TrovoGetUsersRequest extends AuthenticatedWebRequest<List<TrovoUser>, TrovoAuth> {
     public static final String URL = "https://open-api.trovo.live/openplatform/getusers";
@@ -48,21 +49,16 @@ public class TrovoGetUsersRequest extends AuthenticatedWebRequest<List<TrovoUser
         assert !this.users.isEmpty() : "You must specify at least one username to query.";
 
         JsonObject body = new JsonObject()
-            .put("user", users);
+            .put("user", this.users);
 
-        String response = WebRequest.sendHttpRequest(
-            new Request.Builder()
-                .url(URL)
-                .post(
-                    RequestBody.create(
-                        body.toString(),
-                        MediaType.get("application/json")
-                    )
-                ),
+        JsonObject json = WebRequest.sendHttpRequest(
+            HttpRequest.newBuilder()
+                .uri(URI.create(URL))
+                .POST(BodyPublishers.ofString(body.toString()))
+                .header("Content-Type", "application/json"),
+            RsonBodyHandler.of(JsonObject.class),
             this.auth
-        );
-
-        JsonObject json = Rson.DEFAULT.fromJson(response, JsonObject.class);
+        ).body();
 
         return Rson.DEFAULT.fromJson(json.get("users"), LIST_TYPE);
     }

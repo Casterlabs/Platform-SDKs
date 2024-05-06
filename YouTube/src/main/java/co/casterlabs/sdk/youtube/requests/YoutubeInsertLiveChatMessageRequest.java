@@ -1,7 +1,6 @@
 package co.casterlabs.sdk.youtube.requests;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -9,14 +8,11 @@ import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.web.ApiException;
 import co.casterlabs.apiutil.web.AuthenticatedWebRequest;
 import co.casterlabs.rakurai.json.element.JsonObject;
-import co.casterlabs.rakurai.json.serialization.JsonParseException;
-import co.casterlabs.sdk.youtube.HttpUtil;
 import co.casterlabs.sdk.youtube.YoutubeAuth;
+import co.casterlabs.sdk.youtube.YoutubeHttpUtil;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import okhttp3.RequestBody;
-import okhttp3.Response;
 
 @Accessors(chain = true)
 public class YoutubeInsertLiveChatMessageRequest extends AuthenticatedWebRequest<Void, YoutubeAuth> {
@@ -38,36 +34,21 @@ public class YoutubeInsertLiveChatMessageRequest extends AuthenticatedWebRequest
             throw new ApiAuthException("You must use user auth when sending a chat message.");
         }
 
-        RequestBody request = RequestBody.create(
-            new JsonObject()
-                .put(
-                    "snippet",
-                    new JsonObject()
-                        .put("liveChatId", this.liveChatId)
-                        .put("type", "textMessageEvent")
-                        .put(
-                            "textMessageDetails",
-                            new JsonObject()
-                                .put("messageText", this.messageText)
-                        )
-                )
-                .toString()
-                .getBytes(StandardCharsets.UTF_8)
-        );
+        JsonObject body = new JsonObject()
+            .put(
+                "snippet",
+                new JsonObject()
+                    .put("liveChatId", this.liveChatId)
+                    .put("type", "textMessageEvent")
+                    .put(
+                        "textMessageDetails",
+                        new JsonObject()
+                            .put("messageText", this.messageText)
+                    )
+            );
 
-        try (Response response = HttpUtil.sendHttp(request, "POST", url, this.auth, "application/json")) {
-            String body = response.body().string();
-
-            if (response.isSuccessful()) {
-                return null;
-            } else if (response.code() == 401) {
-                throw new ApiAuthException(body);
-            } else {
-                throw new ApiException(body);
-            }
-        } catch (JsonParseException e) {
-            throw new ApiException(e);
-        }
+        YoutubeHttpUtil.insert(body.toString(), "application/json", url, this.auth);
+        return null;
     }
 
 }

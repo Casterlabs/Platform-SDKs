@@ -1,7 +1,8 @@
 package co.casterlabs.apiutil.auth;
 
+import java.net.http.HttpRequest;
+
 import lombok.NonNull;
-import okhttp3.Request;
 
 public abstract class AuthProvider {
 
@@ -9,7 +10,7 @@ public abstract class AuthProvider {
     /* Requests     */
     /* ------------ */
 
-    public void authenticateRequest(@NonNull Request.Builder request) throws ApiAuthException {
+    public void authenticateRequest(@NonNull HttpRequest.Builder request) throws ApiAuthException {
         if (this.isExpired()) {
             this.refresh();
         }
@@ -17,7 +18,7 @@ public abstract class AuthProvider {
         this.authenticateRequest0(request);
     }
 
-    protected abstract void authenticateRequest0(@NonNull Request.Builder request);
+    protected abstract void authenticateRequest0(@NonNull HttpRequest.Builder request);
 
     /* ------------ */
     /* Auth         */
