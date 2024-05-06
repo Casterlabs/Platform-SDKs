@@ -1,4 +1,4 @@
-package co.casterlabs.sdk.tiktok.requests;
+package co.casterlabs.sdk.tiktok.requests.unsupported;
 
 import java.io.IOException;
 import java.net.URI;
