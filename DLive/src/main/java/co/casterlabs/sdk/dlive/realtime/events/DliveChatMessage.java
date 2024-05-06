@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import co.casterlabs.rakurai.json.annotating.JsonClass;
+import co.casterlabs.rakurai.json.element.JsonElement;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.ToString;
@@ -17,12 +18,22 @@ public class DliveChatMessage {
     // Note that DLive internally calls emotes "emojis" and stickers "emotes"
 
     private String id;
-    private Instant createdAt;
+    private JsonElement createdAt;
     private DliveChatSender sender;
     private String content;
 
     @Getter(AccessLevel.NONE)
     private int[] emojis;
+
+    public Instant getCreatedAt() {
+        long value;
+        if (this.createdAt.isJsonString()) {
+            value = Long.parseLong(this.createdAt.getAsString());
+        } else {
+            value = this.createdAt.getAsNumber().longValue();
+        }
+        return Instant.ofEpochMilli(value);
+    }
 
     public boolean isStickerMessage() {
         return this.content.matches(":(emote|emoji)\\/(global|vip|channel|mine)\\/[^\\/]+?\\/[a-z0-9]+_[0-9]{6}:");

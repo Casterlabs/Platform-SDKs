@@ -3,6 +3,7 @@ package co.casterlabs.sdk.dlive.types;
 import java.time.Instant;
 
 import co.casterlabs.rakurai.json.annotating.JsonClass;
+import co.casterlabs.rakurai.json.element.JsonElement;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -15,8 +16,18 @@ public class DliveUser {
     private String avatar;
     private String displayname;
     private String username;
-    private Instant createdAt;
+    private JsonElement createdAt;
     private DliveLivestream livestream;
     private DliveList followers;
+
+    public Instant getCreatedAt() {
+        long value;
+        if (this.createdAt.isJsonString()) {
+            value = Long.parseLong(this.createdAt.getAsString());
+        } else {
+            value = this.createdAt.getAsNumber().longValue();
+        }
+        return Instant.ofEpochMilli(value);
+    }
 
 }
