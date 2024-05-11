@@ -100,7 +100,7 @@ public class DliveChat implements Closeable {
                 if (listener != null) {
                     listener.onOpen();
                 }
-            } catch (ApiAuthException | InterruptedException e) {
+            } catch (ApiAuthException e) {
                 FastLogger.logException(e);
                 this.close();
             }
