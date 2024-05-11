@@ -28,7 +28,7 @@ public class TiktokWebcastRoomData {
 
             case 2:
             default:
-                System.out.println(this.streamInfo.status);
+//                System.out.println(this.streamInfo.status);
                 return true;
         }
     }
