@@ -23,6 +23,7 @@ import co.casterlabs.rakurai.json.annotating.JsonField;
 import co.casterlabs.rakurai.json.element.JsonObject;
 import co.casterlabs.sdk.dlive.DliveAuth.DliveAuthData;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.SneakyThrows;
@@ -30,7 +31,7 @@ import lombok.SneakyThrows;
 public class DliveAuth extends AuthProvider<DliveAuthData> {
     private final Object lock = new Object();
 
-    private String clientId;
+    private @Getter String clientId;
     private String clientSecret;
     private @Nullable String redirectUri; // Null when application auth.
     private boolean isApplicationAuth = false;

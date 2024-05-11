@@ -20,6 +20,7 @@ import co.casterlabs.rakurai.json.annotating.JsonField;
 import co.casterlabs.rakurai.json.element.JsonObject;
 import co.casterlabs.sdk.tiktok.TiktokAuth.TiktokAuthData;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.SneakyThrows;
@@ -27,7 +28,7 @@ import lombok.SneakyThrows;
 public class TiktokAuth extends AuthProvider<TiktokAuthData> {
     private final Object lock = new Object();
 
-    private String clientId;
+    private @Getter String clientId;
     private String clientSecret;
 
     /* ---------------- */
