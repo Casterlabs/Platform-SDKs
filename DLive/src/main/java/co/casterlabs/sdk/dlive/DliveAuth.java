@@ -5,6 +5,8 @@ import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.util.Base64;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.jetbrains.annotations.Nullable;
 import org.unbescape.uri.UriEscape;
@@ -72,15 +74,15 @@ public class DliveAuth extends AuthProvider<DliveAuthData> {
         synchronized (this.lock) {
             try {
                 String credential = "Basic " + Base64.getEncoder().encodeToString((this.clientId + ":" + this.clientSecret).getBytes());
-                String body;
+                Map<String, String> body;
 
                 if (this.isApplicationAuth) {
-                    body = "grant_type=client_credentials";
+                    body = Map.of("grant_type", "client_credentials");
                 } else {
-                    body = String.format(
-                        "grant_type=refresh_token&refresh_token=%s&redirect_uri=%s",
-                        UriEscape.escapeUriQueryParam(this.data().refreshToken),
-                        UriEscape.escapeUriQueryParam(this.redirectUri)
+                    body = Map.of(
+                        "grant_type", "refresh_token",
+                        "refresh_token", this.data().refreshToken,
+                        "redirect_uri", this.redirectUri
                     );
                 }
 
@@ -88,7 +90,14 @@ public class DliveAuth extends AuthProvider<DliveAuthData> {
                     HttpRequest.newBuilder()
                         .uri(URI.create("https://dlive.tv/o/token"))
                         .header("Authorization", credential)
-                        .POST(BodyPublishers.ofString(body))
+                        .POST(
+                            BodyPublishers.ofString(
+                                body.entrySet()
+                                    .stream()
+                                    .map((e) -> UriEscape.escapeUriQueryParam(e.getKey()) + "=" + UriEscape.escapeUriQueryParam(e.getValue()))
+                                    .collect(Collectors.joining("&"))
+                            )
+                        )
                         .header("Content-Type", "application/x-www-form-urlencoded"),
                     RsonBodyHandler.of(JsonObject.class),
                     null
