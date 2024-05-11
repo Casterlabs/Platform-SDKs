@@ -168,21 +168,8 @@ public class DliveAuth extends AuthProvider<DliveAuthData> {
     /* ---------------- */
 
     static void checkAndThrow(JsonObject body) throws ApiAuthException {
-        if (body.containsKey("error")) {
-            String error = body.getString("error");
-            String description;
-
-            if (body.containsKey("error_description")) {
-                description = body.getString("error_description");
-            } else if (body.containsKey("message")) {
-                description = body.getString("message");
-            } else {
-                description = body.toString();
-            }
-
-            throw new ApiAuthException(error + ": " + description);
-        } else if (body.containsKey("errors")) {
-            throw new ApiAuthException(body.get("errors").toString());
+        if (body.containsKey("error") || body.containsKey("errors")) {
+            throw new ApiAuthException(body.toString());
         }
     }
 
