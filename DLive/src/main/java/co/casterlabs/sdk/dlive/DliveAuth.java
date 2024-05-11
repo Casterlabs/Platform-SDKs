@@ -137,6 +137,7 @@ public class DliveAuth extends AuthProvider<DliveAuthData> {
     @NoArgsConstructor
     @JsonClass(exposeAll = true)
     public static class DliveAuthData {
+        @JsonField("issued_at")
         private long issuedAt = System.currentTimeMillis();
 
         @JsonField("access_token")

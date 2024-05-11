@@ -107,6 +107,7 @@ public class TiktokAuth extends AuthProvider<TiktokAuthData> {
     @NoArgsConstructor
     @JsonClass(exposeAll = true)
     public static class TiktokAuthData {
+        @JsonField("issued_at")
         private long issuedAt = System.currentTimeMillis();
 
         @JsonField("access_token")
