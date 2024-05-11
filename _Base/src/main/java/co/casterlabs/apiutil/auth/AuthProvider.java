@@ -2,9 +2,16 @@ package co.casterlabs.apiutil.auth;
 
 import java.net.http.HttpRequest;
 
+import lombok.AllArgsConstructor;
 import lombok.NonNull;
 
-public abstract class AuthProvider {
+@AllArgsConstructor
+public abstract class AuthProvider<T> {
+    protected final @NonNull AuthDataProvider<T> dataProvider;
+
+    protected T data() {
+        return this.dataProvider.load();
+    }
 
     /* ------------ */
     /* Requests     */
@@ -26,8 +33,8 @@ public abstract class AuthProvider {
 
     public abstract void refresh() throws ApiAuthException;
 
-    public abstract boolean isApplicationAuth();
-
     public abstract boolean isExpired();
+
+    public abstract boolean isApplicationAuth();
 
 }
