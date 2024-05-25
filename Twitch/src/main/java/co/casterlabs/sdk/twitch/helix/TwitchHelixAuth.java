@@ -63,7 +63,7 @@ public class TwitchHelixAuth extends AuthProvider<TwitchHelixAuthData> {
     @SneakyThrows
     @Override
     protected void authenticateRequest0(@NonNull HttpRequest.Builder request) {
-        request.header("Authorization", "Bearer " + this.data().accessToken);
+        request.header("Authorization", String.join(" ", this.data().tokenType, this.data().accessToken));
         request.header("Client-ID", this.clientId);
     }
 

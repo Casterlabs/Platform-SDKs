@@ -53,7 +53,7 @@ public class TiktokAuth extends AuthProvider<TiktokAuthData> {
     @SneakyThrows
     @Override
     protected void authenticateRequest0(@NonNull HttpRequest.Builder request) {
-        request.header("Authorization", "Bearer " + this.data().accessToken);
+        request.header("Authorization", String.join(" ", this.data().tokenType, this.data().accessToken));
     }
 
     @Override
