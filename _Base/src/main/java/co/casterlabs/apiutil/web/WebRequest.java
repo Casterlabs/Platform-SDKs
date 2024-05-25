@@ -5,6 +5,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandler;
+import java.util.OptionalLong;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -49,10 +50,18 @@ public abstract class WebRequest<T> {
                 HttpResponse<T> response = Concurrency.execute(request.uri().getHost(), () -> client.send(request, bodyHandler));
 
                 if (response.statusCode() == 429 || response.statusCode() == 420) {
-                    if (request.uri().toString().contains("/helix/eventsub") && request.uri().toString().contains("twitch")) {
-                        // Twitch's EventSub incorrectly returns 429 when you have too many
-                        // subscriptions. So we'll just bail-out entirely.
-                        return response;
+                    if (request.uri().toString().contains("/helix") && request.uri().toString().contains("twitch")) {
+                        // Some Twitch endpoints return 429 for non-ratelimit reasons.
+                        // See: https://github.com/twitchdev/issues/issues/958
+
+                        OptionalLong remainingOptional = response.headers().firstValueAsLong("Ratelimit-Remaining");
+                        if (remainingOptional.isPresent()) {
+                            long remaining = remainingOptional.getAsLong();
+                            if (remaining > 1) {
+                                // Means that our request isn't being subjected to a ratelimit.
+                                return response;
+                            }
+                        }
                     }
 
                     if (retryCount == MAX_RETRIES) {
