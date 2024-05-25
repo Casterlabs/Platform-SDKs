@@ -49,14 +49,14 @@ public class RsonBodyHandler {
                 public CompletionStage<T> getBody() {
                     return this.stringSubscriber
                         .getBody()
-                        .thenApply((json) -> {
-                            if (json == null || json.isEmpty()) {
+                        .thenApply((jsonString) -> {
+                            if (jsonString == null || jsonString.isBlank()) {
                                 return null;
                             }
                             try {
-                                return Rson.DEFAULT.fromJson(json, type);
+                                return Rson.DEFAULT.fromJson(jsonString, type);
                             } catch (JsonParseException e) {
-                                throw new RuntimeException(e);
+                                throw new RuntimeException(jsonString, e);
                             }
                         });
                 }
