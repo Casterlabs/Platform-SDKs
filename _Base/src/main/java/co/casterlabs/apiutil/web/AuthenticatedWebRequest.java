@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 
 @AllArgsConstructor
-public abstract class AuthenticatedWebRequest<T, A extends AuthProvider> extends WebRequest<T> {
+public abstract class AuthenticatedWebRequest<T, A extends AuthProvider<?>> extends WebRequest<T> {
     protected @NonNull A auth;
 
 }

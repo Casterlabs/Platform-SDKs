@@ -32,7 +32,6 @@ public abstract class WebRequest<T> {
 
     protected abstract T execute() throws ApiException, ApiAuthException, IOException;
 
-    public static <T> HttpResponse<T> sendHttpRequest(@NonNull HttpRequest.Builder builder, @NonNull BodyHandler<T> bodyHandler, @Nullable AuthProvider auth) throws IOException {
         if (auth != null) {
             try {
                 auth.authenticateRequest(builder);
@@ -40,6 +39,7 @@ public abstract class WebRequest<T> {
                 throw new IOException(e);
             }
         }
+    public static <T> HttpResponse<T> sendHttpRequest(@NonNull HttpRequest.Builder builder, @NonNull BodyHandler<T> bodyHandler, @Nullable AuthProvider<?> auth) throws IOException {
 
         HttpRequest request = builder.build();
 
