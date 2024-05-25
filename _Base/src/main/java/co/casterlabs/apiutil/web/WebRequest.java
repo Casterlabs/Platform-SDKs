@@ -34,8 +34,6 @@ public abstract class WebRequest<T> {
 
     public static <T> HttpResponse<T> sendHttpRequest(@NonNull HttpRequest.Builder builder, @NonNull BodyHandler<T> bodyHandler, @Nullable AuthProvider<?> auth) throws IOException {
         try {
-            HttpRequest request = builder.build();
-
             final int MAX_RETRIES = 20;
             int retryCount = 0;
             while (true) {
@@ -47,6 +45,7 @@ public abstract class WebRequest<T> {
                     }
                 }
 
+                HttpRequest request = builder.build();
                 HttpResponse<T> response = Concurrency.execute(request.uri().getHost(), () -> client.send(request, bodyHandler));
 
                 if (response.statusCode() == 429 || response.statusCode() == 420) {
