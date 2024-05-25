@@ -62,7 +62,7 @@ public class YoutubeAuth extends AuthProvider<YoutubeAuthData> {
     @Override
     protected void authenticateRequest0(@NonNull HttpRequest.Builder request) {
         if (!this.isApplicationAuth()) {
-            request.header("Authorization", String.join(" ", this.data().tokenType, this.data().accessToken));
+            request.header("Authorization", "Bearer " + this.data().accessToken);
         }
 
         // Inject the client key.
