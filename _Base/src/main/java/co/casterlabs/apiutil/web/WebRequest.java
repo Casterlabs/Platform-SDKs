@@ -19,6 +19,11 @@ import lombok.NonNull;
 public abstract class WebRequest<T> {
     public static final HttpClient client = HttpClient.newHttpClient();
 
+    static {
+        WebRequest.class.getClassLoader().setPackageAssertionStatus("co.casterlabs.sdk", true);
+        WebRequest.class.getClassLoader().setPackageAssertionStatus("co.casterlabs.apiutil", true);
+    }
+
     public Promise<T> sendAsync() {
         return new Promise<>(this::send);
     }
