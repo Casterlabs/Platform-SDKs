@@ -32,31 +32,49 @@ public abstract class WebRequest<T> {
 
     protected abstract T execute() throws ApiException, ApiAuthException, IOException;
 
-        if (auth != null) {
-            try {
-                auth.authenticateRequest(builder);
-            } catch (ApiAuthException e) {
-                throw new IOException(e);
-            }
-        }
     public static <T> HttpResponse<T> sendHttpRequest(@NonNull HttpRequest.Builder builder, @NonNull BodyHandler<T> bodyHandler, @Nullable AuthProvider<?> auth) throws IOException {
+        try {
+            HttpRequest request = builder.build();
 
-        HttpRequest request = builder.build();
+            final int MAX_RETRIES = 20;
+            int retryCount = 0;
+            while (true) {
+                if (auth != null) {
+                    try {
+                        auth.authenticateRequest(builder);
+                    } catch (ApiAuthException e) {
+                        throw new IOException(e);
+                    }
+                }
 
-        while (true) {
-            try {
                 HttpResponse<T> response = Concurrency.execute(request.uri().getHost(), () -> client.send(request, bodyHandler));
 
                 if (response.statusCode() == 429 || response.statusCode() == 420) {
-                    Ratelimiter.ratelimitTMR(request.uri().getHost());
+                    if (request.uri().toString().contains("/helix/eventsub") && request.uri().toString().contains("twitch")) {
+                        // Twitch's EventSub incorrectly returns 429 when you have too many
+                        // subscriptions. So we'll just bail-out entirely.
+                        return response;
+                    }
+
+                    if (retryCount == MAX_RETRIES) {
+                        throw new IOException(
+                            "Retried 20 times without success."
+                                + "\nRequest uri: " + response.uri()
+                                + "\nResponse headers: " + response.headers()
+                                + "\nResponse status: " + response.statusCode()
+                        );
+                    }
+
+                    Ratelimiter.ratelimitHeaders(request.uri().getHost(), response);
+                    retryCount++;
                     continue; // Try again.
                 }
 
                 return response;
-            } catch (InterruptedException e) {
-                Thread.interrupted();
-                throw new IOException(e);
             }
+        } catch (InterruptedException e) {
+            Thread.interrupted(); // Clear.
+            throw new IOException(e);
         }
     }
 
