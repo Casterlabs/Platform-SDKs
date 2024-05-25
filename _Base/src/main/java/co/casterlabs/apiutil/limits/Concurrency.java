@@ -7,12 +7,7 @@ import java.util.concurrent.Semaphore;
 
 public class Concurrency {
     private static final Map<String, Semaphore> semaphoreCache = new HashMap<>();
-    private static int maxOutgoingPerDomain = -1;
-
-    public static void setMaxOutgoingPerDomain(int value) {
-        semaphoreCache.clear();
-        maxOutgoingPerDomain = value;
-    }
+    private static final int maxOutgoingPerDomain = 30;
 
     public static <T> T execute(String domain, IOSupplier<T> supp) throws InterruptedException, IOException {
         Semaphore lock = null;
