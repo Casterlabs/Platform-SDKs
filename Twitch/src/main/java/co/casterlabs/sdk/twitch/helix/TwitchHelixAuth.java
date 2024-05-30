@@ -26,7 +26,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.SneakyThrows;
 
 @SuppressWarnings("deprecation")
 public class TwitchHelixAuth extends AuthProvider<TwitchHelixAuthData> {
@@ -71,10 +70,9 @@ public class TwitchHelixAuth extends AuthProvider<TwitchHelixAuthData> {
     /* Impl.            */
     /* ---------------- */
 
-    @SneakyThrows
     @Override
-    protected void authenticateRequest0(@NonNull HttpRequest.Builder request) {
-        request.header("Authorization", "Bearer " + this.data().accessToken);
+    public void authenticateRequest(@NonNull HttpRequest.Builder request) throws ApiAuthException {
+        request.header("Authorization", this.getAccessToken());
         request.header("Client-ID", this.clientId);
     }
 

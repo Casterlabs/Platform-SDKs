@@ -22,7 +22,7 @@ public class KickAuth extends AuthProvider<KickAuthData> {
     }
 
     @Override
-    protected void authenticateRequest0(@NonNull HttpRequest.Builder request) {
+    public void authenticateRequest(@NonNull HttpRequest.Builder request) {
         request.header("Authorization", "Bearer " + this.data().token);
     }
 

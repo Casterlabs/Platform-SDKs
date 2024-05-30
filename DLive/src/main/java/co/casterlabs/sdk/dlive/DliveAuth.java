@@ -28,7 +28,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.SneakyThrows;
 
 @SuppressWarnings("deprecation")
 public class DliveAuth extends AuthProvider<DliveAuthData> {
@@ -75,10 +74,9 @@ public class DliveAuth extends AuthProvider<DliveAuthData> {
     /* Impl.            */
     /* ---------------- */
 
-    @SneakyThrows
     @Override
-    protected void authenticateRequest0(@NonNull HttpRequest.Builder request) {
-        request.header("Authorization", this.data().accessToken);
+    public void authenticateRequest(@NonNull HttpRequest.Builder request) throws ApiAuthException {
+        request.header("Authorization", this.getAccessToken());
     }
 
     @Override

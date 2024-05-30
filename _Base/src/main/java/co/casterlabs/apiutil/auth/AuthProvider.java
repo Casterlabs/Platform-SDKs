@@ -21,15 +21,7 @@ public abstract class AuthProvider<T> {
     /* Requests     */
     /* ------------ */
 
-    public void authenticateRequest(@NonNull HttpRequest.Builder request) throws ApiAuthException {
-        if (this.isExpired()) {
-            this.refresh();
-        }
-
-        this.authenticateRequest0(request);
-    }
-
-    protected abstract void authenticateRequest0(@NonNull HttpRequest.Builder request);
+    public abstract void authenticateRequest(@NonNull HttpRequest.Builder request) throws ApiAuthException;
 
     /* ------------ */
     /* Auth         */

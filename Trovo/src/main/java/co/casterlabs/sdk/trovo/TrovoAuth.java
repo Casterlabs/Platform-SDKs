@@ -25,7 +25,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.SneakyThrows;
 
 @SuppressWarnings("deprecation")
 public class TrovoAuth extends AuthProvider<TrovoAuthData> {
@@ -69,11 +68,10 @@ public class TrovoAuth extends AuthProvider<TrovoAuthData> {
     /* Impl.            */
     /* ---------------- */
 
-    @SneakyThrows
     @Override
-    protected void authenticateRequest0(@NonNull HttpRequest.Builder request) {
+    public void authenticateRequest(@NonNull HttpRequest.Builder request) throws ApiAuthException {
         if (!this.isApplicationAuth) {
-            request.header("Authorization", "OAuth " + this.data().accessToken);
+            request.header("Authorization", this.getAccessToken());
         }
         request.header("Client-ID", this.clientId);
     }
