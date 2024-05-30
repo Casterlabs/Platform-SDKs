@@ -28,15 +28,21 @@ public class Ratelimiter {
         HttpHeaders headers = response.headers();
 
         try {
-            if (headers.firstValue("Ratelimit-Reset").isPresent()) {
-                long resetAfter = headers.firstValueAsLong("Ratelimit-Reset").getAsLong();
+            final String[] HEADERS = {
+                    "Retry-After",
+                    "Ratelimit-Reset",
+                    "X-Ratelimit-Reset"
+            };
+            for (String headerName : HEADERS) {
+                if (headers.firstValue(headerName).isEmpty()) continue;
+
+                long resetAfter = headers.firstValueAsLong(headerName).getAsLong();
                 Thread.sleep(parseRatelimitValue(resetAfter));
-            } else if (headers.firstValue("X-Ratelimit-Reset").isPresent()) {
-                long resetAfter = headers.firstValueAsLong("X-Ratelimit-Reset").getAsLong();
-                Thread.sleep(parseRatelimitValue(resetAfter));
-            } else {
-                ratelimitExponential(domain);
+                return;
             }
+
+            // We couldn't find a suitable header, fallback to a backoff implementation.
+            ratelimitExponential(domain);
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException(headers.toString(), e);
         }
