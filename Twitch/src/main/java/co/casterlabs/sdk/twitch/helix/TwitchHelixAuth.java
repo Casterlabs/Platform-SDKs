@@ -37,23 +37,31 @@ public class TwitchHelixAuth extends AuthProvider<TwitchHelixAuthData> {
     /* Construction     */
     /* ---------------- */
 
-    private TwitchHelixAuth(AuthDataProvider<TwitchHelixAuthData> dataProvider) {
+    /**
+     * User
+     */
+    protected TwitchHelixAuth(AuthDataProvider<TwitchHelixAuthData> dataProvider, String clientId, String clientSecret) {
         super(dataProvider);
+        this.clientId = clientId;
+        this.clientSecret = clientSecret;
+    }
+
+    /**
+     * Application
+     */
+    protected TwitchHelixAuth(String clientId, String clientSecret) {
+        super(new InMemoryAuthDataProvider<>(TwitchHelixAuthData.of(null)));
+        this.clientId = clientId;
+        this.clientSecret = clientSecret;
+        this.isApplicationAuth = true;
     }
 
     public static TwitchHelixAuth ofUser(AuthDataProvider<TwitchHelixAuthData> dataProvider, String clientId, String clientSecret) {
-        TwitchHelixAuth auth = new TwitchHelixAuth(dataProvider);
-        auth.clientId = clientId;
-        auth.clientSecret = clientSecret;
-        return auth;
+        return new TwitchHelixAuth(dataProvider, clientId, clientSecret);
     }
 
     public static TwitchHelixAuth ofApplication(String clientId, String clientSecret) {
-        TwitchHelixAuth auth = new TwitchHelixAuth(new InMemoryAuthDataProvider<>(TwitchHelixAuthData.of(null)));
-        auth.clientId = clientId;
-        auth.clientSecret = clientSecret;
-        auth.isApplicationAuth = true;
-        return auth;
+        return new TwitchHelixAuth(clientId, clientSecret);
     }
 
     /* ---------------- */

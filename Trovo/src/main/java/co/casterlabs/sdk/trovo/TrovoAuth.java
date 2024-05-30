@@ -36,22 +36,30 @@ public class TrovoAuth extends AuthProvider<TrovoAuthData> {
     /* Construction     */
     /* ---------------- */
 
-    private TrovoAuth(AuthDataProvider<TrovoAuthData> dataProvider) {
+    /**
+     * User
+     */
+    protected TrovoAuth(AuthDataProvider<TrovoAuthData> dataProvider, String clientId, String clientSecret) {
         super(dataProvider);
+        this.clientId = clientId;
+        this.clientSecret = clientSecret;
+    }
+
+    /**
+     * Application
+     */
+    protected TrovoAuth(String clientId) {
+        super(new InMemoryAuthDataProvider<>(TrovoAuthData.of(null)));
+        this.clientId = clientId;
+        this.isApplicationAuth = true;
     }
 
     public static TrovoAuth ofUser(AuthDataProvider<TrovoAuthData> dataProvider, String clientId, String clientSecret) {
-        TrovoAuth auth = new TrovoAuth(dataProvider);
-        auth.clientId = clientId;
-        auth.clientSecret = clientSecret;
-        return auth;
+        return new TrovoAuth(dataProvider, clientId, clientSecret);
     }
 
     public static TrovoAuth ofApplication(String clientId) {
-        TrovoAuth auth = new TrovoAuth(new InMemoryAuthDataProvider<>(TrovoAuthData.of(null)));
-        auth.clientId = clientId;
-        auth.isApplicationAuth = true;
-        return auth;
+        return new TrovoAuth(clientId);
     }
 
     /* ---------------- */

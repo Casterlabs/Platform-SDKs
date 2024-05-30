@@ -36,23 +36,31 @@ public class YoutubeAuth extends AuthProvider<YoutubeAuthData> {
     /* Construction     */
     /* ---------------- */
 
-    private YoutubeAuth(AuthDataProvider<YoutubeAuthData> dataProvider) {
+    /**
+     * User
+     */
+    protected YoutubeAuth(AuthDataProvider<YoutubeAuthData> dataProvider, String apiKey, String clientId, String clientSecret) {
         super(dataProvider);
+        this.apiKey = apiKey;
+        this.clientId = clientId;
+        this.clientSecret = clientSecret;
+    }
+
+    /**
+     * Application
+     */
+    protected YoutubeAuth(String apiKey) {
+        super(new InMemoryAuthDataProvider<>(YoutubeAuthData.of(null)));
+        this.apiKey = apiKey;
+        this.isApplicationAuth = true;
     }
 
     public static YoutubeAuth ofUser(AuthDataProvider<YoutubeAuthData> dataProvider, String apiKey, String clientId, String clientSecret) {
-        YoutubeAuth auth = new YoutubeAuth(dataProvider);
-        auth.apiKey = apiKey;
-        auth.clientId = clientId;
-        auth.clientSecret = clientSecret;
-        return auth;
+        return new YoutubeAuth(dataProvider, apiKey, clientId, clientSecret);
     }
 
     public static YoutubeAuth ofApplication(String apiKey) {
-        YoutubeAuth auth = new YoutubeAuth(new InMemoryAuthDataProvider<>(YoutubeAuthData.of(null)));
-        auth.apiKey = apiKey;
-        auth.isApplicationAuth = true;
-        return auth;
+        return new YoutubeAuth(apiKey);
     }
 
     /* ---------------- */

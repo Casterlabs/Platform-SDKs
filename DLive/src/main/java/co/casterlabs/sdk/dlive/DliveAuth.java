@@ -40,24 +40,32 @@ public class DliveAuth extends AuthProvider<DliveAuthData> {
     /* Construction     */
     /* ---------------- */
 
-    private DliveAuth(AuthDataProvider<DliveAuthData> dataProvider) {
+    /**
+     * User
+     */
+    protected DliveAuth(AuthDataProvider<DliveAuthData> dataProvider, String clientId, String clientSecret, String redirectUri) {
         super(dataProvider);
+        this.clientId = clientId;
+        this.clientSecret = clientSecret;
+        this.redirectUri = redirectUri;
+    }
+
+    /**
+     * Application
+     */
+    protected DliveAuth(String clientId, String clientSecret) {
+        super(new InMemoryAuthDataProvider<>(DliveAuthData.of(null)));
+        this.clientId = clientId;
+        this.clientSecret = clientSecret;
+        this.isApplicationAuth = true;
     }
 
     public static DliveAuth ofUser(AuthDataProvider<DliveAuthData> dataProvider, String clientId, String clientSecret, String redirectUri) {
-        DliveAuth auth = new DliveAuth(dataProvider);
-        auth.clientId = clientId;
-        auth.clientSecret = clientSecret;
-        auth.redirectUri = redirectUri;
-        return auth;
+        return new DliveAuth(dataProvider, clientId, clientSecret, redirectUri);
     }
 
     public static DliveAuth ofApplication(String clientId, String clientSecret) {
-        DliveAuth auth = new DliveAuth(new InMemoryAuthDataProvider<>(DliveAuthData.of(null)));
-        auth.clientId = clientId;
-        auth.clientSecret = clientSecret;
-        auth.isApplicationAuth = true;
-        return auth;
+        return new DliveAuth(clientId, clientSecret);
     }
 
     /* ---------------- */

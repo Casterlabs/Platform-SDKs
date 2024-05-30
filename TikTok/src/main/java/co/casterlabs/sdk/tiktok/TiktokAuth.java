@@ -35,15 +35,17 @@ public class TiktokAuth extends AuthProvider<TiktokAuthData> {
     /* Construction     */
     /* ---------------- */
 
-    private TiktokAuth(AuthDataProvider<TiktokAuthData> dataProvider) {
+    /**
+     * User
+     */
+    protected TiktokAuth(AuthDataProvider<TiktokAuthData> dataProvider, String clientId, String clientSecret) {
         super(dataProvider);
+        this.clientId = clientId;
+        this.clientSecret = clientSecret;
     }
 
     public static TiktokAuth ofUser(AuthDataProvider<TiktokAuthData> dataProvider, String clientId, String clientSecret) {
-        TiktokAuth auth = new TiktokAuth(dataProvider);
-        auth.clientId = clientId;
-        auth.clientSecret = clientSecret;
-        return auth;
+        return new TiktokAuth(dataProvider, clientId, clientSecret);
     }
 
     /* ---------------- */
