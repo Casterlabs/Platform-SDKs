@@ -16,7 +16,9 @@ import co.casterlabs.apiutil.web.RsonBodyHandler;
 import co.casterlabs.apiutil.web.WebRequest;
 import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.annotating.JsonClass;
+import co.casterlabs.rakurai.json.annotating.JsonDeserializationMethod;
 import co.casterlabs.rakurai.json.annotating.JsonField;
+import co.casterlabs.rakurai.json.element.JsonElement;
 import co.casterlabs.rakurai.json.element.JsonObject;
 import co.casterlabs.sdk.trovo.TrovoAuth.TrovoAuthData;
 import lombok.EqualsAndHashCode;
@@ -165,6 +167,11 @@ public class TrovoAuth extends AuthProvider<TrovoAuthData> {
 
         @JsonField("token_type")
         public String tokenType;
+
+        @JsonDeserializationMethod("refreshToken")
+        private void $deserialize_refreshToken(JsonElement e) {
+            this.refreshToken = e.getAsString(); // Compat. for some old code.
+        }
 
         public static TrovoAuthData of(String refreshToken) {
             TrovoAuthData d = new TrovoAuthData();

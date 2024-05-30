@@ -16,7 +16,9 @@ import co.casterlabs.apiutil.auth.AuthProvider;
 import co.casterlabs.apiutil.web.ApiException;
 import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.annotating.JsonClass;
+import co.casterlabs.rakurai.json.annotating.JsonDeserializationMethod;
 import co.casterlabs.rakurai.json.annotating.JsonField;
+import co.casterlabs.rakurai.json.element.JsonElement;
 import co.casterlabs.rakurai.json.element.JsonObject;
 import co.casterlabs.sdk.youtube.YoutubeAuth.YoutubeAuthData;
 import lombok.EqualsAndHashCode;
@@ -161,6 +163,11 @@ public class YoutubeAuth extends AuthProvider<YoutubeAuthData> {
 
         @JsonField("token_type")
         public String tokenType;
+
+        @JsonDeserializationMethod("refreshToken")
+        private void $deserialize_refreshToken(JsonElement e) {
+            this.refreshToken = e.getAsString(); // Compat. for some old code.
+        }
 
         public static YoutubeAuthData of(String refreshToken) {
             YoutubeAuthData d = new YoutubeAuthData();
