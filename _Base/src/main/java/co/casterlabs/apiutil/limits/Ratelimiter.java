@@ -27,14 +27,18 @@ public class Ratelimiter {
     public static void ratelimitHeaders(String domain, HttpResponse<?> response) throws InterruptedException {
         HttpHeaders headers = response.headers();
 
-        if (headers.firstValue("Ratelimit-Reset").isPresent()) {
-            long resetAfter = headers.firstValueAsLong("Ratelimit-Reset").getAsLong();
-            Thread.sleep(parseRatelimitValue(resetAfter));
-        } else if (headers.firstValue("X-Ratelimit-Reset").isPresent()) {
-            long resetAfter = headers.firstValueAsLong("X-Ratelimit-Reset").getAsLong();
-            Thread.sleep(parseRatelimitValue(resetAfter));
-        } else {
-            ratelimitExponential(domain);
+        try {
+            if (headers.firstValue("Ratelimit-Reset").isPresent()) {
+                long resetAfter = headers.firstValueAsLong("Ratelimit-Reset").getAsLong();
+                Thread.sleep(parseRatelimitValue(resetAfter));
+            } else if (headers.firstValue("X-Ratelimit-Reset").isPresent()) {
+                long resetAfter = headers.firstValueAsLong("X-Ratelimit-Reset").getAsLong();
+                Thread.sleep(parseRatelimitValue(resetAfter));
+            } else {
+                ratelimitExponential(domain);
+            }
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(headers.toString(), e);
         }
     }
 
