@@ -8,15 +8,6 @@ public class KickApi {
     public static String PUSHER_CLUSTER = "us2";
     public static String PUSHER_KEY = "eb1d5f283081a78b932c";
 
-    private static boolean hasInitialized = false;
-
-    public static void init() {
-        if (hasInitialized) return;
-
-        KickApi.class.getClassLoader().setPackageAssertionStatus("co.casterlabs.sdk.kick", true);
-        hasInitialized = true;
-    }
-
     public static String parseResponsiveImage(JsonElement e) {
         if ((e == null) || e.isJsonNull()) {
             return null;

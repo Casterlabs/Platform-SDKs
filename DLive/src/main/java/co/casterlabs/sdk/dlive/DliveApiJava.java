@@ -6,10 +6,6 @@ public class DliveApiJava {
     public static final String API = "https://api.dlive.tv";
     public static final String REALTIME_API = "wss://api-ws.dlive.tv";
 
-    static {
-        ClassLoader.getSystemClassLoader().setDefaultAssertionStatus(true);
-    }
-
     public static String formatQuery(String query) {
         JsonObject payload = new JsonObject();
 
