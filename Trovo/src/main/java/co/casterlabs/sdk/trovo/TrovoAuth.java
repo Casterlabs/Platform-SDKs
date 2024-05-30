@@ -152,7 +152,14 @@ public class TrovoAuth extends AuthProvider<TrovoAuthData> {
     @Override
     public boolean isExpired() {
         synchronized (this.lock) {
-            return ((System.currentTimeMillis() - this.data().issuedAt) / 1000) > this.data().expiresIn;
+            TrovoAuthData data = this.data();
+
+            if (data.accessToken == null) {
+                return true;
+            }
+
+            long secondsSinceIssuance = (System.currentTimeMillis() - data.issuedAt) / 1000;
+            return secondsSinceIssuance > data.expiresIn;
         }
     }
 

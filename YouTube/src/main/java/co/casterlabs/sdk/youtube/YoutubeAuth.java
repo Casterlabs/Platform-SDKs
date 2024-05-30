@@ -137,9 +137,15 @@ public class YoutubeAuth extends AuthProvider<YoutubeAuthData> {
 
     @Override
     public boolean isExpired() {
-        if (this.isApplicationAuth) return false;
         synchronized (this.lock) {
-            return ((System.currentTimeMillis() - this.data().issuedAt) / 1000) > this.data().expiresIn;
+            YoutubeAuthData data = this.data();
+
+            if (data.accessToken == null) {
+                return true;
+            }
+
+            long secondsSinceIssuance = (System.currentTimeMillis() - data.issuedAt) / 1000;
+            return secondsSinceIssuance > data.expiresIn;
         }
     }
 
