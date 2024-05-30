@@ -9,7 +9,11 @@ import lombok.NonNull;
 public abstract class AuthProvider<T> {
     protected final @NonNull AuthDataProvider<T> dataProvider;
 
-    protected T data() {
+    /**
+     * Only use this if you know what you are doing!
+     */
+    @Deprecated
+    public T data() {
         return this.dataProvider.load();
     }
 

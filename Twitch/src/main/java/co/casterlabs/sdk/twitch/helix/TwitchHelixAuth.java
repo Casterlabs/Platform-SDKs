@@ -26,6 +26,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 
+@SuppressWarnings("deprecation")
 public class TwitchHelixAuth extends AuthProvider<TwitchHelixAuthData> {
     private final Object lock = new Object();
 
@@ -156,21 +157,21 @@ public class TwitchHelixAuth extends AuthProvider<TwitchHelixAuthData> {
     @JsonClass(exposeAll = true)
     public static class TwitchHelixAuthData {
         @JsonField("issued_at")
-        private long issuedAt = System.currentTimeMillis();
+        public long issuedAt = System.currentTimeMillis();
 
         @JsonField("access_token")
-        private String accessToken;
+        public String accessToken;
 
         @JsonField("expires_in")
-        private int expiresIn;
+        public int expiresIn;
 
         @JsonField("refresh_token")
-        private String refreshToken;
+        public String refreshToken;
 
-        private String scope;
+        public String scope;
 
         @JsonField("token_type")
-        private String tokenType;
+        public String tokenType;
 
         public static TwitchHelixAuthData of(String refreshToken) {
             TwitchHelixAuthData d = new TwitchHelixAuthData();

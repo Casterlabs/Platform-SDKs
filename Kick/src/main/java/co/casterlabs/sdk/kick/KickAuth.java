@@ -14,6 +14,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
+@SuppressWarnings("deprecation")
 public class KickAuth extends AuthProvider<KickAuthData> {
 
     public KickAuth(AuthDataProvider<KickAuthData> dataProvider) {
