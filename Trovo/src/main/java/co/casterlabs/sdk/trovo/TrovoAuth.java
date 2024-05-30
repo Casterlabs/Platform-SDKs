@@ -135,6 +135,15 @@ public class TrovoAuth extends AuthProvider<TrovoAuthData> {
         ).body();
     }
 
+    public String getAccessToken() throws ApiAuthException {
+        synchronized (this.lock) {
+            if (this.isExpired()) {
+                this.refresh();
+            }
+            return this.data().accessToken;
+        }
+    }
+
     @Override
     public boolean isApplicationAuth() {
         return this.isApplicationAuth;

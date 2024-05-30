@@ -97,6 +97,15 @@ public class TiktokAuth extends AuthProvider<TiktokAuthData> {
         }
     }
 
+    public String getAccessToken() throws ApiAuthException {
+        synchronized (this.lock) {
+            if (this.isExpired()) {
+                this.refresh();
+            }
+            return this.data().accessToken;
+        }
+    }
+
     @Override
     public boolean isApplicationAuth() {
         return false;
