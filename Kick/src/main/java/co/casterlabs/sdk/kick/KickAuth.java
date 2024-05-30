@@ -6,6 +6,8 @@ import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.auth.AuthDataProvider;
 import co.casterlabs.apiutil.auth.AuthProvider;
 import co.casterlabs.rakurai.json.annotating.JsonClass;
+import co.casterlabs.rakurai.json.annotating.JsonDeserializationMethod;
+import co.casterlabs.rakurai.json.element.JsonElement;
 import co.casterlabs.sdk.kick.KickAuth.KickAuthData;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -42,6 +44,11 @@ public class KickAuth extends AuthProvider<KickAuthData> {
     @JsonClass(exposeAll = true)
     public static class KickAuthData {
         public String token;
+
+        @JsonDeserializationMethod("refreshToken")
+        private void $deserialize_refreshToken(JsonElement e) {
+            this.token = e.getAsString(); // Compat. for some old code.
+        }
 
     }
 
