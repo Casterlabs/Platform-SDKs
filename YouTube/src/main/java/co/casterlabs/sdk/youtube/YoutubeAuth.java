@@ -91,9 +91,11 @@ public class YoutubeAuth extends AuthProvider<YoutubeAuthData> {
 
         synchronized (this.lock) {
             try {
+                String refreshToken = this.data().refreshToken;
+
                 Map<String, String> body = Map.of(
                     "grant_type", "refresh_token",
-                    "refresh_token", this.data().refreshToken,
+                    "refresh_token", refreshToken,
                     "client_id", this.clientId,
                     "client_secret", this.clientSecret
                 );
@@ -108,6 +110,12 @@ public class YoutubeAuth extends AuthProvider<YoutubeAuthData> {
                     null
                 );
                 checkAndThrow(json);
+
+                if (!json.containsKey("refresh_token")) {
+                    // Server didn't give us a new refresh token, inject the old one so that we
+                    // don't break things.
+                    json.put("refresh_token", refreshToken);
+                }
 
                 YoutubeAuthData data = Rson.DEFAULT.fromJson(json, YoutubeAuthData.class);
                 this.dataProvider.save(data);
