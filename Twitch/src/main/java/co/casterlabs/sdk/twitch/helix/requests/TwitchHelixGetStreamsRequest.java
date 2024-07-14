@@ -45,7 +45,7 @@ public class TwitchHelixGetStreamsRequest extends AuthenticatedWebRequest<List<H
 
     @Override
     protected List<HelixStream> execute() throws ApiException, ApiAuthException, IOException {
-        assert this.ids.size() > 0 && this.logins.size() > 0 : "You must supply either an id or login to query for.";
+        assert this.ids.size() > 0 || this.logins.size() > 0 : "You must supply an id or login to query for.";
 
         String url = "https://api.twitch.tv/helix/streams?" + new URIParameters()
             .putAllAsSeparateKeys("user_id", this.ids)
