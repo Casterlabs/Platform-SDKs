@@ -4,6 +4,7 @@ import java.net.http.HttpHeaders;
 import java.net.http.HttpResponse;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.OptionalLong;
 
 import lombok.NonNull;
 
@@ -34,9 +35,10 @@ public class Ratelimiter {
                     "X-Ratelimit-Reset"
             };
             for (String headerName : HEADERS) {
-                if (headers.firstValue(headerName).isEmpty()) continue;
+                OptionalLong value = headers.firstValueAsLong(headerName);
+                if (value.isEmpty()) continue;
 
-                long resetAfter = headers.firstValueAsLong(headerName).getAsLong();
+                long resetAfter = value.getAsLong();
                 Thread.sleep(parseRatelimitValue(resetAfter));
                 return;
             }
@@ -58,13 +60,19 @@ public class Ratelimiter {
         if (resetAfter > now) {
             // It can't be Epoch Seconds. Unless it's decades in the future. We'll assume
             // it's milliseconds since that's improbable for a ratelimit.
-            resetAfter = System.currentTimeMillis() - resetAfter;
+            resetAfter = now - resetAfter;
         } else if (resetAfter > now / 1000) {
             // It can't be Seconds. Unless it's decades.... Yada yada.
-            resetAfter = System.currentTimeMillis() - resetAfter * 1000 /*s->ms*/;
+            resetAfter = now - resetAfter * 1000 /*s->ms*/;
         } else {
             // Has to be seconds.
             resetAfter *= 1000 /*s->ms*/;
+        }
+
+        if (resetAfter < 0) {
+            // Seems it might've already passed.
+            // We'll wait a little bit before re-requesting though.
+            return 100;
         }
 
         return resetAfter;
