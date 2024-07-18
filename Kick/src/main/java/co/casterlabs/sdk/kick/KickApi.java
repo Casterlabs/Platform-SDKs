@@ -6,7 +6,7 @@ import co.casterlabs.rakurai.json.element.JsonObject;
 public class KickApi {
     public static String API_BASE_URL = "https://kick.com"; // You can override this with a proxy of your choice ;)
     public static String PUSHER_CLUSTER = "us2";
-    public static String PUSHER_KEY = "eb1d5f283081a78b932c";
+    public static String PUSHER_KEY = "32cbd69e4b950bf97679";
 
     public static String parseResponsiveImage(JsonElement e) {
         if ((e == null) || e.isJsonNull()) {
