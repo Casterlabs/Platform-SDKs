@@ -56,7 +56,7 @@ public class YoutubeGetLiveBroadcastRequest extends AuthenticatedWebRequest<List
                     throw new ApiAuthException("You must use user auth when requesting `mine()`");
                 }
 
-                url += "&broadcastStatus=all&mine=true";
+                url += "&mine=true";
                 break;
             }
         }
