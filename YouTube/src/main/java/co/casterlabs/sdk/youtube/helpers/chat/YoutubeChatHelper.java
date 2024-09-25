@@ -18,7 +18,7 @@ public class YoutubeChatHelper {
     private boolean shouldLoop = true;
     private String paginationToken = null;
 
-    private @Setter double pollingMultiple = 1;
+    private @Setter long overridePollingInterval = -1; // -1 to use the recommended value YouTube provides.
 
     public YoutubeChatHelper(@NonNull String liveChatId, @NonNull YoutubeAuth auth, @NonNull YoutubeChatListener listener) {
         this.liveChatId = liveChatId;
@@ -55,7 +55,8 @@ public class YoutubeChatHelper {
             }
 
             this.paginationToken = list.getNextPageToken();
-            Thread.sleep((long) (list.getPollingIntervalMillis() * this.pollingMultiple));
+
+            Thread.sleep(this.overridePollingInterval == -1 ? list.getPollingIntervalMillis() : this.overridePollingInterval);
         } catch (ApiException e) {
             String message = e.getMessage();
             if (message.contains("The live chat that you are trying to retrieve cannot be found.") ||
