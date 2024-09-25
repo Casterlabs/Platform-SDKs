@@ -46,20 +46,7 @@ public class YoutubeChatHelper {
                 this.listener.onHistory(list.getEvents());
             } else {
                 try {
-                    long referencePoint = Long.MAX_VALUE;
-
                     for (YoutubeLiveChatEvent event : list.getEvents()) {
-                        // Get the timestamp of the event, compare it to the last message timestamp,
-                        // then wait for the difference to help ease the sudden influx of messages.
-                        // This atmost delays messages by 2s and is normally ~1s.
-                        long publishedAt = event.getEvent().getPublishedAt().toEpochMilli();
-                        long timeBetweenPollAndPublish = publishedAt - referencePoint;
-                        referencePoint = publishedAt;
-
-                        if (timeBetweenPollAndPublish > 0) {
-                            Thread.sleep(timeBetweenPollAndPublish);
-                        }
-
                         this.listener.onEvent(event);
                     }
                 } catch (Throwable t) {
