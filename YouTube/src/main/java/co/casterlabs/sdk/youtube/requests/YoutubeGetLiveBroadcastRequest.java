@@ -1,6 +1,8 @@
 package co.casterlabs.sdk.youtube.requests;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.unbescape.uri.UriEscape;
 
@@ -10,12 +12,13 @@ import co.casterlabs.apiutil.web.AuthenticatedWebRequest;
 import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.element.JsonArray;
 import co.casterlabs.rakurai.json.element.JsonObject;
+import co.casterlabs.rakurai.json.serialization.JsonParseException;
 import co.casterlabs.sdk.youtube.YoutubeAuth;
 import co.casterlabs.sdk.youtube.YoutubeHttpUtil;
 import co.casterlabs.sdk.youtube.types.YoutubeLiveBroadcastData;
 import lombok.NonNull;
 
-public class YoutubeGetLiveBroadcastRequest extends AuthenticatedWebRequest<YoutubeLiveBroadcastData, YoutubeAuth> {
+public class YoutubeGetLiveBroadcastRequest extends AuthenticatedWebRequest<List<YoutubeLiveBroadcastData>, YoutubeAuth> {
     private int queryMode = -1; // id, mine
     private String queryData = null;
 
@@ -36,7 +39,7 @@ public class YoutubeGetLiveBroadcastRequest extends AuthenticatedWebRequest<Yout
     }
 
     @Override
-    protected YoutubeLiveBroadcastData execute() throws ApiException, ApiAuthException, IOException {
+    protected List<YoutubeLiveBroadcastData> execute() throws ApiException, ApiAuthException, IOException {
         assert this.queryMode != -1 : "You must specify a query either by ID or mine.";
 
         String url = "https://youtube.googleapis.com/youtube/v3/liveBroadcasts"
@@ -65,14 +68,22 @@ public class YoutubeGetLiveBroadcastRequest extends AuthenticatedWebRequest<Yout
             return null;
         }
 
-        JsonObject item = items.getObject(0);
+        return items.toList()
+            .stream()
+            .map((e) -> e.getAsObject())
+            .map((item) -> {
+                // Inject the ID into the snippet.
+                item
+                    .getObject("snippet")
+                    .put("id", item.getString("id"));
 
-        // Inject the ID into the snippet.
-        item
-            .getObject("snippet")
-            .put("id", item.getString("id"));
-
-        return Rson.DEFAULT.fromJson(item, YoutubeLiveBroadcastData.class);
+                try {
+                    return Rson.DEFAULT.fromJson(item, YoutubeLiveBroadcastData.class);
+                } catch (JsonParseException ex) {
+                    throw new RuntimeException(ex);
+                }
+            })
+            .collect(Collectors.toList());
     }
 
 }
