@@ -51,7 +51,7 @@ public class YoutubeGetLiveBroadcastRequest extends AuthenticatedWebRequest<List
                 break;
             }
 
-            case 2: {
+            case 1: {
                 if (this.auth.isApplicationAuth()) {
                     throw new ApiAuthException("You must use user auth when requesting `mine()`");
                 }
