@@ -12,6 +12,7 @@ import co.casterlabs.apiutil.web.ApiException;
 import co.casterlabs.apiutil.web.WebRequest;
 import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.element.JsonObject;
+import co.casterlabs.sdk.tiktok.TiktokApi;
 import co.casterlabs.sdk.tiktok.types.unsupported.TiktokScrapedProfileData;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -31,7 +32,7 @@ public class TiktokScrapeProfileRequest extends WebRequest<TiktokScrapedProfileD
         }
 
         String pageHtml = WebRequest.sendHttpRequest(
-            HttpRequest.newBuilder(URI.create("https://www.tiktok.com/@" + this.handle)),
+            HttpRequest.newBuilder(URI.create(TiktokApi.TIKTOK_WEB_URL + "/@" + this.handle)),
             BodyHandlers.ofString(),
             null
         ).body();

@@ -72,7 +72,7 @@ public class TiktokAuth extends AuthProvider<TiktokAuthData> {
 
                 JsonObject json = WebRequest.sendHttpRequest(
                     HttpRequest.newBuilder()
-                        .uri(URI.create("https://open.tiktokapis.com/v2/oauth/token/"))
+                        .uri(URI.create(TiktokApi.TIKTOK_OPENAPI_URL + "/v2/oauth/token/"))
                         .POST(
                             BodyPublishers.ofString(
                                 body.entrySet()

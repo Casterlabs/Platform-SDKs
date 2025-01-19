@@ -11,6 +11,7 @@ import co.casterlabs.apiutil.web.RsonBodyHandler;
 import co.casterlabs.apiutil.web.WebRequest;
 import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.element.JsonObject;
+import co.casterlabs.sdk.tiktok.TiktokApi;
 import co.casterlabs.sdk.tiktok.TiktokAuth;
 import co.casterlabs.sdk.tiktok.types.TiktokUserInfo;
 import lombok.NonNull;
@@ -23,7 +24,7 @@ public class TiktokGetUserInfoRequest extends AuthenticatedWebRequest<TiktokUser
 
     @Override
     protected TiktokUserInfo execute() throws ApiException, ApiAuthException, IOException {
-        final String url = "https://open.tiktokapis.com/v2/user/info/?fields=open_id,union_id,avatar_url,display_name,bio_description,profile_deep_link,is_verified,follower_count,following_count,likes_count";
+        final String url = TiktokApi.TIKTOK_OPENAPI_URL + "/v2/user/info/?fields=open_id,union_id,avatar_url,display_name,bio_description,profile_deep_link,is_verified,follower_count,following_count,likes_count";
 
         JsonObject json = WebRequest.sendHttpRequest(
             HttpRequest.newBuilder(URI.create(url)),
