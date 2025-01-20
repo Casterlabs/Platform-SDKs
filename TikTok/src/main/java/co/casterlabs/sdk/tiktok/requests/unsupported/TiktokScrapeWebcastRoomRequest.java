@@ -50,6 +50,11 @@ public class TiktokScrapeWebcastRoomRequest extends WebRequest<TiktokWebcastRoom
 
         JsonObject json = Rson.DEFAULT.fromJson(hydrationData, JsonObject.class);
         JsonObject currentRoom = json.getObject("CurrentRoom");
+
+        if (!json.containsKey("LiveRoom")) {
+            throw new ApiException("No room data available (user has never streamed).");
+        }
+
         JsonObject liveRoom = json.getObject("LiveRoom");
 
         // Combine a bunch of objects into a single object.
