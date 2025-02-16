@@ -57,7 +57,8 @@ public class TwitchHelixGetUsersRequest extends AuthenticatedWebRequest<List<Hel
 
         String url = "https://api.twitch.tv/helix/users?" + new URIParameters()
             .putAllAsSeparateKeys("id", this.ids)
-            .putAllAsSeparateKeys("login", this.logins);
+            .putAllAsSeparateKeys("login", this.logins)
+            .put("first", "100");
 
         JsonObject response = WebRequest.sendHttpRequest(
             HttpRequest.newBuilder()

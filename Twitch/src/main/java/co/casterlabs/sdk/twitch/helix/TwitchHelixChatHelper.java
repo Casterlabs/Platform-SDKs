@@ -99,7 +99,8 @@ public class TwitchHelixChatHelper {
 
                     List<HelixSimpleUser> moderators = new TwitchHelixGetChannelModeratorsRequest(auth)
                         .forBroadcasterId(forBroadcasterId)
-                        .send();
+                        .send()
+                        .all();
 
                     if (moderators.isEmpty()) {
                         return new TwitchHelixChatResult("mods.none", "There are no moderators", Map.of());
@@ -158,7 +159,8 @@ public class TwitchHelixChatHelper {
                 case "vips": {
                     List<HelixSimpleUser> vips = new TwitchHelixGetChannelVIPsRequest(auth)
                         .forBroadcasterId(forBroadcasterId)
-                        .send();
+                        .send()
+                        .all();
 
                     if (vips.isEmpty()) {
                         return new TwitchHelixChatResult("vips.none", "There are no VIPs", Map.of());

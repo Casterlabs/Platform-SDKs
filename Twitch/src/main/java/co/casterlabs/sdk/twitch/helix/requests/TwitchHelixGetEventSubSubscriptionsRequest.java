@@ -3,18 +3,15 @@ package co.casterlabs.sdk.twitch.helix.requests;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpRequest;
-import java.util.LinkedList;
-import java.util.List;
+import java.net.http.HttpRequest.Builder;
+
+import org.jetbrains.annotations.Nullable;
 
 import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.web.ApiException;
 import co.casterlabs.apiutil.web.AuthenticatedWebRequest;
-import co.casterlabs.apiutil.web.RsonBodyHandler;
+import co.casterlabs.apiutil.web.PaginatedResponse;
 import co.casterlabs.apiutil.web.URIParameters;
-import co.casterlabs.apiutil.web.WebRequest;
-import co.casterlabs.rakurai.json.Rson;
-import co.casterlabs.rakurai.json.TypeToken;
-import co.casterlabs.rakurai.json.element.JsonObject;
 import co.casterlabs.sdk.twitch.helix.TwitchHelixAuth;
 import co.casterlabs.sdk.twitch.helix.types.HelixEventSubSubscription;
 import co.casterlabs.sdk.twitch.helix.types.HelixEventSubSubscription.HelixEventSubStatus;
@@ -24,7 +21,7 @@ import lombok.experimental.Accessors;
 
 @Setter
 @Accessors(chain = true, fluent = true)
-public class TwitchHelixGetEventSubSubscriptionsRequest extends AuthenticatedWebRequest<List<HelixEventSubSubscription>, TwitchHelixAuth> {
+public class TwitchHelixGetEventSubSubscriptionsRequest extends AuthenticatedWebRequest<PaginatedResponse<HelixEventSubSubscription>, TwitchHelixAuth> {
     private HelixEventSubStatus byStatus;
     private String byUserId;
     private String byType;
@@ -38,37 +35,29 @@ public class TwitchHelixGetEventSubSubscriptionsRequest extends AuthenticatedWeb
     }
 
     @Override
-    protected List<HelixEventSubSubscription> execute() throws ApiException, ApiAuthException, IOException {
-        List<HelixEventSubSubscription> list = new LinkedList<>();
-        String pageToken = null;
-        while (true) {
-            String url = "https://api.twitch.tv/helix/eventsub/subscriptions?" + new URIParameters()
-                .optionalPut("status", this.byStatus == null ? null : this.byStatus.name().toLowerCase())
-                .optionalPut("user_id", this.byUserId)
-                .optionalPut("type", this.byType)
-                .optionalPut("after", pageToken);
-
-            JsonObject response = WebRequest.sendHttpRequest(
-                HttpRequest.newBuilder()
-                    .uri(URI.create(url)),
-                RsonBodyHandler.of(JsonObject.class),
-                this.auth
-            ).body();
-
-            if (response != null && !response.containsKey("data")) {
-                throw new ApiException(response.toString());
+    protected PaginatedResponse<HelixEventSubSubscription> execute() throws ApiException, ApiAuthException, IOException {
+        return new PaginatedResponse<>(new _HelixPaginationHelper<>() {
+            @Override
+            protected Builder request(@Nullable String cursor) {
+                String url = "https://api.twitch.tv/helix/eventsub/subscriptions?" + new URIParameters()
+                    .optionalPut("status", byStatus == null ? null : byStatus.name().toLowerCase())
+                    .optionalPut("user_id", byUserId)
+                    .optionalPut("type", byType)
+                    .optionalPut("after", cursor);
+                return HttpRequest.newBuilder()
+                    .uri(URI.create(url));
             }
 
-            list.addAll(Rson.DEFAULT.fromJson(response.get("data"), new TypeToken<List<HelixEventSubSubscription>>() {
-            }));
-
-            if (response.containsKey("pagination") && response.getObject("pagination").containsKey("cursor")) {
-                pageToken = response.getObject("pagination").getString("cursor");
-            } else {
-                break;
+            @Override
+            protected TwitchHelixAuth auth() {
+                return auth;
             }
-        }
-        return list;
+
+            @Override
+            protected Class<HelixEventSubSubscription[]> generic() {
+                return HelixEventSubSubscription[].class;
+            }
+        });
     }
 
 }

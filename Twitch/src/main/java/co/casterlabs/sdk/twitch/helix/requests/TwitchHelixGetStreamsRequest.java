@@ -49,7 +49,8 @@ public class TwitchHelixGetStreamsRequest extends AuthenticatedWebRequest<List<H
 
         String url = "https://api.twitch.tv/helix/streams?" + new URIParameters()
             .putAllAsSeparateKeys("user_id", this.ids)
-            .putAllAsSeparateKeys("user_login", this.logins);
+            .putAllAsSeparateKeys("user_login", this.logins)
+            .put("first", "100");
 
         JsonObject response = WebRequest.sendHttpRequest(
             HttpRequest.newBuilder()
