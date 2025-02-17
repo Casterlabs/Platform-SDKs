@@ -47,11 +47,11 @@ public class PaginatedResponse<R> {
     public Stream<R> stream() throws ApiException, ApiAuthException, IOException {
         return Stream.generate(new Supplier<>() {
             private R[] current;
-            private int index = 0;
+            private volatile int index = 0;
 
             @SneakyThrows
             @Override
-            public R get() {
+            public synchronized R get() {
                 if (this.current == null || this.index == this.current.length) {
                     this.current = PaginatedResponse.this.next();
                     this.index = 0;
