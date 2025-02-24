@@ -3,121 +3,130 @@ package co.casterlabs.apiutil.realtime;
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
-import org.java_websocket.client.WebSocketClient;
-import org.java_websocket.handshake.ServerHandshake;
+import org.jetbrains.annotations.Nullable;
 
 import co.casterlabs.apiutil.limits.ExponentialBackoff;
+import co.casterlabs.commons.async.AsyncTask;
+import co.casterlabs.commons.websocket.WebSocketClient;
+import co.casterlabs.commons.websocket.WebSocketListener;
+import lombok.AccessLevel;
 import lombok.NonNull;
-import lombok.SneakyThrows;
+import lombok.Setter;
 import xyz.e3ndr.fastloggingframework.logging.FastLogger;
 
-public class WSConnection implements Closeable {
-    private URI uri;
-    private WSListener listener;
+public abstract class WSConnection implements Closeable {
+    public static final ThreadFactory THREAD_FACTORY = Executors.defaultThreadFactory();
 
-    private FastLogger logger;
+    private final ExponentialBackoff backoff = new ExponentialBackoff();
+    private final FastLogger logger = new FastLogger("WSConnection (" + this.uri + ")");
+
+    private @Setter(AccessLevel.PROTECTED) URI uri;
     private Connection conn;
 
-    private ExponentialBackoff backoff = new ExponentialBackoff();
+    private volatile boolean closeIsLocal = false;
 
-    @SneakyThrows
-    public WSConnection(@NonNull String uri, @NonNull WSListener listener) {
-        this.uri = new URI(uri);
-        this.listener = listener;
-        this.logger = new FastLogger("WSConnection (" + this.uri + ")");
-    }
-
-    public void send(@NonNull Object payload) {
-        if (this.conn == null) {
+    public synchronized void connect() throws InterruptedException, IOException {
+        if (this.conn != null) {
             throw new IllegalStateException("You must close the connection before calling connect().");
         }
 
-        this.conn.send(payload.toString());
-    }
+        this.closeIsLocal = false;
+        long backoffTime = this.backoff.getWaitTime();
+        Thread.sleep(backoffTime);
 
-    public synchronized void connect() throws InterruptedException {
-        if (this.conn == null) {
-            long backoffTime = this.backoff.getWaitTime();
-            Thread.sleep(backoffTime);
-
-            this.conn = new Connection();
-            this.conn.connectBlocking();
-        } else {
-            throw new IllegalStateException("You must close the connection before calling connect().");
-        }
+        this.conn = new Connection();
+        this.conn.ws.connect(60_000, 15_000);
     }
 
     public boolean isOpen() {
-        return this.conn != null;
+        return this.conn != null && this.conn.ws.isConnected();
     }
 
     @Override
     public void close() {
-        doCleanup();
+        this.closeIsLocal = true;
+        if (this.isOpen()) {
+            try {
+                this.conn.ws.close();
+            } catch (Throwable ignored) {}
+        }
+        this.doCleanup();
     }
 
-    protected void doCleanup() {
-        if (this.conn != null) {
-            try {
-                this.conn.close();
-            } catch (Exception ignored) {}
-        }
-
+    private void doCleanup() {
         this.conn = null;
     }
 
-    private class Connection extends WebSocketClient {
+    /* ------------ */
+    /* Abstract API */
+    /* ------------ */
+
+    protected abstract void onOpen();
+
+    protected abstract void onMessage(String raw);
+
+    protected abstract void onClose(boolean remote);
+
+    /* ------------ */
+    /* Internals    */
+    /* ------------ */
+
+    protected void send(@NonNull String payload) throws IOException {
+        if (this.conn == null) {
+            throw new IllegalStateException("You must connect() before calling send().");
+        }
+        this.conn.send(payload);
+    }
+
+    private class Connection implements WebSocketListener {
         private static final String DEBUG_WS_CONNECTED = "Connected \u2713";
         private static final String DEBUG_WS_DISCONNECTED = "Disconnected \u00d7";
         private static final String DEBUG_WS_SEND = "\u2191 %s";
         private static final String DEBUG_WS_RECIEVE = "\u2193 %s";
 
+        private WebSocketClient ws;
+
         public Connection() {
-            super(WSConnection.this.uri);
+            this.ws = new WebSocketClient(WSConnection.this.uri);
+            this.ws.setListener(this);
+            this.ws.setThreadFactory(THREAD_FACTORY);
+        }
+
+        public void send(String payload) throws IOException {
+            WSConnection.this.logger.trace(String.format(DEBUG_WS_SEND, payload));
+            this.ws.send(payload);
         }
 
         @Override
-        public void send(String payload) {
-            logger.trace(String.format(DEBUG_WS_SEND, payload));
-            super.send(payload);
+        public void onOpen(WebSocketClient client, Map<String, String> headers, @Nullable String acceptedProtocol) {
+            WSConnection.this.logger.trace(DEBUG_WS_CONNECTED);
+            WSConnection.this.onOpen();
         }
 
         @Override
-        public void onOpen(ServerHandshake handshakedata) {
-            logger.trace(DEBUG_WS_CONNECTED);
-            listener.onOpen();
-        }
-
-        @Override
-        public final void onMessage(String raw) {
-            logger.trace(String.format(DEBUG_WS_RECIEVE, raw));
-
+        public void onText(WebSocketClient client, String string) {
+            WSConnection.this.logger.trace(String.format(DEBUG_WS_RECIEVE, string));
             try {
-                listener.onMessage(raw);
+                WSConnection.this.onMessage(string);
             } catch (Throwable t) {
-                logger.severe("An uncaught exception occurred whilst processing frame: %s\n%s", raw, t);
+                logger.severe("An uncaught exception occurred whilst processing frame: %s\n%s", string, t);
             }
         }
 
-        private void onClose() {
-            logger.trace(DEBUG_WS_DISCONNECTED);
-            doCleanup();
-            new Thread(() -> listener.onClose());
+        @Override
+        public void onClosed(WebSocketClient client) {
+            WSConnection.this.logger.trace(DEBUG_WS_DISCONNECTED);
+            WSConnection.this.doCleanup();
+            AsyncTask.create(() -> WSConnection.this.onClose(!WSConnection.this.closeIsLocal));
         }
 
         @Override
-        public void onClose(int code, String reason, boolean remote) {
-            this.onClose();
-        }
-
-        @Override
-        public void onError(Exception e) {
-            if ((e instanceof IOException) && e.getMessage().equals("Socket closed")) {
-                this.onClose();
-            } else {
-                logger.severe("An uncaught exception occurred:\n%s", e);
-            }
+        public void onException(Throwable t) {
+            WSConnection.this.logger.severe("An uncaught exception occurred:\n%s", t);
         }
 
     }
