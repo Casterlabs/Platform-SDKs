@@ -20,12 +20,11 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 
 @Setter
-@NonNull
-@Accessors(chain = true)
+@Accessors(chain = true, fluent = true)
 public class TrovoGetChannelFollowersRequest extends AuthenticatedWebRequest<TrovoGetChannelFollowersResponse, TrovoAuth> {
     public static final String URL = "https://open-api.trovo.live/openplatform/channels/%s/followers";
 
-    private String channelId;
+    private String byChannelId;
 
     public TrovoGetChannelFollowersRequest(@NonNull TrovoAuth auth) {
         super(auth);
@@ -33,10 +32,10 @@ public class TrovoGetChannelFollowersRequest extends AuthenticatedWebRequest<Tro
 
     @Override
     protected TrovoGetChannelFollowersResponse execute() throws IOException, ApiException {
-        assert this.channelId != null : "You must set a channel id.";
+        assert this.byChannelId != null : "You must set a channel id.";
 
         return WebRequest.sendHttpRequest(
-            HttpRequest.newBuilder(URI.create(String.format(URL, this.channelId))),
+            HttpRequest.newBuilder(URI.create(String.format(URL, this.byChannelId))),
             RsonBodyHandler.of(TrovoGetChannelFollowersResponse.class),
             this.auth
         ).body();

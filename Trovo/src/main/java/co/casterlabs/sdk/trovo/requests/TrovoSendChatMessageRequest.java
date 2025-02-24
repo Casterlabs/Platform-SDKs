@@ -17,13 +17,12 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 @Setter
-@NonNull
-@Accessors(chain = true)
+@Accessors(chain = true, fluent = true)
 public class TrovoSendChatMessageRequest extends AuthenticatedWebRequest<Void, TrovoAuth> {
     public static final String URL = "https://open-api.trovo.live/openplatform/chat/send";
 
-    private String message;
-    private String channelId;
+    private String withMessage;
+    private String forChannelId;
 
     public TrovoSendChatMessageRequest(@NonNull TrovoAuth auth) {
         super(auth);
@@ -31,14 +30,14 @@ public class TrovoSendChatMessageRequest extends AuthenticatedWebRequest<Void, T
 
     @Override
     protected Void execute() throws ApiException, ApiAuthException, IOException {
-        assert this.message != null : "You must set a message.";
+        assert this.withMessage != null : "You must set a message.";
         assert !this.auth.isApplicationAuth() : "You must use user auth for this request.";
 
         JsonObject body = new JsonObject()
-            .put("content", this.message);
+            .put("content", this.withMessage);
 
-        if (this.channelId != null) {
-            body.put("channel_id", this.channelId);
+        if (this.forChannelId != null) {
+            body.put("channel_id", this.forChannelId);
         }
 
         WebRequest.sendHttpRequest(

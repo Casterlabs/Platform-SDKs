@@ -15,14 +15,13 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 @Setter
-@NonNull
-@Accessors(chain = true)
+@Accessors(chain = true, fluent = true)
 public class TrovoDeleteChatMessageRequest extends AuthenticatedWebRequest<Void, TrovoAuth> {
     public static final String URL = "https://open-api.trovo.live/openplatform/channels/%s/messages/%s/senderuid/%s";
 
-    private @Setter String channelId;
-    private @Setter String messageId;
-    private @Setter String senderId;
+    private String forChannelId;
+    private String forSenderId;
+    private String withMessageId;
 
     public TrovoDeleteChatMessageRequest(@NonNull TrovoAuth auth) {
         super(auth);
@@ -30,14 +29,14 @@ public class TrovoDeleteChatMessageRequest extends AuthenticatedWebRequest<Void,
 
     @Override
     protected Void execute() throws ApiException, ApiAuthException, IOException {
-        assert this.channelId != null : "You must set a channel id.";
-        assert this.messageId != null : "You must set a message id.";
-        assert this.senderId != null : "You must set a sender id.";
+        assert this.forChannelId != null : "You must set a channel id.";
+        assert this.forSenderId != null : "You must set a sender id.";
+        assert this.withMessageId != null : "You must set a message id.";
         assert !this.auth.isApplicationAuth() : "You must use user auth for this request.";
 
         WebRequest.sendHttpRequest(
             HttpRequest.newBuilder()
-                .uri(URI.create(String.format(URL, this.channelId, this.messageId, this.senderId)))
+                .uri(URI.create(String.format(URL, this.forChannelId, this.withMessageId, this.forSenderId)))
                 .DELETE(),
             BodyHandlers.discarding(),
             this.auth

@@ -2,26 +2,22 @@ package co.casterlabs.sdk.trovo.requests.data;
 
 import co.casterlabs.rakurai.json.annotating.JsonClass;
 import co.casterlabs.rakurai.json.annotating.JsonField;
-import lombok.Getter;
-import lombok.NonNull;
 import lombok.ToString;
 
-@Getter
-@NonNull
 @ToString
 @JsonClass(exposeAll = true)
 public class TrovoGameCategory {
-    private String id;
+    public final String id = null;
 
-    private String name;
+    public final String name = null;
 
     @JsonField("short_name")
-    private String shortName;
+    public final String shortName = null;
 
     @JsonField("icon_url")
-    private String iconUrl;
+    public final String iconUrl = null;
 
     @JsonField("desc")
-    private String description;
+    public final String description = null;
 
 }

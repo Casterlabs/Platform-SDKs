@@ -20,13 +20,12 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 @Setter
-@NonNull
-@Accessors(chain = true)
+@Accessors(chain = true, fluent = true)
 public class TrovoGetChannelInfoRequest extends AuthenticatedWebRequest<TrovoChannelInfo, TrovoAuth> {
     private static final String URL = "https://open-api.trovo.live/openplatform/channels/id";
     private static final String SELF_URL = "https://open-api.trovo.live/openplatform/channel";
 
-    private @Nullable String channelId;
+    private @Nullable String byChannelId;
 
     public TrovoGetChannelInfoRequest(@NonNull TrovoAuth auth) {
         super(auth);
@@ -36,13 +35,13 @@ public class TrovoGetChannelInfoRequest extends AuthenticatedWebRequest<TrovoCha
     protected TrovoChannelInfo execute() throws ApiException, ApiAuthException, IOException {
         HttpRequest.Builder request = HttpRequest.newBuilder();
 
-        if (this.channelId == null) {
+        if (this.byChannelId == null) {
             assert !this.auth.isApplicationAuth() : "You cannot use application auth to request self info. Set a channel id or use user auth.";
 
             request.uri(URI.create(SELF_URL));
         } else {
             JsonObject body = new JsonObject()
-                .put("channel_id", this.channelId);
+                .put("channel_id", this.byChannelId);
 
             request
                 .uri(URI.create(URL))

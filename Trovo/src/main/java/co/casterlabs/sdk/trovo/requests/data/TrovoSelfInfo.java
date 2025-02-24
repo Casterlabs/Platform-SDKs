@@ -4,33 +4,29 @@ import org.jetbrains.annotations.Nullable;
 
 import co.casterlabs.rakurai.json.annotating.JsonClass;
 import co.casterlabs.rakurai.json.annotating.JsonField;
-import lombok.Getter;
-import lombok.NonNull;
 import lombok.ToString;
 
-@Getter
-@NonNull
 @ToString
 @JsonClass(exposeAll = true)
 public class TrovoSelfInfo {
     @JsonField("userName")
-    private String username;
+    public final String username = null;
 
     @JsonField("nickName")
-    private String nickname;
+    public final String nickname = null;
 
     @JsonField("userId")
-    private String userId;
+    public final String userId = null;
 
-    private @Nullable String email;
+    public final @Nullable String email = null;
 
     @JsonField("channelId")
-    private String channelId;
+    public final String channelId = null;
 
     @JsonField("profilePic")
-    private String profilePictureLink;
+    public final String profilePicUrl = null;
 
     @JsonField("info")
-    private String streamerInfo;
+    public final String streamerInfo = null;
 
 }

@@ -22,13 +22,12 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 
 @Setter
-@NonNull
-@Accessors(chain = true)
+@Accessors(chain = true, fluent = true)
 public class TrovoSendChatCommandRequest extends AuthenticatedWebRequest<SendChatCommandResult, TrovoAuth> {
     public static final String URL = "https://open-api.trovo.live/openplatform/channels/command";
 
-    private String command;
-    private String channelId;
+    private String withCommand;
+    private String forChannelId;
 
     public TrovoSendChatCommandRequest(@NonNull TrovoAuth auth) {
         super(auth);
@@ -39,20 +38,20 @@ public class TrovoSendChatCommandRequest extends AuthenticatedWebRequest<SendCha
             command = command.substring(1);
         }
 
-        this.command = command;
+        this.withCommand = command;
 
         return this;
     }
 
     @Override
     protected SendChatCommandResult execute() throws ApiException, ApiAuthException, IOException {
-        assert this.channelId != null : "You must set a channel id.";
-        assert this.command != null : "You must set a command.";
+        assert this.forChannelId != null : "You must set a channel id.";
+        assert this.withCommand != null : "You must set a command.";
         assert !this.auth.isApplicationAuth() : "You must use user auth for this request.";
 
         JsonObject body = new JsonObject()
-            .put("command", this.command)
-            .put("channel_id", this.channelId);
+            .put("command", this.withCommand)
+            .put("channel_id", this.forChannelId);
 
         return WebRequest.sendHttpRequest(
             HttpRequest.newBuilder()

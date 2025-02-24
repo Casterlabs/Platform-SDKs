@@ -2,23 +2,19 @@ package co.casterlabs.sdk.trovo.requests.data;
 
 import co.casterlabs.rakurai.json.annotating.JsonClass;
 import co.casterlabs.rakurai.json.annotating.JsonField;
-import lombok.Getter;
-import lombok.NonNull;
 import lombok.ToString;
 
-@Getter
-@NonNull
 @ToString
 @JsonClass(exposeAll = true)
 public class TrovoFollower {
-    private String username;
+    public final String username = null;
 
-    private String nickname;
+    public final String nickname = null;
 
     @JsonField("profile_pic")
-    private String profilePic;
+    public final String profilePicUrl = null;
 
     @JsonField("followed_at")
-    private String followedAt;
+    public final String followedAt = null;
 
 }

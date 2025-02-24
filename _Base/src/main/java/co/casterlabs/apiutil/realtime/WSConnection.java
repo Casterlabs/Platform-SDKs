@@ -27,6 +27,8 @@ public abstract class WSConnection implements Closeable {
     private @Setter(AccessLevel.PROTECTED) URI uri;
     private Connection conn;
 
+    private Thread keepAliveThread = null;
+
     private volatile boolean closeIsLocal = false;
 
     public synchronized void connect() throws InterruptedException, IOException {
@@ -59,6 +61,25 @@ public abstract class WSConnection implements Closeable {
 
     private void doCleanup() {
         this.conn = null;
+        this.keepAliveThread = null;
+    }
+
+    protected synchronized void doKeepAlive(long interval, Runnable run) {
+        if (!this.isOpen()) throw new IllegalStateException("You must connect() before calling doKeepAlive().");
+        if (this.keepAliveThread != null) throw new IllegalStateException("You can only call doKeepAlive() once per connect().");
+
+        this.keepAliveThread = new Thread(() -> {
+            Thread curr = Thread.currentThread();
+            while (this.keepAliveThread == curr) {
+                try {
+                    run.run();
+                    Thread.sleep(interval);
+                } catch (InterruptedException ignored) {}
+            }
+        });
+        this.keepAliveThread.setName("WSConnection KeepAlive");
+        this.keepAliveThread.setDaemon(true);
+        this.keepAliveThread.start();
     }
 
     /* ------------ */

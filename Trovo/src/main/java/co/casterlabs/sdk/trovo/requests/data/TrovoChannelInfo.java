@@ -4,77 +4,72 @@ import java.util.List;
 
 import co.casterlabs.rakurai.json.annotating.JsonClass;
 import co.casterlabs.rakurai.json.annotating.JsonField;
-import lombok.Getter;
-import lombok.NonNull;
 import lombok.ToString;
 
-@Getter
-@NonNull
 @ToString
 @JsonClass(exposeAll = true)
 public class TrovoChannelInfo {
     @JsonField("uid")
-    private String id;
+    public final String id = null;
 
     @JsonField("is_live")
-    private boolean isLive;
+    public final Boolean isLive = null;
 
     @JsonField("category_id")
-    private String categoryId;
+    public final String categoryId = null;
 
     @JsonField("category_name")
-    private String categoryName;
+    public final String categoryName = null;
 
     @JsonField("live_title")
-    private String streamTitle;
+    public final String streamTitle = null;
 
     @JsonField("audi_type")
-    private TrovoAudienceType audienceType;
+    public final TrovoAudienceType audienceType = null;
 
     @JsonField("language_code")
-    private String languageCode;
+    public final String languageCode = null;
 
     @JsonField("thumbnail")
-    private String thumbnailLink;
+    public final String thumbnailUrl = null;
 
     @JsonField("current_viewers")
-    private long currentViewers;
+    public final Long currentViewers = null;
 
     @JsonField("followers")
-    private long followers;
+    public final Long followersCount = null;
 
     @JsonField("streamer_info")
-    private String streamerInfo;
+    public final String streamerInfo = null;
 
     @JsonField("profile_pic")
-    private String profilePictureLink;
+    public final String profilePictureUrl = null;
 
     @JsonField("channel_url")
-    private String channelUrl;
+    public final String channelUrl = null;
 
     @JsonField("created_at")
-    private String createdAt;
+    public final String createdAt = null;
 
     @JsonField("subscriber_num")
-    private long subscribers;
+    public final Long subscribers = null;
 
-    @JsonField("stream_key")
-    private String streamKey;
-
-    private String username;
+    public final String username = null;
 
     @JsonField("social_links")
-    private List<Social> socials;
+    public final List<Social> socials = null;
 
-    @Getter
-    @NonNull
+    /**
+     * Requires channel_details_self and to be requested as auth.
+     */
+    @JsonField("stream_key")
+    public final String streamKey = null;
+
     @ToString
     @JsonClass(exposeAll = true)
     public static class Social {
-        private String type;
-
-        @JsonField("url")
-        private String link;
+        public final String type = null;
+        public final String url = null;
 
     }
 
