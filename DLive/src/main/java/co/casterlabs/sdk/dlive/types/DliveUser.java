@@ -1,33 +1,38 @@
 package co.casterlabs.sdk.dlive.types;
 
-import java.time.Instant;
+import java.lang.reflect.Field;
 
 import co.casterlabs.rakurai.json.annotating.JsonClass;
+import co.casterlabs.rakurai.json.annotating.JsonDeserializationMethod;
+import co.casterlabs.rakurai.json.annotating.JsonExclude;
 import co.casterlabs.rakurai.json.element.JsonElement;
-import lombok.Getter;
 import lombok.ToString;
 
-@Getter
 @ToString
 @JsonClass(exposeAll = true)
 public class DliveUser {
     public static final String GQL_DATA = "avatar,displayname,username,createdAt,livestream{" + DliveLivestream.GQL_DATA + "},followers(first:0){" + DliveList.GQL_DATA + "}";
 
-    private String avatar;
-    private String displayname;
-    private String username;
-    private JsonElement createdAt;
-    private DliveLivestream livestream;
-    private DliveList followers;
+    public final String avatar = null;
+    public final String displayname = null;
+    public final String username = null;
+    public final DliveLivestream livestream = null;
+    public final DliveList followers = null;
 
-    public Instant getCreatedAt() {
+    public final @JsonExclude Long createdAt = null;
+
+    @JsonDeserializationMethod("createdAt")
+    private void $deserialize_createdAt(JsonElement e) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
         long value;
-        if (this.createdAt.isJsonString()) {
-            value = Long.parseLong(this.createdAt.getAsString());
+        if (e.isJsonString()) {
+            value = Long.parseLong(e.getAsString());
         } else {
-            value = this.createdAt.getAsNumber().longValue();
+            value = e.getAsNumber().longValue();
         }
-        return Instant.ofEpochMilli(value);
+
+        Field f = DliveUser.class.getField("createdAt");
+        f.setAccessible(true);
+        f.set(this, value);
     }
 
 }

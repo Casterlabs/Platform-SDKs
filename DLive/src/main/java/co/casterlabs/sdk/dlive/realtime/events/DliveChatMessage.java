@@ -1,38 +1,41 @@
 package co.casterlabs.sdk.dlive.realtime.events;
 
-import java.time.Instant;
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
 import co.casterlabs.rakurai.json.annotating.JsonClass;
+import co.casterlabs.rakurai.json.annotating.JsonDeserializationMethod;
+import co.casterlabs.rakurai.json.annotating.JsonExclude;
 import co.casterlabs.rakurai.json.element.JsonElement;
-import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.ToString;
 
-@Getter
 @ToString
 @JsonClass(exposeAll = true)
 public class DliveChatMessage {
     // https://dev.dlive.tv/schema/chattext.doc.html
     // Note that DLive internally calls emotes "emojis" and stickers "emotes"
 
-    private String id;
-    private JsonElement createdAt;
-    private DliveChatSender sender;
-    private String content;
+    public final String id = null;
+    public final DliveChatSender sender = null;
+    public final String content = null;
 
-    @Getter(AccessLevel.NONE)
-    private int[] emojis;
+    private final int[] emojis = null;
 
-    public Instant getCreatedAt() {
+    public final @JsonExclude Long createdAt = null;
+
+    @JsonDeserializationMethod("createdAt")
+    private void $deserialize_createdAt(JsonElement e) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
         long value;
-        if (this.createdAt.isJsonString()) {
-            value = Long.parseLong(this.createdAt.getAsString());
+        if (e.isJsonString()) {
+            value = Long.parseLong(e.getAsString());
         } else {
-            value = this.createdAt.getAsNumber().longValue();
+            value = e.getAsNumber().longValue();
         }
-        return Instant.ofEpochMilli(value);
+
+        Field f = DliveChatMessage.class.getField("createdAt");
+        f.setAccessible(true);
+        f.set(this, value);
     }
 
     public boolean isStickerMessage() {

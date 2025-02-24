@@ -23,13 +23,13 @@ public class DliveGetUserRequest extends AuthenticatedWebRequest<DliveUser, Dliv
         super(auth);
     }
 
-    public DliveGetUserRequest queryByUsername(@NonNull String username) {
+    public DliveGetUserRequest byUsername(@NonNull String username) {
         this.queryType = "user";
         this.queryVariables = String.format("username:%s", new JsonString(username));
         return this;
     }
 
-    public DliveGetUserRequest queryByDisplayname(@NonNull String display) {
+    public DliveGetUserRequest byDisplayname(@NonNull String display) {
         this.queryType = "userByDisplayName";
         this.queryVariables = String.format("displayname:%s", new JsonString(display));
         return this;
@@ -37,7 +37,7 @@ public class DliveGetUserRequest extends AuthenticatedWebRequest<DliveUser, Dliv
 
     @Override
     protected DliveUser execute() throws ApiException, ApiAuthException, IOException {
-        assert this.queryType != null : "Must queryByUsername() or queryByDisplayname()";
+        assert this.queryType != null : "Must byUsername() or byDisplayname()";
 
         JsonObject response = DliveHttpUtil.sendHttp(String.format(QUERY, this.queryType, this.queryVariables), this.auth);
 

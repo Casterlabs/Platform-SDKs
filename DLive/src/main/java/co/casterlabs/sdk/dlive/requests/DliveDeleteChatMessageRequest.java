@@ -5,20 +5,20 @@ import java.io.IOException;
 import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.web.ApiException;
 import co.casterlabs.apiutil.web.AuthenticatedWebRequest;
+import co.casterlabs.rakurai.json.element.JsonString;
 import co.casterlabs.sdk.dlive.DliveAuth;
 import co.casterlabs.sdk.dlive.DliveHttpUtil;
-import co.casterlabs.rakurai.json.element.JsonString;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
 @Setter
-@Accessors(chain = true)
+@Accessors(chain = true, fluent = true)
 public class DliveDeleteChatMessageRequest extends AuthenticatedWebRequest<Void, DliveAuth> {
     private static final String QUERY = "mutation{chatDelete(streamer:%s,id:%s){err{code}}";
 
-    private String streamer;
-    private String id;
+    private String forStreamer;
+    private String forId;
 
     public DliveDeleteChatMessageRequest(@NonNull DliveAuth auth) {
         super(auth);
@@ -26,13 +26,13 @@ public class DliveDeleteChatMessageRequest extends AuthenticatedWebRequest<Void,
 
     @Override
     protected Void execute() throws ApiException, ApiAuthException, IOException {
-        assert this.streamer != null : "Must setStreamer()";
-        assert this.id != null : "Must setId()";
+        assert this.forStreamer != null : "Must specify a streamer";
+        assert this.forId != null : "Must specify a message id";
 
         DliveHttpUtil.sendHttp(
             String.format(
                 QUERY,
-                new JsonString(this.streamer), new JsonString(this.id)
+                new JsonString(this.forStreamer), new JsonString(this.forId)
             ),
             this.auth
         );

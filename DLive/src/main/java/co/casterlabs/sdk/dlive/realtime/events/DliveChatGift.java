@@ -1,35 +1,40 @@
 package co.casterlabs.sdk.dlive.realtime.events;
 
-import java.time.Instant;
+import java.lang.reflect.Field;
 
 import org.jetbrains.annotations.Nullable;
 
 import co.casterlabs.rakurai.json.annotating.JsonClass;
+import co.casterlabs.rakurai.json.annotating.JsonDeserializationMethod;
+import co.casterlabs.rakurai.json.annotating.JsonExclude;
 import co.casterlabs.rakurai.json.element.JsonElement;
-import lombok.Getter;
 import lombok.ToString;
 
-@Getter
 @ToString
 @JsonClass(exposeAll = true)
 public class DliveChatGift {
     // https://dev.dlive.tv/schema/chatgift.doc.html
 
-    private String id;
-    private JsonElement createdAt;
-    private DliveChatSender sender;
-    private DliveChatDonationType gift;
-    private int amount;
-    private @Nullable String message;
+    public final String id = null;
+    public final DliveChatSender sender = null;
+    public final DliveChatDonationType gift = null;
+    public final Integer amount = null;
+    public final @Nullable String message = null;
 
-    public Instant getCreatedAt() {
+    public final @JsonExclude Long createdAt = null;
+
+    @JsonDeserializationMethod("createdAt")
+    private void $deserialize_createdAt(JsonElement e) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
         long value;
-        if (this.createdAt.isJsonString()) {
-            value = Long.parseLong(this.createdAt.getAsString());
+        if (e.isJsonString()) {
+            value = Long.parseLong(e.getAsString());
         } else {
-            value = this.createdAt.getAsNumber().longValue();
+            value = e.getAsNumber().longValue();
         }
-        return Instant.ofEpochMilli(value);
+
+        Field f = DliveChatGift.class.getField("createdAt");
+        f.setAccessible(true);
+        f.set(this, value);
     }
 
 }

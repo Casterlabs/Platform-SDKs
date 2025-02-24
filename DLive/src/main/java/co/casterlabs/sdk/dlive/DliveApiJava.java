@@ -3,8 +3,8 @@ package co.casterlabs.sdk.dlive;
 import co.casterlabs.rakurai.json.element.JsonObject;
 
 public class DliveApiJava {
-    public static final String API = "https://api.dlive.tv";
-    public static final String REALTIME_API = "wss://api-ws.dlive.tv";
+    public static String API = "https://api.dlive.tv";
+    public static String REALTIME_API = "wss://api-ws.dlive.tv";
 
     public static String formatQuery(String query) {
         JsonObject payload = new JsonObject();
