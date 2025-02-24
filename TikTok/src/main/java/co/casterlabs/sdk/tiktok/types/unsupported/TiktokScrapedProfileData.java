@@ -2,33 +2,31 @@ package co.casterlabs.sdk.tiktok.types.unsupported;
 
 import co.casterlabs.rakurai.json.annotating.JsonClass;
 import co.casterlabs.rakurai.json.annotating.JsonField;
-import lombok.Getter;
 import lombok.ToString;
 
-@Getter
 @ToString
 @JsonClass(exposeAll = true)
 public class TiktokScrapedProfileData {
 
     @JsonField("uniqueId")
-    private String handle;
+    public final String handle = null;
 
-    private String nickname;
+    public final String nickname = null;
 
     @JsonField("avatarLarger")
-    private String avatarLink;
+    public final String avatarLink = null;
 
     @JsonField("signature")
-    private String bio;
+    public final String bio = null;
 
-    private boolean verified;
+    public final Boolean verified = null;
 
-    private boolean privateAccount;
+    public final Boolean privateAccount = null;
 
-    private String region;
+    public final String region = null;
 
-    private long followerCount;
+    public final Long followerCount = null;
 
-    private long heartCount;
+    public final Long heartCount = null;
 
 }

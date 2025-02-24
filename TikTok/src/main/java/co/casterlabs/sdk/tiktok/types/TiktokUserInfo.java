@@ -3,10 +3,8 @@ package co.casterlabs.sdk.tiktok.types;
 import co.casterlabs.rakurai.json.annotating.JsonClass;
 import co.casterlabs.rakurai.json.annotating.JsonExclude;
 import co.casterlabs.rakurai.json.annotating.JsonField;
-import lombok.Getter;
 import lombok.ToString;
 
-@Getter
 @ToString
 @JsonClass(exposeAll = true)
 public class TiktokUserInfo {
@@ -14,36 +12,36 @@ public class TiktokUserInfo {
     @Deprecated
     @JsonExclude
     @ToString.Exclude
-    private long requestMadeAt = System.currentTimeMillis();
+    public final long requestMadeAt = System.currentTimeMillis();
 
     @JsonField("open_id")
-    private String openId;
+    public final String openId = null;
 
     @JsonField("union_id")
-    private String unionId;
+    public final String unionId = null;
 
     @JsonField("avatar_url")
-    private String avatarUrl;
+    public final String avatarUrl = null;
 
     @JsonField("bio_description")
-    private String bio;
+    public final String bio = null;
 
     @JsonField("display_name")
-    private String displayName;
+    public final String displayName = null;
 
     @JsonField("follower_count")
-    private int follower_count;
+    public final Integer followerCount = null;
 
     @JsonField("following_count")
-    private int followingCount;
+    public final Integer followingCount = null;
 
     @JsonField("likes_count")
-    private int likesCount;
+    public final Integer likesCount = null;
 
     @JsonField("is_verified")
-    private boolean isVerified;
+    public final Boolean isVerified = null;
 
     @JsonField("profile_deep_link")
-    private String profileDeepLink;
+    public final String profileDeepLink = null;
 
 }

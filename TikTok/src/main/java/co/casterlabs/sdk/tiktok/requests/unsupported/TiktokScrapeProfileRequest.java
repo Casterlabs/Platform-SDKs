@@ -18,21 +18,21 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 @Setter
-@Accessors(chain = true)
+@Accessors(chain = true, fluent = true)
 public class TiktokScrapeProfileRequest extends WebRequest<TiktokScrapedProfileData> {
     // We're looking for the initial hydration data.
     private static final Pattern HYDRATION_DATA = Pattern.compile("<script id=\"__UNIVERSAL_DATA_FOR_REHYDRATION__\" type=\"application\\/json\">.+?<\\/script>");
 
-    private String handle;
+    private String byHandle;
 
     @Override
     protected TiktokScrapedProfileData execute() throws ApiException, ApiAuthException, IOException {
-        if (this.handle.startsWith("@")) {
-            this.handle = this.handle.substring(1);
+        if (this.byHandle.startsWith("@")) {
+            this.byHandle = this.byHandle.substring(1);
         }
 
         String pageHtml = WebRequest.sendHttpRequest(
-            HttpRequest.newBuilder(URI.create(TiktokApi.TIKTOK_WEB_URL + "/@" + this.handle)),
+            HttpRequest.newBuilder(URI.create(TiktokApi.TIKTOK_WEB_URL + "/@" + this.byHandle)),
             BodyHandlers.ofString(),
             null
         ).body();

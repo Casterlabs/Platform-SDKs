@@ -11,22 +11,24 @@ import co.casterlabs.apiutil.web.WebRequest;
 import co.casterlabs.sdk.tiktok.TiktokApi;
 import co.casterlabs.sdk.tiktok.types.TiktokUserInfo;
 import lombok.NonNull;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 
 /**
  * Avoid using this unless you absolutely need their @handle.
  */
-@Setter
 @Deprecated
-@Accessors(chain = true)
 public class TiktokGetUserHandleRequest extends WebRequest<String> {
     private @NonNull String profileDeepLink;
-    private long deepLinkRequestedAt = System.currentTimeMillis();
+    private long deepLinkRequestedAt;
 
-    public TiktokGetUserHandleRequest setUserInfo(@NonNull TiktokUserInfo userInfo) {
-        this.profileDeepLink = userInfo.getProfileDeepLink();
-        this.deepLinkRequestedAt = userInfo.getRequestMadeAt();
+    public TiktokGetUserHandleRequest byUserInfo(@NonNull TiktokUserInfo userInfo) {
+        this.profileDeepLink = userInfo.profileDeepLink;
+        this.deepLinkRequestedAt = userInfo.requestMadeAt;
+        return this;
+    }
+
+    public TiktokGetUserHandleRequest byProfileDeepLink(@NonNull String profileDeepLink) {
+        this.profileDeepLink = profileDeepLink;
+        this.deepLinkRequestedAt = System.currentTimeMillis();
         return this;
     }
 
