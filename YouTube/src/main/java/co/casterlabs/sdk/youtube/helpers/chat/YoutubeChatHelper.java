@@ -38,15 +38,15 @@ public class YoutubeChatHelper {
     private void doLoop() {
         try {
             YoutubeLiveChatMessagesList list = new YoutubeListLiveChatMessagesRequest(this.auth)
-                .setLiveChatId(this.liveChatId)
-                .setPageToken(this.paginationToken)
+                .forLiveChatId(this.liveChatId)
+                .withPageToken(this.paginationToken)
                 .send();
 
-            if (list.isHistorical()) {
-                this.listener.onHistory(list.getEvents());
+            if (list.isHistorical) {
+                this.listener.onHistory(list.events);
             } else {
                 try {
-                    for (YoutubeLiveChatEvent event : list.getEvents()) {
+                    for (YoutubeLiveChatEvent event : list.events) {
                         this.listener.onEvent(event);
                     }
                 } catch (Throwable t) {
@@ -54,9 +54,9 @@ public class YoutubeChatHelper {
                 }
             }
 
-            this.paginationToken = list.getNextPageToken();
+            this.paginationToken = list.nextPageToken;
 
-            Thread.sleep(this.overridePollingInterval == -1 ? list.getPollingIntervalMillis() : this.overridePollingInterval);
+            Thread.sleep(this.overridePollingInterval == -1 ? list.pollingIntervalMillis : this.overridePollingInterval);
         } catch (ApiException e) {
             String message = e.getMessage();
             if (message.contains("The live chat that you are trying to retrieve cannot be found.") ||

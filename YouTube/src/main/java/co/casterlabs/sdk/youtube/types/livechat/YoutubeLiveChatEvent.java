@@ -8,16 +8,15 @@ import co.casterlabs.rakurai.json.serialization.JsonParseException;
 import co.casterlabs.rakurai.json.validation.JsonValidationException;
 import co.casterlabs.sdk.youtube.types.livechat.events.YoutubeLiveEvent;
 import co.casterlabs.sdk.youtube.types.livechat.events.YoutubeLiveEventType;
-import lombok.Getter;
 import lombok.ToString;
 
-@Getter
 @ToString
 @JsonClass(exposeAll = true)
 public class YoutubeLiveChatEvent {
-    private String id;
-    private boolean isHistorical;
-    private YoutubeLiveChatAuthor authorDetails;
+    public final String id = null;
+    public final boolean isHistorical = false;
+    public final YoutubeLiveChatAuthor authorDetails = new YoutubeLiveChatAuthor();
+
     private @JsonExclude YoutubeLiveEvent event;
 
     @JsonDeserializationMethod("snippet")
@@ -26,7 +25,7 @@ public class YoutubeLiveChatEvent {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends YoutubeLiveEvent> T getEvent() {
+    public <T extends YoutubeLiveEvent> T event() {
         return (T) this.event;
     }
 

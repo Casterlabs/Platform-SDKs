@@ -1,14 +1,12 @@
 package co.casterlabs.sdk.youtube.types.livechat.events;
 
 import co.casterlabs.rakurai.json.annotating.JsonClass;
-import lombok.Getter;
 import lombok.ToString;
 
-@Getter
 @ToString
 @JsonClass(exposeAll = true)
 public class YoutubeLiveMembershipGiftingEvent extends YoutubeLiveEvent {
-    private int giftMembershipsCount;
-    private String giftMembershipsLevelName;
+    public final Integer giftMembershipsCount = null;
+    public final String giftMembershipsLevelName = null;
 
 }

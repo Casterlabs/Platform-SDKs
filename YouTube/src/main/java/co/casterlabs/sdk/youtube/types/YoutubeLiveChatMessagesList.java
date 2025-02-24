@@ -1,5 +1,6 @@
 package co.casterlabs.sdk.youtube.types;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -12,23 +13,21 @@ import co.casterlabs.rakurai.json.element.JsonElement;
 import co.casterlabs.rakurai.json.serialization.JsonParseException;
 import co.casterlabs.rakurai.json.validation.JsonValidationException;
 import co.casterlabs.sdk.youtube.types.livechat.YoutubeLiveChatEvent;
-import lombok.Getter;
 import lombok.ToString;
 
-@Getter
 @ToString
 @JsonClass(exposeAll = true)
 public class YoutubeLiveChatMessagesList {
-    private boolean isHistorical;
+    public final boolean isHistorical = false;
 
-    private String nextPageToken;
+    public final String nextPageToken = null;
 
-    private long pollingIntervalMillis;
+    public final Long pollingIntervalMillis = null;
 
-    private List<YoutubeLiveChatEvent> events;
+    public final List<YoutubeLiveChatEvent> events = null;
 
     @JsonDeserializationMethod("items")
-    private void $deserialize_items(JsonElement itemsElement) throws JsonValidationException, JsonParseException {
+    private void $deserialize_items(JsonElement itemsElement) throws JsonValidationException, JsonParseException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
         JsonArray items = itemsElement.getAsArray();
 
         List<YoutubeLiveChatEvent> events = new ArrayList<>(items.size());
@@ -38,7 +37,9 @@ public class YoutubeLiveChatMessagesList {
             events.add(Rson.DEFAULT.fromJson(item, YoutubeLiveChatEvent.class));
         }
 
-        this.events = Collections.unmodifiableList(events);
+        Field f = YoutubeLiveChatMessagesList.class.getField("events");
+        f.setAccessible(true);
+        f.set(this, Collections.unmodifiableList(events));
     }
 
     public boolean isEmpty() {

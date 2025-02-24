@@ -36,7 +36,6 @@ public class YoutubeGetChannelSnippetRequest extends AuthenticatedWebRequest<You
 
         this.queryMode = 1;
         this.queryData = username;
-
         return this;
     }
 

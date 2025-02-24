@@ -17,25 +17,24 @@ import co.casterlabs.sdk.youtube.YoutubeAuth;
 import co.casterlabs.sdk.youtube.YoutubeHttpUtil;
 import co.casterlabs.sdk.youtube.types.YoutubeLiveBroadcastData;
 import lombok.NonNull;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
+@Setter
+@Accessors(chain = true, fluent = true)
 public class YoutubeSearchForLiveBroadcastSnippet extends AuthenticatedWebRequest<List<YoutubeLiveBroadcastData.LiveBroadcastSnippet>, YoutubeAuth> {
-    private String channelId = null;
+    private String byChannelId = null;
 
     public YoutubeSearchForLiveBroadcastSnippet(@NonNull YoutubeAuth auth) {
         super(auth);
     }
 
-    public YoutubeSearchForLiveBroadcastSnippet byId(@NonNull String channelId) {
-        this.channelId = channelId;
-        return this;
-    }
-
     @Override
     protected List<YoutubeLiveBroadcastData.LiveBroadcastSnippet> execute() throws ApiException, ApiAuthException, IOException {
-        assert this.channelId != null : "You must specify the ID of the channel to search.";
+        assert this.byChannelId != null : "You must specify the ID of the channel to search.";
 
         String url = "https://www.googleapis.com/youtube/v3/search?part=snippet"
-            + "&channelId=" + UriEscape.escapeUriQueryParam(this.channelId)
+            + "&channelId=" + UriEscape.escapeUriQueryParam(this.byChannelId)
             + "&type=video"
             + "&eventType=live";
 

@@ -10,19 +10,22 @@ import lombok.NonNull;
 @AllArgsConstructor
 public enum YoutubeLiveEventType {
     // https://developers.google.com/youtube/v3/live/docs/liveChatMessages#resource
-    CHAT_ENDED_EVENT(YoutubeLiveChatEndedEvent.class),
-    MESSAGE_DELETED_EVENT(YoutubeLiveMessageDeletedEvent.class),
-    SPONSOR_ONLY_MODE_ENDED_EVENT(YoutubeLiveSponsorOnlyModeEndedEvent.class),
+
+    // @formatter:off
+                   CHAT_ENDED_EVENT(YoutubeLiveChatEndedEvent.class),
+              MESSAGE_DELETED_EVENT(YoutubeLiveMessageDeletedEvent.class),
+      SPONSOR_ONLY_MODE_ENDED_EVENT(YoutubeLiveSponsorOnlyModeEndedEvent.class),
     SPONSOR_ONLY_MODE_STARTED_EVENT(YoutubeLiveSponsorOnlyModeStartedEvent.class),
-    NEW_SPONSOR_EVENT(YoutubeLiveNewSponsorEvent.class),
-    MEMBER_MILESTONE_CHAT_EVENT(YoutubeLiveMemberMilestoneChatEvent.class),
-    SUPER_CHAT_EVENT(YoutubeLiveSuperChatEvent.class),
-    SUPER_STICKER_EVENT(YoutubeLiveSuperStickerEvent.class),
-    TEXT_MESSAGE_EVENT(YoutubeLiveTextMessageEvent.class),
-    TOMBSTONE(YoutubeLiveTombstoneEvent.class),
-    USER_BANNED_EVENT(YoutubeLiveUserBannedEvent.class),
-    MEMBERSHIP_GIFTING_EVENT(YoutubeLiveMembershipGiftingEvent.class),
-    GIFT_MEMBERSHIP_RECEIVED_EVENT(YoutubeLiveGiftMembershipReceivedEvent.class),
+                  NEW_SPONSOR_EVENT(YoutubeLiveNewSponsorEvent.class),
+        MEMBER_MILESTONE_CHAT_EVENT(YoutubeLiveMemberMilestoneChatEvent.class),
+                   SUPER_CHAT_EVENT(YoutubeLiveSuperChatEvent.class),
+                SUPER_STICKER_EVENT(YoutubeLiveSuperStickerEvent.class),
+                 TEXT_MESSAGE_EVENT(YoutubeLiveTextMessageEvent.class),
+                          TOMBSTONE(YoutubeLiveTombstoneEvent.class),
+                  USER_BANNED_EVENT(YoutubeLiveUserBannedEvent.class),
+           MEMBERSHIP_GIFTING_EVENT(YoutubeLiveMembershipGiftingEvent.class),
+     GIFT_MEMBERSHIP_RECEIVED_EVENT(YoutubeLiveGiftMembershipReceivedEvent.class),
+    // @formatter:on
     ;
 
     private Class<? extends YoutubeLiveEvent> clazz;
@@ -33,7 +36,6 @@ public enum YoutubeLiveEventType {
     public static <T extends YoutubeLiveEvent> T fromJson(@NonNull JsonObject json) throws JsonValidationException, JsonParseException {
         // Remove all the subtypes and extract them to the root snippet.
         final String[] subs = {};
-
         for (String sub : subs) {
             if (json.containsKey(sub)) {
                 json.toMap().putAll(json.remove(sub).getAsObject().toMap());
@@ -50,7 +52,6 @@ public enum YoutubeLiveEventType {
         String converted = type
             .replaceAll("([A-Z])", "_$1") // textMessageEvent -> text_Message_Event
             .toUpperCase(); // text_Message_Event -> TEXT_MESSAGE_EVENT
-
         return YoutubeLiveEventType.valueOf(converted);
     }
 

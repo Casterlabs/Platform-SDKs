@@ -14,10 +14,11 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-@Accessors(chain = true)
+@Setter
+@Accessors(chain = true, fluent = true)
 public class YoutubeInsertLiveChatMessageRequest extends AuthenticatedWebRequest<Void, YoutubeAuth> {
-    private @Setter @NonNull String liveChatId = null;
-    private @Setter @Nullable String messageText = null;
+    private @NonNull String forLiveChatId = null;
+    private @Nullable String withMessageText = null;
 
     public YoutubeInsertLiveChatMessageRequest(@NonNull YoutubeAuth auth) {
         super(auth);
@@ -25,8 +26,8 @@ public class YoutubeInsertLiveChatMessageRequest extends AuthenticatedWebRequest
 
     @Override
     protected Void execute() throws ApiException, ApiAuthException, IOException {
-        assert this.liveChatId != null : "You must specify a chat id.";
-        assert this.messageText != null : "You must set `messageText`.";
+        assert this.forLiveChatId != null : "You must specify a chat id.";
+        assert this.withMessageText != null : "You must set `messageText`.";
 
         final String url = "https://youtube.googleapis.com/youtube/v3/liveChat/messages?part=snippet";
 
@@ -38,12 +39,12 @@ public class YoutubeInsertLiveChatMessageRequest extends AuthenticatedWebRequest
             .put(
                 "snippet",
                 new JsonObject()
-                    .put("liveChatId", this.liveChatId)
+                    .put("liveChatId", this.forLiveChatId)
                     .put("type", "textMessageEvent")
                     .put(
                         "textMessageDetails",
                         new JsonObject()
-                            .put("messageText", this.messageText)
+                            .put("messageText", this.withMessageText)
                     )
             );
 

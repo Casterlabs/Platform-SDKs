@@ -1,14 +1,12 @@
 package co.casterlabs.sdk.youtube.types;
 
 import co.casterlabs.rakurai.json.annotating.JsonClass;
-import lombok.Getter;
 
-@Getter
 @JsonClass(exposeAll = true)
 public class YoutubeThumbnail {
-    private String url;
-    private int width;
-    private int height;
+    public final String url = null;
+    public final Integer width = null;
+    public final Integer height = null;
 
     @Override
     public String toString() {

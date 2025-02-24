@@ -1,28 +1,18 @@
 package co.casterlabs.sdk.youtube.types.livechat;
 
 import co.casterlabs.rakurai.json.annotating.JsonClass;
-import lombok.Getter;
 import lombok.ToString;
 
-@Getter
 @ToString
 @JsonClass(exposeAll = true)
 public class YoutubeLiveChatAuthor {
-
-    private String channelId;
-
-    private String channelUrl;
-
-    private String displayName;
-
-    private String profileImageUrl;
-
-    private boolean isVerified;
-
-    private boolean isChatOwner;
-
-    private boolean isChatSponsor;
-
-    private boolean isChatModerator;
+    public final String channelId = null;
+    public final String channelUrl = null;
+    public final String displayName = null;
+    public final String profileImageUrl = null;
+    public final Boolean isVerified = null;
+    public final Boolean isChatOwner = null;
+    public final Boolean isChatSponsor = null;
+    public final Boolean isChatModerator = null;
 
 }
