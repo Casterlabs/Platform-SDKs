@@ -5,11 +5,12 @@ import java.util.List;
 import co.casterlabs.sdk.trovo.chat.TrovoMessageType;
 import co.casterlabs.sdk.trovo.chat.TrovoRawChatMessage;
 import co.casterlabs.sdk.trovo.chat.TrovoSubLevel;
-import lombok.AllArgsConstructor;
 
-@AllArgsConstructor
-public class TrovoWelcomeMessage implements TrovoMessage {
-    private TrovoRawChatMessage raw;
+public class TrovoWelcomeMessage extends TrovoMessage {
+
+    public TrovoWelcomeMessage(TrovoRawChatMessage raw) {
+        super(raw);
+    }
 
     public String getViewerNickname() {
         return this.raw.nick_name;
@@ -38,11 +39,6 @@ public class TrovoWelcomeMessage implements TrovoMessage {
     @Override
     public TrovoMessageType getType() {
         return TrovoMessageType.WELCOME;
-    }
-
-    @Override
-    public boolean isCatchup() {
-        return this.raw.is_catchup;
     }
 
 }

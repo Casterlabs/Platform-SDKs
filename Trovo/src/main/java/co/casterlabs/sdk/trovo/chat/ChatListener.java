@@ -1,7 +1,5 @@
 package co.casterlabs.sdk.trovo.chat;
 
-import java.util.List;
-
 import co.casterlabs.sdk.trovo.chat.messages.TrovoChatMessage;
 import co.casterlabs.sdk.trovo.chat.messages.TrovoCustomSpellMessage;
 import co.casterlabs.sdk.trovo.chat.messages.TrovoFollowMessage;
@@ -16,63 +14,6 @@ import co.casterlabs.sdk.trovo.chat.messages.TrovoSubscriptionMessage;
 import co.casterlabs.sdk.trovo.chat.messages.TrovoWelcomeMessage;
 
 public interface ChatListener {
-
-    // Usually a bunch of messages means it's the chat history.
-    default void onBatchMessages(List<TrovoMessage> messages) {
-        for (TrovoMessage message : messages) {
-            switch (message.getType()) {
-                case CHAT:
-                    this.onChatMessage((TrovoChatMessage) message);
-                    break;
-
-                case FOLLOW:
-                    this.onFollow((TrovoFollowMessage) message);
-                    break;
-
-                case GIFT_SUB_RANDOM:
-                    this.onGiftSubRandomly((TrovoGiftSubRandomlyMessage) message);
-                    break;
-
-                case GIFT_SUB_USER:
-                    this.onGiftSub((TrovoGiftSubMessage) message);
-                    break;
-
-                case MAGIC_CHAT_BULLET_SCREEN:
-                case MAGIC_CHAT_COLORFUL:
-                case MAGIC_CHAT_SPELL:
-                case MAGIC_CHAT_SUPER_CAP:
-                    this.onMagicChat((TrovoMagicChatMessage) message);
-                    break;
-
-                case SPELL:
-                    this.onSpell((TrovoSpellMessage) message);
-                    break;
-
-                case PLATFORM_EVENT:
-                    this.onPlatformEvent((TrovoPlatformEventMessage) message);
-                    break;
-
-                case RAID_WELCOME:
-                    this.onRaidWelcome((TrovoRaidWelcomeMessage) message);
-                    break;
-
-                case SUBSCRIPTION:
-                    this.onSubscription((TrovoSubscriptionMessage) message);
-                    break;
-
-                case WELCOME:
-                    this.onWelcome((TrovoWelcomeMessage) message);
-                    break;
-
-                case CUSTOM_SPELL:
-                    this.onCustomSpell((TrovoCustomSpellMessage) message);
-                    break;
-
-                case UNKNOWN:
-                    break;
-            }
-        }
-    }
 
     default void onOpen() {}
 
@@ -99,5 +40,59 @@ public interface ChatListener {
     default void onWelcome(TrovoWelcomeMessage message) {}
 
     default void onClose(boolean remote) {}
+
+    public static void fireListener(TrovoMessage chat, ChatListener listener) {
+        switch (chat.getType()) {
+            case CHAT:
+                listener.onChatMessage((TrovoChatMessage) chat);
+                break;
+
+            case FOLLOW:
+                listener.onFollow((TrovoFollowMessage) chat);
+                break;
+
+            case GIFT_SUB_RANDOM:
+                listener.onGiftSubRandomly((TrovoGiftSubRandomlyMessage) chat);
+                break;
+
+            case GIFT_SUB_USER:
+                listener.onGiftSub((TrovoGiftSubMessage) chat);
+                break;
+
+            case MAGIC_CHAT_BULLET_SCREEN:
+            case MAGIC_CHAT_COLORFUL:
+            case MAGIC_CHAT_SPELL:
+            case MAGIC_CHAT_SUPER_CAP:
+                listener.onMagicChat((TrovoMagicChatMessage) chat);
+                break;
+
+            case SPELL:
+                listener.onSpell((TrovoSpellMessage) chat);
+                break;
+
+            case PLATFORM_EVENT:
+                listener.onPlatformEvent((TrovoPlatformEventMessage) chat);
+                break;
+
+            case RAID_WELCOME:
+                listener.onRaidWelcome((TrovoRaidWelcomeMessage) chat);
+                break;
+
+            case SUBSCRIPTION:
+                listener.onSubscription((TrovoSubscriptionMessage) chat);
+                break;
+
+            case WELCOME:
+                listener.onWelcome((TrovoWelcomeMessage) chat);
+                break;
+
+            case CUSTOM_SPELL:
+                listener.onCustomSpell((TrovoCustomSpellMessage) chat);
+                break;
+
+            case UNKNOWN:
+                break;
+        }
+    }
 
 }

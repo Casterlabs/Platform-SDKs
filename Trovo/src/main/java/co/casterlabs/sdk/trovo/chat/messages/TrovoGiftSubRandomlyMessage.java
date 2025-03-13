@@ -5,11 +5,12 @@ import java.util.List;
 import co.casterlabs.sdk.trovo.chat.TrovoMessageType;
 import co.casterlabs.sdk.trovo.chat.TrovoRawChatMessage;
 import co.casterlabs.sdk.trovo.chat.TrovoSubLevel;
-import lombok.AllArgsConstructor;
 
-@AllArgsConstructor
-public class TrovoGiftSubRandomlyMessage implements TrovoMessage {
-    private TrovoRawChatMessage raw;
+public class TrovoGiftSubRandomlyMessage extends TrovoMessage {
+
+    public TrovoGiftSubRandomlyMessage(TrovoRawChatMessage raw) {
+        super(raw);
+    }
 
     public int getGiftAmount() {
         return Integer.parseInt(this.raw.content);
@@ -42,11 +43,6 @@ public class TrovoGiftSubRandomlyMessage implements TrovoMessage {
     @Override
     public TrovoMessageType getType() {
         return TrovoMessageType.GIFT_SUB_RANDOM;
-    }
-
-    @Override
-    public boolean isCatchup() {
-        return this.raw.is_catchup;
     }
 
 }

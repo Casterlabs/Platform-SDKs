@@ -2,20 +2,20 @@ package co.casterlabs.sdk.trovo.chat.messages;
 
 import java.util.List;
 
+import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.element.JsonObject;
 import co.casterlabs.sdk.trovo.chat.TrovoMessageType;
 import co.casterlabs.sdk.trovo.chat.TrovoRawChatMessage;
-import co.casterlabs.sdk.trovo.chat.TrovoSpell;
 import co.casterlabs.sdk.trovo.chat.TrovoSubLevel;
-import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
 
-@AllArgsConstructor
-public class TrovoSpellMessage implements TrovoMessage {
-    private TrovoRawChatMessage raw;
-    private JsonObject content;
+public class TrovoSpellMessage extends TrovoMessage {
+    private final JsonObject content;
 
-    public TrovoSpell getSpell() {
-        return TrovoSpell.get(this.getGift());
+    @SneakyThrows
+    public TrovoSpellMessage(TrovoRawChatMessage raw) {
+        super(raw);
+        this.content = Rson.DEFAULT.fromJson(raw.content, JsonObject.class);
     }
 
     public String getGift() {
@@ -57,11 +57,6 @@ public class TrovoSpellMessage implements TrovoMessage {
     @Override
     public TrovoMessageType getType() {
         return TrovoMessageType.SPELL;
-    }
-
-    @Override
-    public boolean isCatchup() {
-        return this.raw.is_catchup;
     }
 
 }

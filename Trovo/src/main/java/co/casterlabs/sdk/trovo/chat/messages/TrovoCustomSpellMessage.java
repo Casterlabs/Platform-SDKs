@@ -2,18 +2,23 @@ package co.casterlabs.sdk.trovo.chat.messages;
 
 import java.util.List;
 
+import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.element.JsonObject;
 import co.casterlabs.sdk.trovo.chat.TrovoMessageType;
 import co.casterlabs.sdk.trovo.chat.TrovoRawChatMessage;
 import co.casterlabs.sdk.trovo.chat.TrovoSubLevel;
-import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
 
-@AllArgsConstructor
-public class TrovoCustomSpellMessage implements TrovoMessage {
+public class TrovoCustomSpellMessage extends TrovoMessage {
     private static final String IMAGE_FORMAT = "https://custom-file.trovo.live/file/%s/icon%d.png?imageView2/2/format/webp";
 
-    private TrovoRawChatMessage raw;
-    private JsonObject content;
+    private final JsonObject content;
+
+    @SneakyThrows
+    public TrovoCustomSpellMessage(TrovoRawChatMessage raw) {
+        super(raw);
+        this.content = Rson.DEFAULT.fromJson(raw.content, JsonObject.class);
+    }
 
     public long getSpellId() {
         return this.content.get("sid").getAsNumber().longValue();
@@ -62,11 +67,6 @@ public class TrovoCustomSpellMessage implements TrovoMessage {
     @Override
     public TrovoMessageType getType() {
         return TrovoMessageType.CUSTOM_SPELL;
-    }
-
-    @Override
-    public boolean isCatchup() {
-        return this.raw.is_catchup;
     }
 
 }

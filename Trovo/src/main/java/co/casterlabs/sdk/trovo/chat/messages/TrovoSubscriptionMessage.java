@@ -5,11 +5,12 @@ import java.util.List;
 import co.casterlabs.sdk.trovo.chat.TrovoMessageType;
 import co.casterlabs.sdk.trovo.chat.TrovoRawChatMessage;
 import co.casterlabs.sdk.trovo.chat.TrovoSubLevel;
-import lombok.AllArgsConstructor;
 
-@AllArgsConstructor
-public class TrovoSubscriptionMessage implements TrovoMessage {
-    private TrovoRawChatMessage raw;
+public class TrovoSubscriptionMessage extends TrovoMessage {
+
+    public TrovoSubscriptionMessage(TrovoRawChatMessage raw) {
+        super(raw);
+    }
 
     public String getSubscriberNickname() {
         return this.raw.nick_name;
@@ -38,11 +39,6 @@ public class TrovoSubscriptionMessage implements TrovoMessage {
     @Override
     public TrovoMessageType getType() {
         return TrovoMessageType.SUBSCRIPTION;
-    }
-
-    @Override
-    public boolean isCatchup() {
-        return this.raw.is_catchup;
     }
 
 }

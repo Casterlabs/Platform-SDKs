@@ -5,11 +5,12 @@ import java.util.List;
 import co.casterlabs.sdk.trovo.chat.TrovoMessageType;
 import co.casterlabs.sdk.trovo.chat.TrovoRawChatMessage;
 import co.casterlabs.sdk.trovo.chat.TrovoSubLevel;
-import lombok.AllArgsConstructor;
 
-@AllArgsConstructor
-public class TrovoRaidWelcomeMessage implements TrovoMessage {
-    private TrovoRawChatMessage raw;
+public class TrovoRaidWelcomeMessage extends TrovoMessage {
+
+    public TrovoRaidWelcomeMessage(TrovoRawChatMessage raw) {
+        super(raw);
+    }
 
     public String getMessage() {
         return this.raw.content;
@@ -42,11 +43,6 @@ public class TrovoRaidWelcomeMessage implements TrovoMessage {
     @Override
     public TrovoMessageType getType() {
         return TrovoMessageType.RAID_WELCOME;
-    }
-
-    @Override
-    public boolean isCatchup() {
-        return this.raw.is_catchup;
     }
 
 }
