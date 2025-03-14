@@ -6,6 +6,7 @@ import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.element.JsonObject;
 import co.casterlabs.sdk.trovo.chat.TrovoMessageType;
 import co.casterlabs.sdk.trovo.chat.TrovoRawChatMessage;
+import co.casterlabs.sdk.trovo.chat.TrovoSpell;
 import co.casterlabs.sdk.trovo.chat.TrovoSubLevel;
 import lombok.SneakyThrows;
 
@@ -16,6 +17,10 @@ public class TrovoSpellMessage extends TrovoMessage {
     public TrovoSpellMessage(TrovoRawChatMessage raw) {
         super(raw);
         this.content = Rson.DEFAULT.fromJson(raw.content, JsonObject.class);
+    }
+
+    public TrovoSpell getSpell() {
+        return TrovoSpell.get(this.getGift());
     }
 
     public String getGift() {
