@@ -18,7 +18,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true, fluent = true)
 public class KickUpdateChannelRequest extends AuthenticatedWebRequest<Void, KickAuth> {
     private @Setter Integer withCategoryId = null;
-    private @Setter Integer withStreamTitle = null;
+    private @Setter String withStreamTitle = null;
 
     public KickUpdateChannelRequest(@NonNull KickAuth auth) {
         super(auth);
@@ -27,7 +27,7 @@ public class KickUpdateChannelRequest extends AuthenticatedWebRequest<Void, Kick
     @Override
     protected Void execute() throws ApiException, ApiAuthException, IOException {
         assert this.withCategoryId != null : "You must specify a category id.";
-        assert this.withStreamTitle != null : "You must specify a stream title.";
+        assert this.withStreamTitle != null && !this.withStreamTitle.isEmpty() : "You must specify a stream title.";
 
         String url = "https://api.kick.com/public/v1/channels";
 
