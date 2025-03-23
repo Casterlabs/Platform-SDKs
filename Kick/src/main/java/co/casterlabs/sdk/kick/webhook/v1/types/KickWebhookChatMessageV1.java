@@ -18,6 +18,8 @@ public class KickWebhookChatMessageV1 implements KickWebhookEvent {
     @JsonField("message_id")
     public final String id = null;
 
+    public final List<Emote> emotes = null;
+
     @JsonClass(exposeAll = true)
     public class Emote {
 
