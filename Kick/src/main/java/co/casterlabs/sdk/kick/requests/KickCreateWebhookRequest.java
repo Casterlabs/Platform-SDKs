@@ -17,7 +17,6 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-@Setter
 @Accessors(chain = true, fluent = true)
 public class KickCreateWebhookRequest extends AuthenticatedWebRequest<KickCreatedWebhook, KickAuth> {
     private @Setter KickWebhookEvent.Type withType = null;

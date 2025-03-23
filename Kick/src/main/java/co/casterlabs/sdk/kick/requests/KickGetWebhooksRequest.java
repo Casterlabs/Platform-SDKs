@@ -12,10 +12,8 @@ import co.casterlabs.rakurai.json.TypeToken;
 import co.casterlabs.sdk.kick.KickAuth;
 import co.casterlabs.sdk.kick.types.KickWebhook;
 import lombok.NonNull;
-import lombok.Setter;
 import lombok.experimental.Accessors;
 
-@Setter
 @Accessors(chain = true, fluent = true)
 public class KickGetWebhooksRequest extends AuthenticatedWebRequest<List<KickWebhook>, KickAuth> {
 

@@ -10,10 +10,8 @@ import co.casterlabs.apiutil.web.AuthenticatedWebRequest;
 import co.casterlabs.sdk.kick.KickAuth;
 import co.casterlabs.sdk.kick.types.KickIntrospection;
 import lombok.NonNull;
-import lombok.Setter;
 import lombok.experimental.Accessors;
 
-@Setter
 @Accessors(chain = true, fluent = true)
 public class KickTokenIntrospectRequest extends AuthenticatedWebRequest<KickIntrospection, KickAuth> {
 

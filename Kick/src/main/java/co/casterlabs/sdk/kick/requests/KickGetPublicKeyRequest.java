@@ -10,10 +10,8 @@ import co.casterlabs.apiutil.web.AuthenticatedWebRequest;
 import co.casterlabs.rakurai.json.element.JsonObject;
 import co.casterlabs.sdk.kick.KickAuth;
 import lombok.NonNull;
-import lombok.Setter;
 import lombok.experimental.Accessors;
 
-@Setter
 @Accessors(chain = true, fluent = true)
 public class KickGetPublicKeyRequest extends AuthenticatedWebRequest<String, KickAuth> {
 

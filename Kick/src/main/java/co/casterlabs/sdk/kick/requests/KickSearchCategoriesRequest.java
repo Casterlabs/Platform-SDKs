@@ -17,7 +17,6 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-@Setter
 @Accessors(chain = true, fluent = true)
 public class KickSearchCategoriesRequest extends AuthenticatedWebRequest<List<KickCategory>, KickAuth> {
     private @Setter String withQuery;

@@ -14,7 +14,6 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-@Setter
 @Accessors(chain = true, fluent = true)
 public class KickDeleteWebhookRequest extends AuthenticatedWebRequest<Void, KickAuth> {
     private @Setter String forId = null;
