@@ -18,7 +18,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true, fluent = true)
 public class KickPostChatMessageRequest extends AuthenticatedWebRequest<KickPostedChatMessage, KickAuth> {
     private @Setter Integer forChannelId = null;
-    private @Setter Integer withContent = null;
+    private @Setter String withContent = null;
     private @Setter boolean asBot = false;
 
     public KickPostChatMessageRequest(@NonNull KickAuth auth) {
