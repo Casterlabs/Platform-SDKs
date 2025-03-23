@@ -55,7 +55,6 @@ public class DliveChat extends WSConnection {
 
     @Override
     protected void onMessage(String raw) {
-
         try {
             JsonObject payload = Rson.DEFAULT.fromJson(raw, JsonObject.class);
 
@@ -72,7 +71,7 @@ public class DliveChat extends WSConnection {
                 }
 
                 case "data": {
-                    if (listener == null) break;
+                    if (this.listener == null) break;
 
                     for (JsonElement e : payload.getObject("payload").getObject("data").getArray("streamMessageReceived")) {
                         JsonObject item = e.getAsObject();
@@ -81,42 +80,42 @@ public class DliveChat extends WSConnection {
                         switch (item.getString("type")) {
 
                             case "Message": {
-                                listener.onMessage(Rson.DEFAULT.fromJson(item, DliveChatMessage.class));
+                                this.listener.onMessage(Rson.DEFAULT.fromJson(item, DliveChatMessage.class));
                                 break;
                             }
 
                             case "Gift": {
-                                listener.onGift(Rson.DEFAULT.fromJson(item, DliveChatGift.class));
+                                this.listener.onGift(Rson.DEFAULT.fromJson(item, DliveChatGift.class));
                                 break;
                             }
 
                             case "Live": {
-                                listener.onLive();
+                                this.listener.onLive();
                                 break;
                             }
 
                             case "Offline": {
-                                listener.onOffline();
+                                this.listener.onOffline();
                                 break;
                             }
 
                             case "Follow": {
-                                listener.onFollow(Rson.DEFAULT.fromJson(item, _DliveChatFollow.class).sender);
+                                this.listener.onFollow(Rson.DEFAULT.fromJson(item, _DliveChatFollow.class).sender);
                                 break;
                             }
 
                             case "Subscription": {
-                                listener.onSubscription(Rson.DEFAULT.fromJson(item, DliveChatSubscription.class));
+                                this.listener.onSubscription(Rson.DEFAULT.fromJson(item, DliveChatSubscription.class));
                                 break;
                             }
 
                             case "Delete": {
-                                listener.onMessagesDelete(Rson.DEFAULT.fromJson(item, _DliveChatDelete.class).ids);
+                                this.listener.onMessagesDelete(Rson.DEFAULT.fromJson(item, _DliveChatDelete.class).ids);
                                 break;
                             }
 
                             case "Host": {
-                                listener.onHost(Rson.DEFAULT.fromJson(item, DliveChatHost.class));
+                                this.listener.onHost(Rson.DEFAULT.fromJson(item, DliveChatHost.class));
                                 break;
                             }
 
