@@ -10,7 +10,7 @@ import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.web.ApiException;
 import co.casterlabs.apiutil.web.AuthenticatedWebRequest;
 import co.casterlabs.apiutil.web.RsonBodyHandler;
-import co.casterlabs.apiutil.web.URIParameters;
+import co.casterlabs.apiutil.web.QueryBuilder;
 import co.casterlabs.apiutil.web.WebRequest;
 import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.TypeToken;
@@ -55,7 +55,7 @@ public class TwitchHelixGetUsersRequest extends AuthenticatedWebRequest<List<Hel
             // Let it through (get the authenticated user's profile).
         }
 
-        String url = "https://api.twitch.tv/helix/users?" + new URIParameters()
+        String url = "https://api.twitch.tv/helix/users?" + new QueryBuilder()
             .putAllAsSeparateKeys("id", this.ids)
             .putAllAsSeparateKeys("login", this.logins)
             .put("first", "100");

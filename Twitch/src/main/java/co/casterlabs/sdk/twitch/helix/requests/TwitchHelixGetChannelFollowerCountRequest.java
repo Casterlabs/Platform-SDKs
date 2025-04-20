@@ -8,7 +8,7 @@ import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.web.ApiException;
 import co.casterlabs.apiutil.web.AuthenticatedWebRequest;
 import co.casterlabs.apiutil.web.RsonBodyHandler;
-import co.casterlabs.apiutil.web.URIParameters;
+import co.casterlabs.apiutil.web.QueryBuilder;
 import co.casterlabs.apiutil.web.WebRequest;
 import co.casterlabs.rakurai.json.element.JsonObject;
 import co.casterlabs.sdk.twitch.helix.TwitchHelixAuth;
@@ -30,7 +30,7 @@ public class TwitchHelixGetChannelFollowerCountRequest extends AuthenticatedWebR
         assert !this.auth.isApplicationAuth() : "You cannot use Application Auth.";
         assert this.forBroadcasterId != null : "You must specify the broadcaster ID corresponding to the authenticated user";
 
-        String url = "https://api.twitch.tv/helix/channels/followers?" + new URIParameters()
+        String url = "https://api.twitch.tv/helix/channels/followers?" + new QueryBuilder()
             .put("broadcaster_id", this.forBroadcasterId)
             .put("first", "1");
 

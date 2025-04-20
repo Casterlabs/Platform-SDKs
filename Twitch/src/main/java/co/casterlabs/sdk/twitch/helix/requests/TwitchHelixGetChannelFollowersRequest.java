@@ -11,7 +11,7 @@ import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.web.ApiException;
 import co.casterlabs.apiutil.web.AuthenticatedWebRequest;
 import co.casterlabs.apiutil.web.PaginatedResponse;
-import co.casterlabs.apiutil.web.URIParameters;
+import co.casterlabs.apiutil.web.QueryBuilder;
 import co.casterlabs.sdk.twitch.helix.TwitchHelixAuth;
 import co.casterlabs.sdk.twitch.helix.types.HelixFollower;
 import lombok.NonNull;
@@ -35,7 +35,7 @@ public class TwitchHelixGetChannelFollowersRequest extends AuthenticatedWebReque
         return new PaginatedResponse<>(new _HelixPaginationHelper<>() {
             @Override
             protected Builder request(@Nullable String cursor) {
-                String url = "https://api.twitch.tv/helix/channels/followers?" + new URIParameters()
+                String url = "https://api.twitch.tv/helix/channels/followers?" + new QueryBuilder()
                     .put("broadcaster_id", forBroadcasterId);
                 return HttpRequest.newBuilder()
                     .uri(URI.create(url));

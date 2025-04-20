@@ -11,7 +11,7 @@ import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.web.ApiException;
 import co.casterlabs.apiutil.web.AuthenticatedWebRequest;
 import co.casterlabs.apiutil.web.RsonBodyHandler;
-import co.casterlabs.apiutil.web.URIParameters;
+import co.casterlabs.apiutil.web.QueryBuilder;
 import co.casterlabs.apiutil.web.WebRequest;
 import co.casterlabs.rakurai.json.element.JsonObject;
 import co.casterlabs.sdk.twitch.helix.TwitchHelixAuth;
@@ -38,7 +38,7 @@ public class TwitchHelixSetRaidStatusRequest extends AuthenticatedWebRequest<Voi
         if (this.shouldRaid) {
             assert this.toBroadcasterId != null : "You must specify the target broadcaster ID corresponding to who you want to raid";
 
-            String url = "https://api.twitch.tv/helix/raids?" + new URIParameters()
+            String url = "https://api.twitch.tv/helix/raids?" + new QueryBuilder()
                 .put("from_broadcaster_id", this.fromBroadcasterId)
                 .put("to_broadcaster_id", this.toBroadcasterId);
 
@@ -50,7 +50,7 @@ public class TwitchHelixSetRaidStatusRequest extends AuthenticatedWebRequest<Voi
                 this.auth
             ).body();
         } else {
-            String url = "https://api.twitch.tv/helix/raids?" + new URIParameters()
+            String url = "https://api.twitch.tv/helix/raids?" + new QueryBuilder()
                 .put("broadcaster_id", this.fromBroadcasterId);
 
             response = WebRequest.sendHttpRequest(

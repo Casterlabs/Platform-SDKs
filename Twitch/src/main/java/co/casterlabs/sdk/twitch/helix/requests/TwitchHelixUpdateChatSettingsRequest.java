@@ -9,7 +9,7 @@ import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.web.ApiException;
 import co.casterlabs.apiutil.web.AuthenticatedWebRequest;
 import co.casterlabs.apiutil.web.RsonBodyHandler;
-import co.casterlabs.apiutil.web.URIParameters;
+import co.casterlabs.apiutil.web.QueryBuilder;
 import co.casterlabs.apiutil.web.WebRequest;
 import co.casterlabs.rakurai.json.element.JsonObject;
 import co.casterlabs.sdk.twitch.helix.TwitchHelixAuth;
@@ -120,7 +120,7 @@ public class TwitchHelixUpdateChatSettingsRequest extends AuthenticatedWebReques
         assert this.forBroadcasterId != null : "You must specify the broadcaster ID corresponding to the authenticated user";
         assert this.moderatorUserId != null : "You must specify the target user ID corresponding to who you want to change moderator status for";
 
-        String url = "https://api.twitch.tv/helix/chat/settings?" + new URIParameters()
+        String url = "https://api.twitch.tv/helix/chat/settings?" + new QueryBuilder()
             .put("broadcaster_id", this.forBroadcasterId)
             .put("moderator_id", this.moderatorUserId);
 

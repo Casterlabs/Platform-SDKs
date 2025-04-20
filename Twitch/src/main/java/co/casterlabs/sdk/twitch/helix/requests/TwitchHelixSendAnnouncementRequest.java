@@ -9,7 +9,7 @@ import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.web.ApiException;
 import co.casterlabs.apiutil.web.AuthenticatedWebRequest;
 import co.casterlabs.apiutil.web.RsonBodyHandler;
-import co.casterlabs.apiutil.web.URIParameters;
+import co.casterlabs.apiutil.web.QueryBuilder;
 import co.casterlabs.apiutil.web.WebRequest;
 import co.casterlabs.rakurai.json.element.JsonObject;
 import co.casterlabs.sdk.twitch.helix.TwitchHelixAuth;
@@ -38,7 +38,7 @@ public class TwitchHelixSendAnnouncementRequest extends AuthenticatedWebRequest<
             .put("message", this.message);
         // TODO support the color param
 
-        String url = "https://api.twitch.tv/helix/chat/announcements?" + new URIParameters()
+        String url = "https://api.twitch.tv/helix/chat/announcements?" + new QueryBuilder()
             .put("broadcaster_id", this.forBroadcasterId)
             .put("moderator_id", this.moderatorId);
 

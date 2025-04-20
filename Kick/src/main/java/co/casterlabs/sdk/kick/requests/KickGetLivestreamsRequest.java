@@ -8,7 +8,7 @@ import java.util.List;
 import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.web.ApiException;
 import co.casterlabs.apiutil.web.AuthenticatedWebRequest;
-import co.casterlabs.apiutil.web.URIParameters;
+import co.casterlabs.apiutil.web.QueryBuilder;
 import co.casterlabs.sdk.kick.KickAuth;
 import co.casterlabs.sdk.kick.types.KickLivestream;
 import lombok.NonNull;
@@ -58,7 +58,7 @@ public class KickGetLivestreamsRequest extends AuthenticatedWebRequest<List<Kick
 
     @Override
     protected List<KickLivestream> execute() throws ApiException, ApiAuthException, IOException {
-        String url = "https://api.kick.com/public/v1/livestreams?" + new URIParameters()
+        String url = "https://api.kick.com/public/v1/livestreams?" + new QueryBuilder()
             .optionalPut("broadcaster_user_id", this.forUserId)
             .optionalPut("category_id", this.forCategoryId)
             .optionalPut("language", this.forLanguage)

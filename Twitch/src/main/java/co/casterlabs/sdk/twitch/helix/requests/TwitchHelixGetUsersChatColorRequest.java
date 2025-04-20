@@ -11,7 +11,7 @@ import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.web.ApiException;
 import co.casterlabs.apiutil.web.AuthenticatedWebRequest;
 import co.casterlabs.apiutil.web.RsonBodyHandler;
-import co.casterlabs.apiutil.web.URIParameters;
+import co.casterlabs.apiutil.web.QueryBuilder;
 import co.casterlabs.apiutil.web.WebRequest;
 import co.casterlabs.rakurai.json.element.JsonObject;
 import co.casterlabs.sdk.twitch.helix.TwitchHelixAuth;
@@ -34,7 +34,7 @@ public class TwitchHelixGetUsersChatColorRequest extends AuthenticatedWebRequest
     protected List<String> execute() throws ApiException, ApiAuthException, IOException {
         if (this.ids.size() == 0) return Collections.emptyList(); // Don't even request.
 
-        String url = "https://api.twitch.tv/helix/chat/color?" + new URIParameters()
+        String url = "https://api.twitch.tv/helix/chat/color?" + new QueryBuilder()
             .putAllAsSeparateKeys("user_id", this.ids);
 
         JsonObject response = WebRequest.sendHttpRequest(

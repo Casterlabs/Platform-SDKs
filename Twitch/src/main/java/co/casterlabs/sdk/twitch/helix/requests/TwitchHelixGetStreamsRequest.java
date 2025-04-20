@@ -10,7 +10,7 @@ import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.web.ApiException;
 import co.casterlabs.apiutil.web.AuthenticatedWebRequest;
 import co.casterlabs.apiutil.web.RsonBodyHandler;
-import co.casterlabs.apiutil.web.URIParameters;
+import co.casterlabs.apiutil.web.QueryBuilder;
 import co.casterlabs.apiutil.web.WebRequest;
 import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.TypeToken;
@@ -47,7 +47,7 @@ public class TwitchHelixGetStreamsRequest extends AuthenticatedWebRequest<List<H
     protected List<HelixStream> execute() throws ApiException, ApiAuthException, IOException {
         assert this.ids.size() > 0 || this.logins.size() > 0 : "You must supply an id or login to query for.";
 
-        String url = "https://api.twitch.tv/helix/streams?" + new URIParameters()
+        String url = "https://api.twitch.tv/helix/streams?" + new QueryBuilder()
             .putAllAsSeparateKeys("user_id", this.ids)
             .putAllAsSeparateKeys("user_login", this.logins)
             .put("first", "100");
