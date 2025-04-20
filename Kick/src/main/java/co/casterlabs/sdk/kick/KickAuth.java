@@ -12,6 +12,7 @@ import org.unbescape.uri.UriEscape;
 
 import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.auth.AuthDataProvider;
+import co.casterlabs.apiutil.auth.AuthDataProvider.InMemoryAuthDataProvider;
 import co.casterlabs.apiutil.auth.AuthProvider;
 import co.casterlabs.apiutil.web.RsonBodyHandler;
 import co.casterlabs.apiutil.web.WebRequest;
@@ -44,8 +45,22 @@ public class KickAuth extends AuthProvider<KickAuthData> {
         this.isApplicationAuth = false;
     }
 
+    /**
+     * Application
+     */
+    protected KickAuth(String clientId, String clientSecret) {
+        super(new InMemoryAuthDataProvider<>(KickAuthData.of(null)));
+        this.clientId = clientId;
+        this.clientSecret = clientSecret;
+        this.isApplicationAuth = true;
+    }
+
     public static KickAuth ofUser(AuthDataProvider<KickAuthData> dataProvider, String clientId, String clientSecret) {
         return new KickAuth(dataProvider, clientId, clientSecret);
+    }
+
+    public static KickAuth ofApplication(String clientId, String clientSecret) {
+        return new KickAuth(clientId, clientSecret);
     }
 
     @Override
@@ -71,20 +86,20 @@ public class KickAuth extends AuthProvider<KickAuthData> {
         try {
             Map<String, String> body;
 
-//            if (this.isApplicationAuth) {
-//                body = Map.of(
-//                    "grant_type", "client_credentials",
-//                    "client_id", this.clientId,
-//                    "client_secret", this.clientSecret
-//                );
-//            } else {
-            body = Map.of(
-                "grant_type", "refresh_token",
-                "refresh_token", this.data().refreshToken,
-                "client_id", this.clientId,
-                "client_secret", this.clientSecret
-            );
-//            }
+            if (this.isApplicationAuth) {
+                body = Map.of(
+                    "grant_type", "client_credentials",
+                    "client_id", this.clientId,
+                    "client_secret", this.clientSecret
+                );
+            } else {
+                body = Map.of(
+                    "grant_type", "refresh_token",
+                    "refresh_token", this.data().refreshToken,
+                    "client_id", this.clientId,
+                    "client_secret", this.clientSecret
+                );
+            }
 
             JsonObject json = WebRequest.sendHttpRequest(
                 HttpRequest.newBuilder()
