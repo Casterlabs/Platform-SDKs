@@ -16,6 +16,9 @@ public class KickStream {
 
     public final String url = null;
 
+    @JsonField("thumbnail")
+    public final String thumbnailUrl = null;
+
     @JsonField("is_live")
     public final Boolean isLive = null;
 
