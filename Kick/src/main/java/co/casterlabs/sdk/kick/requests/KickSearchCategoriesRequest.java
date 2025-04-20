@@ -10,7 +10,6 @@ import org.unbescape.uri.UriEscape;
 import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.web.ApiException;
 import co.casterlabs.apiutil.web.AuthenticatedWebRequest;
-import co.casterlabs.rakurai.json.TypeToken;
 import co.casterlabs.sdk.kick.KickAuth;
 import co.casterlabs.sdk.kick.types.KickCategory;
 import lombok.NonNull;
@@ -34,8 +33,7 @@ public class KickSearchCategoriesRequest extends AuthenticatedWebRequest<List<Ki
         return _KickApi.request(
             HttpRequest.newBuilder(URI.create(url)),
             this.auth,
-            new TypeToken<List<KickCategory>>() {
-            }
+            KickCategory.LIST_TYPE
         );
     }
 

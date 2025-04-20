@@ -45,7 +45,7 @@ public class KickGetChannelRequest extends AuthenticatedWebRequest<KickChannel, 
         return _KickApi.request(
             HttpRequest.newBuilder(URI.create(url)),
             this.auth,
-            KickChannel[].class
+            KickChannel.ARRAY_TYPE
         )[0];
     }
 

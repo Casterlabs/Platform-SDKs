@@ -1,7 +1,9 @@
 package co.casterlabs.sdk.kick.types;
 
 import java.time.Instant;
+import java.util.List;
 
+import co.casterlabs.rakurai.json.TypeToken;
 import co.casterlabs.rakurai.json.annotating.JsonClass;
 import co.casterlabs.rakurai.json.annotating.JsonField;
 import lombok.ToString;
@@ -9,6 +11,9 @@ import lombok.ToString;
 @ToString
 @JsonClass(exposeAll = true)
 public class KickLivestream {
+    public static final TypeToken<KickLivestream[]> ARRAY_TYPE = TypeToken.of(KickLivestream[].class);
+    public static final TypeToken<List<KickLivestream>> LIST_TYPE = new TypeToken<List<KickLivestream>>() {
+    };
 
     public final String slug = null;
 

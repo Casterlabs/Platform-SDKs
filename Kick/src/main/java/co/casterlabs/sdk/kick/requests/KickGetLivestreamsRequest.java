@@ -9,7 +9,6 @@ import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.web.ApiException;
 import co.casterlabs.apiutil.web.AuthenticatedWebRequest;
 import co.casterlabs.apiutil.web.URIParameters;
-import co.casterlabs.rakurai.json.TypeToken;
 import co.casterlabs.sdk.kick.KickAuth;
 import co.casterlabs.sdk.kick.types.KickLivestream;
 import lombok.NonNull;
@@ -69,8 +68,7 @@ public class KickGetLivestreamsRequest extends AuthenticatedWebRequest<List<Kick
         return _KickApi.request(
             HttpRequest.newBuilder(URI.create(url)),
             this.auth,
-            new TypeToken<List<KickLivestream>>() {
-            }
+            KickLivestream.LIST_TYPE
         );
     }
 

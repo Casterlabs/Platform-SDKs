@@ -1,5 +1,8 @@
 package co.casterlabs.sdk.kick.types;
 
+import java.util.List;
+
+import co.casterlabs.rakurai.json.TypeToken;
 import co.casterlabs.rakurai.json.annotating.JsonClass;
 import co.casterlabs.rakurai.json.annotating.JsonField;
 import lombok.ToString;
@@ -7,6 +10,9 @@ import lombok.ToString;
 @ToString
 @JsonClass(exposeAll = true)
 public class KickChannel {
+    public static final TypeToken<KickChannel[]> ARRAY_TYPE = TypeToken.of(KickChannel[].class);
+    public static final TypeToken<List<KickChannel>> LIST_TYPE = new TypeToken<List<KickChannel>>() {
+    };
 
     public final String slug = null;
 

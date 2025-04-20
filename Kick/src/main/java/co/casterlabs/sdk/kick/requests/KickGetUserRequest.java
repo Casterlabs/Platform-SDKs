@@ -38,7 +38,7 @@ public class KickGetUserRequest extends AuthenticatedWebRequest<KickUser, KickAu
         return _KickApi.request(
             HttpRequest.newBuilder(URI.create(url)),
             this.auth,
-            KickUser[].class
+            KickUser.ARRAY_TYPE
         )[0];
     }
 
