@@ -12,6 +12,20 @@ import lombok.NonNull;
 public class QueryBuilder {
     private List<String> parameters = new LinkedList<>();
 
+    public static QueryBuilder from(String... entries) {
+        if (entries.length % 2 != 0) {
+            throw new IllegalArgumentException("You must supply an even amount of keys so they may be mapped to k=v pairs.");
+        }
+
+        QueryBuilder builder = new QueryBuilder();
+        for (int i = 0; i < entries.length; i += 2) {
+            String key = entries[i];
+            String value = entries[i + 1];
+            builder.optionalPut(key, value);
+        }
+        return builder;
+    }
+
     /**
      * Only put()s if the value isn't null.
      */

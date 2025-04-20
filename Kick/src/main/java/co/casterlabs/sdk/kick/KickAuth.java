@@ -84,19 +84,20 @@ public class KickAuth extends AuthProvider<KickAuthData> {
     public void refresh() throws ApiAuthException {
         this.lock.lock();
         try {
-            QueryBuilder params = new QueryBuilder();
-
+            QueryBuilder params;
             if (this.isApplicationAuth) {
-                params
-                    .put("grant_type", "client_credentials")
-                    .put("client_id", this.clientId)
-                    .put("client_secret", this.clientSecret);
+                params = QueryBuilder.from(
+                    "grant_type", "client_credentials",
+                    "client_id", this.clientId,
+                    "client_secret", this.clientSecret
+                );
             } else {
-                params
-                    .put("grant_type", "refresh_token")
-                    .put("refresh_token", this.data().refreshToken)
-                    .put("client_id", this.clientId)
-                    .put("client_secret", this.clientSecret);
+                params = QueryBuilder.from(
+                    "grant_type", "refresh_token",
+                    "refresh_token", this.data().refreshToken,
+                    "client_id", this.clientId,
+                    "client_secret", this.clientSecret
+                );
             }
 
             KickAuthData data = tokenEndpoint(params);
@@ -166,25 +167,28 @@ public class KickAuth extends AuthProvider<KickAuthData> {
         final ChallengeMethod codeChallengeMethod = ChallengeMethod.SHA256;
         String codeChallenge = PKCEUtil.generateChallenge(codeChallengeMethod, verifier);
 
-        return "https://id.kick.com/oauth/authorize?" + new QueryBuilder()
-            .put("client_id", clientId)
-            .put("response_type", "code")
-            .put("redirect_uri", redirectUri)
-            .put("state", state)
-            .put("scope", String.join(" ", scopes))
-            .put("code_challenge_method", codeChallengeMethod)
-            .put("code_challenge", codeChallenge);
+        return "https://id.kick.com/oauth/authorize?" + QueryBuilder.from(
+            "client_id", clientId,
+            "response_type", "code",
+            "redirect_uri", redirectUri,
+            "state", state,
+            "scope", String.join(" ", scopes),
+            "code_challenge_method", codeChallengeMethod.toString(),
+            "code_challenge", codeChallenge
+        );
     }
 
     public static KickAuthData exchangeCodeGrant(@NonNull ParsedQuery query, @NonNull String clientId, @NonNull String clientSecret, @NonNull String redirectUri, @NonNull String verifier) throws ApiAuthException {
-        QueryBuilder params = new QueryBuilder()
-            .put("code", query.getSingle("code"))
-            .put("client_id", clientId)
-            .put("client_secret", clientSecret)
-            .put("redirect_uri", redirectUri)
-            .put("grant_type", "authorization_code")
-            .put("code_verifier", verifier);
-        return KickAuth.tokenEndpoint(params);
+        return KickAuth.tokenEndpoint(
+            QueryBuilder.from(
+                "code", query.getSingle("code"),
+                "client_id", clientId,
+                "client_secret", clientSecret,
+                "redirect_uri", redirectUri,
+                "grant_type", "authorization_code",
+                "code_verifier", verifier
+            )
+        );
     }
 
     /* ---------------- */
@@ -202,9 +206,7 @@ public class KickAuth extends AuthProvider<KickAuthData> {
             JsonObject json = WebRequest.sendHttpRequest(
                 HttpRequest.newBuilder()
                     .uri(URI.create("https://id.kick.com/oauth/token"))
-                    .POST(
-                        BodyPublishers.ofString(params.toString())
-                    )
+                    .POST(BodyPublishers.ofString(params.toString()))
                     .header("Content-Type", "application/x-www-form-urlencoded"),
                 RsonBodyHandler.of(JsonObject.class),
                 null
