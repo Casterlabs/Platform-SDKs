@@ -4,6 +4,8 @@ import org.jetbrains.annotations.Nullable;
 
 import co.casterlabs.rakurai.json.annotating.JsonClass;
 import co.casterlabs.rakurai.json.annotating.JsonField;
+import xyz.e3ndr.fastloggingframework.logging.FastLogger;
+import xyz.e3ndr.fastloggingframework.logging.LogLevel;
 
 @JsonClass(exposeAll = true)
 public class KickWebhookUserV1 {
@@ -45,6 +47,36 @@ public class KickWebhookUserV1 {
         public static class Badge {
             public final String text = null;
             public final String type = null;
+
+            public String getImageUrl() {
+                switch (this.type) {
+                    case "broadcaster":
+                        return "https://raw.githubusercontent.com/Casterlabs/Platform-SDKs/main/Kick/Badges/broadcaster.svg";
+                    case "moderator":
+                        return "https://raw.githubusercontent.com/Casterlabs/Platform-SDKs/main/Kick/Badges/moderator.svg";
+                    case "vip":
+                        return "https://raw.githubusercontent.com/Casterlabs/Platform-SDKs/main/Kick/Badges/vip.svg";
+                    case "og":
+                        return "https://raw.githubusercontent.com/Casterlabs/Platform-SDKs/main/Kick/Badges/og.svg";
+                    case "verified":
+                        return "https://raw.githubusercontent.com/Casterlabs/Platform-SDKs/main/Kick/Badges/verified.svg";
+                    case "founder":
+                        return "https://raw.githubusercontent.com/Casterlabs/Platform-SDKs/main/Kick/Badges/founder.svg";
+                    case "staff":
+                        return "https://raw.githubusercontent.com/Casterlabs/Platform-SDKs/main/Kick/Badges/staff.svg";
+                    case "subscriber":
+                        return "https://raw.githubusercontent.com/Casterlabs/Platform-SDKs/main/Kick/Badges/subscriber.svg";
+
+                    case "sub_gifter":
+                        // TODO detect if they are gifter level 1 or 2.
+                        return "https://raw.githubusercontent.com/Casterlabs/Platform-SDKs/main/Kick/Badges/sub_gifter_1.svg";
+
+                    default:
+                        FastLogger.logStatic(LogLevel.WARNING, "Unknown badge type: %s ('%s')", this.type, this.text);
+                        return null;
+                }
+            }
+
         }
 
     }
