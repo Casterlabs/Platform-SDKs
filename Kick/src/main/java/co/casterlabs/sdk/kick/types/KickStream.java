@@ -4,7 +4,9 @@ import java.time.Instant;
 
 import co.casterlabs.rakurai.json.annotating.JsonClass;
 import co.casterlabs.rakurai.json.annotating.JsonField;
+import lombok.ToString;
 
+@ToString
 @JsonClass(exposeAll = true)
 public class KickStream {
 
