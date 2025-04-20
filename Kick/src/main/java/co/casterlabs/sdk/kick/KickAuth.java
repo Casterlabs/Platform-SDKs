@@ -4,16 +4,13 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
-import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.Collectors;
-
-import org.unbescape.uri.UriEscape;
 
 import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.auth.AuthDataProvider;
 import co.casterlabs.apiutil.auth.AuthDataProvider.InMemoryAuthDataProvider;
 import co.casterlabs.apiutil.auth.AuthProvider;
+import co.casterlabs.apiutil.web.QueryBuilder;
 import co.casterlabs.apiutil.web.RsonBodyHandler;
 import co.casterlabs.apiutil.web.WebRequest;
 import co.casterlabs.rakurai.json.Rson;
@@ -84,51 +81,23 @@ public class KickAuth extends AuthProvider<KickAuthData> {
     public void refresh() throws ApiAuthException {
         this.lock.lock();
         try {
-            Map<String, String> body;
+            QueryBuilder params = new QueryBuilder();
 
             if (this.isApplicationAuth) {
-                body = Map.of(
-                    "grant_type", "client_credentials",
-                    "client_id", this.clientId,
-                    "client_secret", this.clientSecret
-                );
+                params
+                    .put("grant_type", "client_credentials")
+                    .put("client_id", this.clientId)
+                    .put("client_secret", this.clientSecret);
             } else {
-                body = Map.of(
-                    "grant_type", "refresh_token",
-                    "refresh_token", this.data().refreshToken,
-                    "client_id", this.clientId,
-                    "client_secret", this.clientSecret
-                );
+                params
+                    .put("grant_type", "refresh_token")
+                    .put("refresh_token", this.data().refreshToken)
+                    .put("client_id", this.clientId)
+                    .put("client_secret", this.clientSecret);
             }
 
-            JsonObject json = WebRequest.sendHttpRequest(
-                HttpRequest.newBuilder()
-                    .uri(URI.create("https://id.kick.com/oauth/token"))
-                    .POST(
-                        BodyPublishers.ofString(
-                            body.entrySet()
-                                .stream()
-                                .map((e) -> UriEscape.escapeUriQueryParam(e.getKey()) + "=" + UriEscape.escapeUriQueryParam(e.getValue()))
-                                .collect(Collectors.joining("&"))
-                        )
-                    )
-                    .header("Content-Type", "application/x-www-form-urlencoded"),
-                RsonBodyHandler.of(JsonObject.class),
-                null
-            ).body();
-            checkAndThrow(json);
-
-            if (json.containsKey("scope") && !json.get("scope").isJsonArray()) {
-                json.put(
-                    "scope",
-                    String.join(" ", Rson.DEFAULT.fromJson(json.get("scope"), String[].class))
-                );
-            }
-
-            KickAuthData data = Rson.DEFAULT.fromJson(json, KickAuthData.class);
+            KickAuthData data = tokenEndpoint(params);
             this.dataProvider.save(data);
-        } catch (IOException e) {
-            throw new ApiAuthException(e);
         } finally {
             this.lock.unlock();
         }
@@ -190,9 +159,36 @@ public class KickAuth extends AuthProvider<KickAuthData> {
     /* Utils            */
     /* ---------------- */
 
-    static void checkAndThrow(JsonObject body) throws ApiAuthException {
+    private static void checkAndThrow(JsonObject body) throws ApiAuthException {
         if (body.containsKey("error") || body.containsKey("errors")) {
             throw new ApiAuthException(body.toString());
+        }
+    }
+
+    static KickAuthData tokenEndpoint(QueryBuilder params) throws ApiAuthException {
+        try {
+            JsonObject json = WebRequest.sendHttpRequest(
+                HttpRequest.newBuilder()
+                    .uri(URI.create("https://id.kick.com/oauth/token"))
+                    .POST(
+                        BodyPublishers.ofString(params.toString())
+                    )
+                    .header("Content-Type", "application/x-www-form-urlencoded"),
+                RsonBodyHandler.of(JsonObject.class),
+                null
+            ).body();
+            checkAndThrow(json);
+
+            if (json.containsKey("scope") && !json.get("scope").isJsonArray()) {
+                json.put(
+                    "scope",
+                    String.join(" ", Rson.DEFAULT.fromJson(json.get("scope"), String[].class))
+                );
+            }
+
+            return Rson.DEFAULT.fromJson(json, KickAuthData.class);
+        } catch (IOException e) {
+            throw new ApiAuthException(e);
         }
     }
 
