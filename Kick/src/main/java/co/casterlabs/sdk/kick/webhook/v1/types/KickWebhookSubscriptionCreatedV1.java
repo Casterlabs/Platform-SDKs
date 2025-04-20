@@ -13,6 +13,9 @@ public class KickWebhookSubscriptionCreatedV1 implements KickWebhookEvent {
 
     public final KickWebhookUserV1 subscriber = null;
 
+    /**
+     * The amount of months they've been subscribed for.
+     */
     public final Integer duration = null;
 
     @JsonField("created_at")
