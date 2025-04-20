@@ -19,6 +19,7 @@ import lombok.experimental.Accessors;
 public class KickPostChatMessageRequest extends AuthenticatedWebRequest<KickPostedChatMessage, KickAuth> {
     private @Setter Integer forChannelId = null;
     private @Setter String withContent = null;
+    private @Setter String replyTo = null;
     private @Setter boolean asBot = false;
 
     public KickPostChatMessageRequest(@NonNull KickAuth auth) {
@@ -38,6 +39,7 @@ public class KickPostChatMessageRequest extends AuthenticatedWebRequest<KickPost
         JsonObject payload = new JsonObject()
             .put("broadcaster_user_id", this.forChannelId)
             .put("content", this.withContent)
+            .put("reply_to_message_id", this.replyTo)
             .put("type", this.asBot ? "bot" : "user");
 
         return _KickApi.request(
