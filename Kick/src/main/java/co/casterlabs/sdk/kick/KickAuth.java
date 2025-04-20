@@ -10,6 +10,9 @@ import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.auth.AuthDataProvider;
 import co.casterlabs.apiutil.auth.AuthDataProvider.InMemoryAuthDataProvider;
 import co.casterlabs.apiutil.auth.AuthProvider;
+import co.casterlabs.apiutil.auth.PKCEUtil;
+import co.casterlabs.apiutil.auth.PKCEUtil.ChallengeMethod;
+import co.casterlabs.apiutil.web.ParsedQuery;
 import co.casterlabs.apiutil.web.QueryBuilder;
 import co.casterlabs.apiutil.web.RsonBodyHandler;
 import co.casterlabs.apiutil.web.WebRequest;
@@ -156,6 +159,35 @@ public class KickAuth extends AuthProvider<KickAuthData> {
     }
 
     /* ---------------- */
+    /* Code Grant       */
+    /* ---------------- */
+
+    public static String startCodeGrant(@NonNull String clientId, @NonNull String redirectUri, @NonNull String[] scopes, @NonNull String state, @NonNull String verifier) {
+        final ChallengeMethod codeChallengeMethod = ChallengeMethod.SHA256;
+        String codeChallenge = PKCEUtil.generateChallenge(codeChallengeMethod, verifier);
+
+        return "https://id.kick.com/oauth/authorize?" + new QueryBuilder()
+            .put("client_id", clientId)
+            .put("response_type", "code")
+            .put("redirect_uri", redirectUri)
+            .put("state", state)
+            .put("scope", String.join(" ", scopes))
+            .put("code_challenge_method", codeChallengeMethod)
+            .put("code_challenge", codeChallenge);
+    }
+
+    public static KickAuthData exchangeCodeGrant(@NonNull ParsedQuery query, @NonNull String clientId, @NonNull String clientSecret, @NonNull String redirectUri, @NonNull String verifier) throws ApiAuthException {
+        QueryBuilder params = new QueryBuilder()
+            .put("code", query.getSingle("code"))
+            .put("client_id", clientId)
+            .put("client_secret", clientSecret)
+            .put("redirect_uri", redirectUri)
+            .put("grant_type", "authorization_code")
+            .put("code_verifier", verifier);
+        return KickAuth.tokenEndpoint(params);
+    }
+
+    /* ---------------- */
     /* Utils            */
     /* ---------------- */
 
@@ -165,7 +197,7 @@ public class KickAuth extends AuthProvider<KickAuthData> {
         }
     }
 
-    static KickAuthData tokenEndpoint(QueryBuilder params) throws ApiAuthException {
+    private static KickAuthData tokenEndpoint(QueryBuilder params) throws ApiAuthException {
         try {
             JsonObject json = WebRequest.sendHttpRequest(
                 HttpRequest.newBuilder()
