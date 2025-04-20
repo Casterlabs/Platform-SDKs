@@ -118,7 +118,7 @@ public class KickAuth extends AuthProvider<KickAuthData> {
             ).body();
             checkAndThrow(json);
 
-            if (json.containsKey("scope") && json.get("scope").isJsonArray()) {
+            if (json.containsKey("scope") && !json.get("scope").isJsonArray()) {
                 json.put(
                     "scope",
                     String.join(" ", Rson.DEFAULT.fromJson(json.get("scope"), String[].class))
