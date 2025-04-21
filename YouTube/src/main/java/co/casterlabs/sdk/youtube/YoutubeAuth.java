@@ -3,6 +3,7 @@ package co.casterlabs.sdk.youtube;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpRequest;
+import java.util.Collection;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.jetbrains.annotations.Nullable;
@@ -181,7 +182,7 @@ public class YoutubeAuth extends AuthProvider<YoutubeAuthData> {
     /* Code Grant       */
     /* ---------------- */
 
-    public static String startCodeGrant(@NonNull String clientId, @NonNull String redirectUri, @NonNull String[] scopes, @Nullable String state) {
+    public static String startCodeGrant(@NonNull String clientId, @NonNull String redirectUri, @NonNull Collection<String> scopes, @Nullable String state) {
         return "https://accounts.google.com/o/oauth2/v2/auth?" + QueryBuilder.from(
             "response_type", "code",
             "prompt", "consent",

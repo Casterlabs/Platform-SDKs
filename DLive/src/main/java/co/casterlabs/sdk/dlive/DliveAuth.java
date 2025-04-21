@@ -5,6 +5,7 @@ import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.util.Base64;
+import java.util.Collection;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.jetbrains.annotations.Nullable;
@@ -176,7 +177,7 @@ public class DliveAuth extends AuthProvider<DliveAuthData> {
     /* Code Grant       */
     /* ---------------- */
 
-    public static String startCodeGrant(@NonNull String clientId, @NonNull String redirectUri, @NonNull String[] scopes, @Nullable String state) {
+    public static String startCodeGrant(@NonNull String clientId, @NonNull String redirectUri, @NonNull Collection<String> scopes, @Nullable String state) {
         return "https://dlive.tv/o/authorize?" + QueryBuilder.from(
             "response_type", "code",
             "force_verify", "true",

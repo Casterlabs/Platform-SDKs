@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
+import java.util.Collection;
 import java.util.concurrent.locks.ReentrantLock;
 
 import co.casterlabs.apiutil.auth.ApiAuthException;
@@ -163,7 +164,7 @@ public class KickAuth extends AuthProvider<KickAuthData> {
     /* Code Grant       */
     /* ---------------- */
 
-    public static String startCodeGrant(@NonNull String clientId, @NonNull String redirectUri, @NonNull String[] scopes, @NonNull String state, @NonNull String verifier) {
+    public static String startCodeGrant(@NonNull String clientId, @NonNull String redirectUri, @NonNull Collection<String> scopes, @NonNull String state, @NonNull String verifier) {
         final ChallengeMethod codeChallengeMethod = ChallengeMethod.SHA256;
         String codeChallenge = PKCEUtil.generateChallenge(codeChallengeMethod, verifier);
 

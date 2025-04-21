@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
+import java.util.Collection;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.jetbrains.annotations.Nullable;
@@ -151,7 +152,7 @@ public class TiktokAuth extends AuthProvider<TiktokAuthData> {
     /* Code Grant       */
     /* ---------------- */
 
-    public static String startCodeGrant(@NonNull String clientKey, @NonNull String redirectUri, @NonNull String[] scopes, @Nullable String state) {
+    public static String startCodeGrant(@NonNull String clientKey, @NonNull String redirectUri, @NonNull Collection<String> scopes, @Nullable String state) {
         return "https://www.tiktok.com/v2/auth/authorize?" + QueryBuilder.from(
             "response_type", "code",
             "client_key", clientKey,

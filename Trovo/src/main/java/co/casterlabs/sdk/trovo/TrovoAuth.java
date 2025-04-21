@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
+import java.util.Collection;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.jetbrains.annotations.Nullable;
@@ -196,7 +197,7 @@ public class TrovoAuth extends AuthProvider<TrovoAuthData> {
     /* Code Grant       */
     /* ---------------- */
 
-    public static String startCodeGrant(@NonNull String clientId, @NonNull String redirectUri, @NonNull String[] scopes, @Nullable String state) {
+    public static String startCodeGrant(@NonNull String clientId, @NonNull String redirectUri, @NonNull Collection<String> scopes, @Nullable String state) {
         return "https://open.trovo.live/page/login.html?" + QueryBuilder.from(
             "response_type", "code",
             "client_id", clientId,
