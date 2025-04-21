@@ -3,18 +3,17 @@ package co.casterlabs.sdk.youtube;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpRequest;
-import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.Collectors;
 
 import org.jetbrains.annotations.Nullable;
-import org.unbescape.uri.UriEscape;
 
 import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.auth.AuthDataProvider;
 import co.casterlabs.apiutil.auth.AuthDataProvider.InMemoryAuthDataProvider;
 import co.casterlabs.apiutil.auth.AuthProvider;
 import co.casterlabs.apiutil.web.ApiException;
+import co.casterlabs.apiutil.web.ParsedQuery;
+import co.casterlabs.apiutil.web.QueryBuilder;
 import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.annotating.JsonClass;
 import co.casterlabs.rakurai.json.annotating.JsonDeserializationMethod;
@@ -94,36 +93,15 @@ public class YoutubeAuth extends AuthProvider<YoutubeAuthData> {
         try {
             String refreshToken = this.data().refreshToken;
 
-            Map<String, String> body = Map.of(
+            QueryBuilder body = QueryBuilder.from(
                 "grant_type", "refresh_token",
                 "refresh_token", refreshToken,
                 "client_id", this.clientId,
                 "client_secret", this.clientSecret
             );
 
-            JsonObject json = YoutubeHttpUtil.insert(
-                body.entrySet()
-                    .stream()
-                    .map((e) -> UriEscape.escapeUriQueryParam(e.getKey()) + "=" + UriEscape.escapeUriQueryParam(e.getValue()))
-                    .collect(Collectors.joining("&")),
-                "application/x-www-form-urlencoded",
-                "https://oauth2.googleapis.com/token",
-                null
-            );
-            checkAndThrow(json);
-
-            if (!json.containsKey("refresh_token")) {
-                // Server didn't give us a new refresh token, inject the old one so that we
-                // don't break things.
-                json.put("refresh_token", refreshToken);
-            }
-
-            YoutubeAuthData data = Rson.DEFAULT.fromJson(json, YoutubeAuthData.class);
+            YoutubeAuthData data = tokenEndpoint(body, refreshToken);
             this.dataProvider.save(data);
-        } catch (ApiAuthException e) {
-            throw e;
-        } catch (IOException | ApiException e) {
-            throw new ApiAuthException(e);
         } finally {
             this.lock.unlock();
         }
@@ -200,12 +178,63 @@ public class YoutubeAuth extends AuthProvider<YoutubeAuthData> {
     }
 
     /* ---------------- */
-    /* Utils            */
+    /* Code Grant       */
     /* ---------------- */
 
-    static void checkAndThrow(JsonObject body) throws ApiAuthException {
+    public static String startCodeGrant(@NonNull String clientId, @NonNull String redirectUri, @NonNull String[] scopes, @Nullable String state) {
+        return "https://accounts.google.com/o/oauth2/v2/auth?" + QueryBuilder.from(
+            "response_type", "code",
+            "prompt", "consent",
+            "access_type", "offline",
+            "client_id", clientId,
+            "redirect_uri", redirectUri,
+            "scope", String.join(" ", scopes),
+            "state", state
+        );
+    }
+
+    public static YoutubeAuthData exchangeCodeGrant(@NonNull ParsedQuery query, @NonNull String clientId, @NonNull String clientSecret, @NonNull String redirectUri) throws ApiAuthException {
+        return tokenEndpoint(
+            QueryBuilder.from(
+                "grant_type", "authorization_code",
+                "code", query.getSingle("code"),
+                "client_id", clientId,
+                "client_secret", clientSecret,
+                "redirect_uri", redirectUri
+            ),
+            null
+        );
+    }
+
+    /* ---------------- */
+    /* Util             */
+    /* ---------------- */
+
+    private static void checkAndThrow(JsonObject body) throws ApiAuthException {
         if (body.containsKey("error") || body.containsKey("errors")) {
             throw new ApiAuthException(body.toString());
+        }
+    }
+
+    private static YoutubeAuthData tokenEndpoint(QueryBuilder params, String oldRefreshToken) throws ApiAuthException {
+        try {
+            JsonObject json = YoutubeHttpUtil.insert(
+                params.toString(),
+                "application/x-www-form-urlencoded",
+                "https://oauth2.googleapis.com/token",
+                null
+            );
+            checkAndThrow(json);
+
+            if (!json.containsKey("refresh_token") && oldRefreshToken != null) {
+                // Server didn't give us a new refresh token, inject the old one so that we
+                // don't break things.
+                json.put("refresh_token", oldRefreshToken);
+            }
+
+            return Rson.DEFAULT.fromJson(json, YoutubeAuthData.class);
+        } catch (IOException | ApiException e) {
+            throw new ApiAuthException(e);
         }
     }
 
