@@ -4,16 +4,16 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
-import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.Collectors;
 
-import org.unbescape.uri.UriEscape;
+import org.jetbrains.annotations.Nullable;
 
 import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.auth.AuthDataProvider;
 import co.casterlabs.apiutil.auth.AuthDataProvider.InMemoryAuthDataProvider;
 import co.casterlabs.apiutil.auth.AuthProvider;
+import co.casterlabs.apiutil.web.ParsedQuery;
+import co.casterlabs.apiutil.web.QueryBuilder;
 import co.casterlabs.apiutil.web.RsonBodyHandler;
 import co.casterlabs.apiutil.web.WebRequest;
 import co.casterlabs.rakurai.json.Rson;
@@ -79,56 +79,26 @@ public class TwitchHelixAuth extends AuthProvider<TwitchHelixAuthData> {
 
     @Override
     public void refresh() throws ApiAuthException {
-                Map<String, String> body;
-
-                if (this.isApplicationAuth) {
-                    body = Map.of(
-                        "grant_type", "client_credentials",
-                        "client_id", this.clientId,
-                        "client_secret", this.clientSecret
-                    );
-                } else {
-                    body = Map.of(
-                        "grant_type", "refresh_token",
-                        "refresh_token", this.data().refreshToken,
-                        "client_id", this.clientId,
-                        "client_secret", this.clientSecret
-                    );
-                }
-
-                JsonObject json = WebRequest.sendHttpRequest(
-                    HttpRequest.newBuilder()
-                        .uri(URI.create("https://id.twitch.tv/oauth2/token"))
-                        .POST(
-                            BodyPublishers.ofString(
-                                body.entrySet()
-                                    .stream()
-                                    .map((e) -> UriEscape.escapeUriQueryParam(e.getKey()) + "=" + UriEscape.escapeUriQueryParam(e.getValue()))
-                                    .collect(Collectors.joining("&"))
-                            )
         this.lock.lock();
         try {
-                        )
-                        .header("Content-Type", "application/x-www-form-urlencoded"),
-                    RsonBodyHandler.of(JsonObject.class),
-                    null
-                ).body();
-                checkAndThrow(json);
-
-                if (json.containsKey("scope")) {
-                    // Twitch's response payload always sends scope back as an array rather than a
-                    // string. So we parse it and replace it.
-                    json.put(
-                        "scope",
-                        String.join(" ", Rson.DEFAULT.fromJson(json.get("scope"), String[].class))
-                    );
-                }
-
-                TwitchHelixAuthData data = Rson.DEFAULT.fromJson(json, TwitchHelixAuthData.class);
-                this.dataProvider.save(data);
+            QueryBuilder params;
+            if (this.isApplicationAuth) {
+                params = QueryBuilder.from(
+                    "grant_type", "client_credentials",
+                    "client_id", this.clientId,
+                    "client_secret", this.clientSecret
+                );
+            } else {
+                params = QueryBuilder.from(
+                    "grant_type", "refresh_token",
+                    "refresh_token", this.data().refreshToken,
+                    "client_id", this.clientId,
+                    "client_secret", this.clientSecret
+                );
             }
-        } catch (IOException e) {
-            throw new ApiAuthException(e);
+
+            TwitchHelixAuthData data = tokenEndpoint(params);
+            this.dataProvider.save(data);
         } finally {
             this.lock.unlock();
         }
@@ -204,12 +174,66 @@ public class TwitchHelixAuth extends AuthProvider<TwitchHelixAuthData> {
     }
 
     /* ---------------- */
-    /* Utils            */
+    /* Code Grant       */
     /* ---------------- */
 
-    static void checkAndThrow(JsonObject body) throws ApiAuthException {
+    public static String startCodeGrant(@NonNull String clientId, @NonNull String redirectUri, @NonNull String[] scopes, @Nullable String state) {
+        return "https://id.twitch.tv/oauth2/authorize?" + QueryBuilder.from(
+            "response_type", "code",
+            "force_verify", "true",
+            "client_id", clientId,
+            "redirect_uri", redirectUri,
+            "scope", String.join(" ", scopes),
+            "state", state
+        );
+    }
+
+    public static TwitchHelixAuthData exchangeCodeGrant(@NonNull ParsedQuery query, @NonNull String clientId, @NonNull String clientSecret, @NonNull String redirectUri) throws ApiAuthException {
+        return tokenEndpoint(
+            QueryBuilder.from(
+                "grant_type", "authorization_code",
+                "code", query.getSingle("code"),
+                "client_id", clientId,
+                "client_secret", clientSecret,
+                "redirect_uri", redirectUri
+            )
+        );
+    }
+
+    /* ---------------- */
+    /* Util             */
+    /* ---------------- */
+
+    private static void checkAndThrow(JsonObject body) throws ApiAuthException {
         if (body.containsKey("error") || body.containsKey("errors")) {
             throw new ApiAuthException(body.toString());
+        }
+    }
+
+    private static TwitchHelixAuthData tokenEndpoint(QueryBuilder params) throws ApiAuthException {
+        try {
+            JsonObject json = WebRequest.sendHttpRequest(
+                HttpRequest.newBuilder()
+                    .uri(URI.create("https://id.twitch.tv/oauth2/token"))
+                    .POST(BodyPublishers.ofString(params.toString()))
+                    .header("Content-Type", "application/x-www-form-urlencoded"),
+                RsonBodyHandler.of(JsonObject.class),
+                null
+            ).body();
+            checkAndThrow(json);
+
+            if (json.containsKey("scope")) {
+                // Twitch's response payload always sends scope back as an array rather than a
+                // string. So we parse it and replace it.
+                json.put(
+                    "scope",
+                    String.join(" ", Rson.DEFAULT.fromJson(json.get("scope"), String[].class))
+                );
+            }
+
+            return Rson.DEFAULT.fromJson(json, TwitchHelixAuthData.class);
+        } catch (IOException e) {
+            throw new ApiAuthException(e);
         }
     }
 
