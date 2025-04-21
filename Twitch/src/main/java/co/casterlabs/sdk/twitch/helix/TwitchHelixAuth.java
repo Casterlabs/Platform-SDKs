@@ -5,6 +5,7 @@ import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.util.Map;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 import org.unbescape.uri.UriEscape;
@@ -29,7 +30,7 @@ import lombok.NonNull;
 
 @SuppressWarnings("deprecation")
 public class TwitchHelixAuth extends AuthProvider<TwitchHelixAuthData> {
-    private final Object lock = new Object();
+    private final ReentrantLock lock = new ReentrantLock();
 
     private @Getter String clientId;
     private String clientSecret;
@@ -78,8 +79,6 @@ public class TwitchHelixAuth extends AuthProvider<TwitchHelixAuthData> {
 
     @Override
     public void refresh() throws ApiAuthException {
-        synchronized (this.lock) {
-            try {
                 Map<String, String> body;
 
                 if (this.isApplicationAuth) {
@@ -107,6 +106,8 @@ public class TwitchHelixAuth extends AuthProvider<TwitchHelixAuthData> {
                                     .map((e) -> UriEscape.escapeUriQueryParam(e.getKey()) + "=" + UriEscape.escapeUriQueryParam(e.getValue()))
                                     .collect(Collectors.joining("&"))
                             )
+        this.lock.lock();
+        try {
                         )
                         .header("Content-Type", "application/x-www-form-urlencoded"),
                     RsonBodyHandler.of(JsonObject.class),
@@ -125,18 +126,23 @@ public class TwitchHelixAuth extends AuthProvider<TwitchHelixAuthData> {
 
                 TwitchHelixAuthData data = Rson.DEFAULT.fromJson(json, TwitchHelixAuthData.class);
                 this.dataProvider.save(data);
-            } catch (IOException e) {
-                throw new ApiAuthException(e);
             }
+        } catch (IOException e) {
+            throw new ApiAuthException(e);
+        } finally {
+            this.lock.unlock();
         }
     }
 
     public String getAccessToken() throws ApiAuthException {
-        synchronized (this.lock) {
+        this.lock.lock();
+        try {
             if (this.isExpired()) {
                 this.refresh();
             }
             return this.data().accessToken;
+        } finally {
+            this.lock.unlock();
         }
     }
 
@@ -147,7 +153,8 @@ public class TwitchHelixAuth extends AuthProvider<TwitchHelixAuthData> {
 
     @Override
     public boolean isExpired() {
-        synchronized (this.lock) {
+        this.lock.lock();
+        try {
             TwitchHelixAuthData data = this.data();
 
             if (data.accessToken == null) {
@@ -156,6 +163,8 @@ public class TwitchHelixAuth extends AuthProvider<TwitchHelixAuthData> {
 
             long secondsSinceIssuance = (System.currentTimeMillis() - data.issuedAt) / 1000;
             return secondsSinceIssuance > data.expiresIn;
+        } finally {
+            this.lock.unlock();
         }
     }
 
