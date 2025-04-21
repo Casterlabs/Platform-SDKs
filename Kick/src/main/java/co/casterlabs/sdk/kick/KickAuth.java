@@ -179,7 +179,7 @@ public class KickAuth extends AuthProvider<KickAuthData> {
     }
 
     public static KickAuthData exchangeCodeGrant(@NonNull ParsedQuery query, @NonNull String clientId, @NonNull String clientSecret, @NonNull String redirectUri, @NonNull String verifier) throws ApiAuthException {
-        return KickAuth.tokenEndpoint(
+        return tokenEndpoint(
             QueryBuilder.from(
                 "code", query.getSingle("code"),
                 "client_id", clientId,
