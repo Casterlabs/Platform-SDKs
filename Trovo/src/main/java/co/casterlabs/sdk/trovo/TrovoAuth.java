@@ -13,6 +13,8 @@ import co.casterlabs.apiutil.auth.AuthDataProvider;
 import co.casterlabs.apiutil.auth.AuthDataProvider.InMemoryAuthDataProvider;
 import co.casterlabs.apiutil.auth.AuthProvider;
 import co.casterlabs.apiutil.web.ApiException;
+import co.casterlabs.apiutil.web.ParsedQuery;
+import co.casterlabs.apiutil.web.QueryBuilder;
 import co.casterlabs.apiutil.web.RsonBodyHandler;
 import co.casterlabs.apiutil.web.WebRequest;
 import co.casterlabs.rakurai.json.Rson;
@@ -100,22 +102,8 @@ public class TrovoAuth extends AuthProvider<TrovoAuthData> {
             ).body();
             checkAndThrow(authData);
 
-            // We don't deserialize because we only need the access token.
-            // We intend on replacing the scope field with our own data from the validation
-            // endpoint.
-            JsonObject validationData = WebRequest.sendHttpRequest(
-                HttpRequest.newBuilder()
-                    .uri(URI.create("https://open-api.trovo.live/openplatform/validate"))
-                    .header("Authorization", "OAuth " + authData.getString("access_token"))
-                    .header("Client-ID", this.clientId)
-                    .header("Accept", "application/json"),
-                RsonBodyHandler.of(JsonObject.class),
-                null
-            ).body();
-            checkAndThrow(validationData);
-
             // Replace.
-            String scope = String.join(" ", Rson.DEFAULT.fromJson(validationData.get("scopes"), String[].class));
+            String scope = getScope(this.clientId, authData.getString("access_token"));
             authData.put("scope", scope);
 
             TrovoAuthData data = Rson.DEFAULT.fromJson(authData, TrovoAuthData.class);
@@ -205,10 +193,73 @@ public class TrovoAuth extends AuthProvider<TrovoAuthData> {
     }
 
     /* ---------------- */
-    /* Utils            */
+    /* Code Grant       */
     /* ---------------- */
 
-    static void checkAndThrow(JsonObject body) throws ApiAuthException {
+    public static String startCodeGrant(@NonNull String clientId, @NonNull String redirectUri, @NonNull String[] scopes, @Nullable String state) {
+        return "https://open.trovo.live/page/login.html?" + QueryBuilder.from(
+            "response_type", "code",
+            "client_id", clientId,
+            "redirect_uri", redirectUri,
+            "scope", String.join("+", scopes),
+            "state", state
+        );
+    }
+
+    public static TrovoAuthData exchangeCodeGrant(@NonNull ParsedQuery query, @NonNull String clientId, @NonNull String clientSecret, @NonNull String redirectUri) throws ApiAuthException {
+        try {
+            JsonObject body = new JsonObject()
+                .put("grant_type", "authorization_code")
+                .put("code", query.getSingle("code"))
+                .put("client_secret", clientSecret)
+                .put("redirect_uri", redirectUri);
+
+            JsonObject authData = WebRequest.sendHttpRequest(
+                HttpRequest.newBuilder()
+                    .uri(URI.create("https://open-api.trovo.live/openplatform/exchangetoken"))
+                    .POST(BodyPublishers.ofString(body.toString()))
+                    .header("Client-ID", clientId)
+                    .header("Accept", "application/json")
+                    .header("Content-Type", "application/json"),
+                RsonBodyHandler.of(JsonObject.class),
+                null
+            ).body();
+            checkAndThrow(authData);
+
+            // Replace.
+            String scope = getScope(clientId, authData.getString("access_token"));
+            authData.put("scope", scope);
+
+            return Rson.DEFAULT.fromJson(authData, TrovoAuthData.class);
+        } catch (IOException e) {
+            throw new ApiAuthException(e);
+        }
+    }
+
+    /* ---------------- */
+    /* Util             */
+    /* ---------------- */
+
+    private static String getScope(String clientId, String accessToken) throws ApiAuthException {
+        try {
+            JsonObject validationData = WebRequest.sendHttpRequest(
+                HttpRequest.newBuilder()
+                    .uri(URI.create("https://open-api.trovo.live/openplatform/validate"))
+                    .header("Authorization", "OAuth " + accessToken)
+                    .header("Client-ID", clientId)
+                    .header("Accept", "application/json"),
+                RsonBodyHandler.of(JsonObject.class),
+                null
+            ).body();
+            checkAndThrow(validationData);
+
+            return String.join(" ", Rson.DEFAULT.fromJson(validationData.get("scopes"), String[].class));
+        } catch (IOException e) {
+            throw new ApiAuthException(e);
+        }
+    }
+
+    private static void checkAndThrow(JsonObject body) throws ApiAuthException {
         if (body.containsKey("error") || body.containsKey("errors")) {
             throw new ApiAuthException(body.toString());
         }
