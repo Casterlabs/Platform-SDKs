@@ -31,7 +31,7 @@ import lombok.NonNull;
 public class TiktokAuth extends AuthProvider<TiktokAuthData> {
     private final ReentrantLock lock = new ReentrantLock();
 
-    private @Getter String clientId;
+    private @Getter String clientKey;
     private String clientSecret;
 
     /* ---------------- */
@@ -41,14 +41,14 @@ public class TiktokAuth extends AuthProvider<TiktokAuthData> {
     /**
      * User
      */
-    protected TiktokAuth(AuthDataProvider<TiktokAuthData> dataProvider, String clientId, String clientSecret) {
+    protected TiktokAuth(AuthDataProvider<TiktokAuthData> dataProvider, String clientKey, String clientSecret) {
         super(dataProvider);
-        this.clientId = clientId;
+        this.clientKey = clientKey;
         this.clientSecret = clientSecret;
     }
 
-    public static TiktokAuth ofUser(AuthDataProvider<TiktokAuthData> dataProvider, String clientId, String clientSecret) {
-        return new TiktokAuth(dataProvider, clientId, clientSecret);
+    public static TiktokAuth ofUser(AuthDataProvider<TiktokAuthData> dataProvider, String clientKey, String clientSecret) {
+        return new TiktokAuth(dataProvider, clientKey, clientSecret);
     }
 
     /* ---------------- */
@@ -67,7 +67,7 @@ public class TiktokAuth extends AuthProvider<TiktokAuthData> {
             Map<String, String> body = Map.of(
                 "grant_type", "refresh_token",
                 "refresh_token", this.data().refreshToken,
-                "client_key", this.clientId,
+                "client_key", this.clientKey,
                 "client_secret", this.clientSecret
             );
 
