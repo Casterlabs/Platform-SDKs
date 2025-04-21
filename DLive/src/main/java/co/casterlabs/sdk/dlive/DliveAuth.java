@@ -5,16 +5,16 @@ import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.util.Base64;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.jetbrains.annotations.Nullable;
-import org.unbescape.uri.UriEscape;
 
 import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.auth.AuthDataProvider;
 import co.casterlabs.apiutil.auth.AuthDataProvider.InMemoryAuthDataProvider;
 import co.casterlabs.apiutil.auth.AuthProvider;
+import co.casterlabs.apiutil.web.ParsedQuery;
+import co.casterlabs.apiutil.web.QueryBuilder;
 import co.casterlabs.apiutil.web.RsonBodyHandler;
 import co.casterlabs.apiutil.web.WebRequest;
 import co.casterlabs.rakurai.json.Rson;
@@ -31,7 +31,7 @@ import lombok.NonNull;
 
 @SuppressWarnings("deprecation")
 public class DliveAuth extends AuthProvider<DliveAuthData> {
-    private final Object lock = new Object();
+    private final ReentrantLock lock = new ReentrantLock();
 
     private @Getter String clientId;
     private String clientSecret;
@@ -81,53 +81,37 @@ public class DliveAuth extends AuthProvider<DliveAuthData> {
 
     @Override
     public void refresh() throws ApiAuthException {
-        synchronized (this.lock) {
-            try {
-                String credential = "Basic " + Base64.getEncoder().encodeToString((this.clientId + ":" + this.clientSecret).getBytes());
-                Map<String, String> body;
-
-                if (this.isApplicationAuth) {
-                    body = Map.of("grant_type", "client_credentials");
-                } else {
-                    body = Map.of(
-                        "grant_type", "refresh_token",
-                        "refresh_token", this.data().refreshToken,
-                        "redirect_uri", this.redirectUri
-                    );
-                }
-
-                JsonObject json = WebRequest.sendHttpRequest(
-                    HttpRequest.newBuilder()
-                        .uri(URI.create("https://dlive.tv/o/token"))
-                        .header("Authorization", credential)
-                        .POST(
-                            BodyPublishers.ofString(
-                                body.entrySet()
-                                    .stream()
-                                    .map((e) -> UriEscape.escapeUriQueryParam(e.getKey()) + "=" + UriEscape.escapeUriQueryParam(e.getValue()))
-                                    .collect(Collectors.joining("&"))
-                            )
-                        )
-                        .header("Content-Type", "application/x-www-form-urlencoded"),
-                    RsonBodyHandler.of(JsonObject.class),
-                    null
-                ).body();
-                checkAndThrow(json);
-
-                DliveAuthData data = Rson.DEFAULT.fromJson(json, DliveAuthData.class);
-                this.dataProvider.save(data);
-            } catch (IOException e) {
-                throw new ApiAuthException(e);
+        this.lock.lock();
+        try {
+            QueryBuilder params;
+            if (this.isApplicationAuth) {
+                params = QueryBuilder.from(
+                    "grant_type", "client_credentials"
+                );
+            } else {
+                params = QueryBuilder.from(
+                    "grant_type", "refresh_token",
+                    "refresh_token", this.data().refreshToken,
+                    "redirect_uri", this.redirectUri
+                );
             }
+
+            DliveAuthData data = tokenEndpoint(this.clientId, this.clientSecret, params);
+            this.dataProvider.save(data);
+        } finally {
+            this.lock.unlock();
         }
     }
 
     public String getAccessToken() throws ApiAuthException {
-        synchronized (this.lock) {
+        this.lock.lock();
+        try {
             if (this.isExpired()) {
                 this.refresh();
             }
             return this.data().accessToken;
+        } finally {
+            this.lock.unlock();
         }
     }
 
@@ -138,7 +122,8 @@ public class DliveAuth extends AuthProvider<DliveAuthData> {
 
     @Override
     public boolean isExpired() {
-        synchronized (this.lock) {
+        this.lock.lock();
+        try {
             DliveAuthData data = this.data();
 
             if (data.accessToken == null) {
@@ -147,6 +132,8 @@ public class DliveAuth extends AuthProvider<DliveAuthData> {
 
             long secondsSinceIssuance = (System.currentTimeMillis() - data.issuedAt) / 1000;
             return secondsSinceIssuance > data.expiresIn;
+        } finally {
+            this.lock.unlock();
         }
     }
 
@@ -186,12 +173,60 @@ public class DliveAuth extends AuthProvider<DliveAuthData> {
     }
 
     /* ---------------- */
-    /* Utils            */
+    /* Code Grant       */
     /* ---------------- */
 
-    static void checkAndThrow(JsonObject body) throws ApiAuthException {
+    public static String startCodeGrant(@NonNull String clientId, @NonNull String redirectUri, @NonNull String[] scopes, @Nullable String state) {
+        return "https://dlive.tv/o/authorize?" + QueryBuilder.from(
+            "response_type", "code",
+            "force_verify", "true",
+            "client_id", clientId,
+            "redirect_uri", redirectUri,
+            "scope", String.join(" ", scopes),
+            "state", state
+        );
+    }
+
+    public static DliveAuthData exchangeCodeGrant(@NonNull ParsedQuery query, @NonNull String clientId, @NonNull String clientSecret, @NonNull String redirectUri) throws ApiAuthException {
+        return tokenEndpoint(
+            clientId,
+            clientSecret,
+            QueryBuilder.from(
+                "grant_type", "authorization_code",
+                "code", query.getSingle("code"),
+                "redirect_uri", redirectUri
+            )
+        );
+    }
+
+    /* ---------------- */
+    /* Util             */
+    /* ---------------- */
+
+    private static void checkAndThrow(JsonObject body) throws ApiAuthException {
         if (body.containsKey("error") || body.containsKey("errors")) {
             throw new ApiAuthException(body.toString());
+        }
+    }
+
+    private static DliveAuthData tokenEndpoint(String clientId, String clientSecret, QueryBuilder params) throws ApiAuthException {
+        try {
+            String credential = "Basic " + Base64.getEncoder().encodeToString((clientId + ":" + clientSecret).getBytes());
+
+            JsonObject json = WebRequest.sendHttpRequest(
+                HttpRequest.newBuilder()
+                    .uri(URI.create("https://dlive.tv/o/token"))
+                    .header("Authorization", credential)
+                    .POST(BodyPublishers.ofString(params.toString()))
+                    .header("Content-Type", "application/x-www-form-urlencoded"),
+                RsonBodyHandler.of(JsonObject.class),
+                null
+            ).body();
+            checkAndThrow(json);
+
+            return Rson.DEFAULT.fromJson(json, DliveAuthData.class);
+        } catch (IOException e) {
+            throw new ApiAuthException(e);
         }
     }
 
