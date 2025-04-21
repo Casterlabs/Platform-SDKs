@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.util.Map;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 import org.jetbrains.annotations.Nullable;
@@ -28,7 +29,7 @@ import lombok.NonNull;
 
 @SuppressWarnings("deprecation")
 public class YoutubeAuth extends AuthProvider<YoutubeAuthData> {
-    private final Object lock = new Object();
+    private final ReentrantLock lock = new ReentrantLock();
 
     private @Getter String apiKey;
     private @Getter @Nullable String clientId; // Null when application auth.
@@ -89,52 +90,55 @@ public class YoutubeAuth extends AuthProvider<YoutubeAuthData> {
     public void refresh() throws ApiAuthException {
         if (this.isApplicationAuth) return;
 
-        synchronized (this.lock) {
-            try {
-                String refreshToken = this.data().refreshToken;
+        this.lock.lock();
+        try {
+            String refreshToken = this.data().refreshToken;
 
-                Map<String, String> body = Map.of(
-                    "grant_type", "refresh_token",
-                    "refresh_token", refreshToken,
-                    "client_id", this.clientId,
-                    "client_secret", this.clientSecret
-                );
+            Map<String, String> body = Map.of(
+                "grant_type", "refresh_token",
+                "refresh_token", refreshToken,
+                "client_id", this.clientId,
+                "client_secret", this.clientSecret
+            );
 
-                JsonObject json = YoutubeHttpUtil.insert(
-                    body.entrySet()
-                        .stream()
-                        .map((e) -> UriEscape.escapeUriQueryParam(e.getKey()) + "=" + UriEscape.escapeUriQueryParam(e.getValue()))
-                        .collect(Collectors.joining("&")),
-                    "application/x-www-form-urlencoded",
-                    "https://oauth2.googleapis.com/token",
-                    null
-                );
-                checkAndThrow(json);
+            JsonObject json = YoutubeHttpUtil.insert(
+                body.entrySet()
+                    .stream()
+                    .map((e) -> UriEscape.escapeUriQueryParam(e.getKey()) + "=" + UriEscape.escapeUriQueryParam(e.getValue()))
+                    .collect(Collectors.joining("&")),
+                "application/x-www-form-urlencoded",
+                "https://oauth2.googleapis.com/token",
+                null
+            );
+            checkAndThrow(json);
 
-                if (!json.containsKey("refresh_token")) {
-                    // Server didn't give us a new refresh token, inject the old one so that we
-                    // don't break things.
-                    json.put("refresh_token", refreshToken);
-                }
-
-                YoutubeAuthData data = Rson.DEFAULT.fromJson(json, YoutubeAuthData.class);
-                this.dataProvider.save(data);
-            } catch (ApiAuthException e) {
-                throw e;
-            } catch (IOException | ApiException e) {
-                throw new ApiAuthException(e);
+            if (!json.containsKey("refresh_token")) {
+                // Server didn't give us a new refresh token, inject the old one so that we
+                // don't break things.
+                json.put("refresh_token", refreshToken);
             }
-        }
 
+            YoutubeAuthData data = Rson.DEFAULT.fromJson(json, YoutubeAuthData.class);
+            this.dataProvider.save(data);
+        } catch (ApiAuthException e) {
+            throw e;
+        } catch (IOException | ApiException e) {
+            throw new ApiAuthException(e);
+        } finally {
+            this.lock.unlock();
+        }
     }
 
     public String getAccessToken() throws ApiAuthException {
         if (this.isApplicationAuth) return null;
-        synchronized (this.lock) {
+        this.lock.lock();
+        try {
             if (this.isExpired()) {
                 this.refresh();
             }
             return this.data().accessToken;
+        } finally {
+            this.lock.unlock();
         }
     }
 
@@ -145,7 +149,8 @@ public class YoutubeAuth extends AuthProvider<YoutubeAuthData> {
 
     @Override
     public boolean isExpired() {
-        synchronized (this.lock) {
+        this.lock.lock();
+        try {
             YoutubeAuthData data = this.data();
 
             if (data.accessToken == null) {
@@ -154,6 +159,8 @@ public class YoutubeAuth extends AuthProvider<YoutubeAuthData> {
 
             long secondsSinceIssuance = (System.currentTimeMillis() - data.issuedAt) / 1000;
             return secondsSinceIssuance > data.expiresIn;
+        } finally {
+            this.lock.unlock();
         }
     }
 
