@@ -4,15 +4,15 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
-import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.Collectors;
 
-import org.unbescape.uri.UriEscape;
+import org.jetbrains.annotations.Nullable;
 
 import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.auth.AuthDataProvider;
 import co.casterlabs.apiutil.auth.AuthProvider;
+import co.casterlabs.apiutil.web.ParsedQuery;
+import co.casterlabs.apiutil.web.QueryBuilder;
 import co.casterlabs.apiutil.web.RsonBodyHandler;
 import co.casterlabs.apiutil.web.WebRequest;
 import co.casterlabs.rakurai.json.Rson;
@@ -64,34 +64,15 @@ public class TiktokAuth extends AuthProvider<TiktokAuthData> {
     public void refresh() throws ApiAuthException {
         this.lock.lock();
         try {
-            Map<String, String> body = Map.of(
+            QueryBuilder params = QueryBuilder.from(
                 "grant_type", "refresh_token",
                 "refresh_token", this.data().refreshToken,
                 "client_key", this.clientKey,
                 "client_secret", this.clientSecret
             );
 
-            JsonObject json = WebRequest.sendHttpRequest(
-                HttpRequest.newBuilder()
-                    .uri(URI.create(TiktokApi.TIKTOK_OPENAPI_URL + "/v2/oauth/token/"))
-                    .POST(
-                        BodyPublishers.ofString(
-                            body.entrySet()
-                                .stream()
-                                .map((e) -> UriEscape.escapeUriQueryParam(e.getKey()) + "=" + UriEscape.escapeUriQueryParam(e.getValue()))
-                                .collect(Collectors.joining("&"))
-                        )
-                    )
-                    .header("Content-Type", "application/x-www-form-urlencoded"),
-                RsonBodyHandler.of(JsonObject.class),
-                null
-            ).body();
-            checkAndThrow(json);
-
-            TiktokAuthData data = Rson.DEFAULT.fromJson(json, TiktokAuthData.class);
+            TiktokAuthData data = tokenEndpoint(params);
             this.dataProvider.save(data);
-        } catch (IOException e) {
-            throw new ApiAuthException(e);
         } finally {
             this.lock.unlock();
         }
@@ -167,16 +148,60 @@ public class TiktokAuth extends AuthProvider<TiktokAuthData> {
     }
 
     /* ---------------- */
-    /* Utils            */
+    /* Code Grant       */
     /* ---------------- */
 
-    static void checkAndThrow(JsonObject body) throws ApiAuthException {
+    public static String startCodeGrant(@NonNull String clientKey, @NonNull String redirectUri, @NonNull String[] scopes, @Nullable String state) {
+        return "https://www.tiktok.com/v2/auth/authorize?" + QueryBuilder.from(
+            "response_type", "code",
+            "client_key", clientKey,
+            "redirect_uri", redirectUri,
+            "scope", String.join(" ", scopes),
+            "state", state
+        );
+    }
+
+    public static TiktokAuthData exchangeCodeGrant(@NonNull ParsedQuery query, @NonNull String clientKey, @NonNull String clientSecret, @NonNull String redirectUri) throws ApiAuthException {
+        return tokenEndpoint(
+            QueryBuilder.from(
+                "grant_type", "authorization_code",
+                "code", query.getSingle("code"),
+                "client_key", clientKey,
+                "client_secret", clientSecret,
+                "redirect_uri", redirectUri
+            )
+        );
+    }
+
+    /* ---------------- */
+    /* Util             */
+    /* ---------------- */
+
+    private static void checkAndThrow(JsonObject body) throws ApiAuthException {
         if (body.containsKey("error_code")) {
             int code = body.getNumber("error_code").intValue();
 
             if (code != 0) {
                 throw new ApiAuthException(body.toString());
             }
+        }
+    }
+
+    private static TiktokAuthData tokenEndpoint(QueryBuilder params) throws ApiAuthException {
+        try {
+            JsonObject json = WebRequest.sendHttpRequest(
+                HttpRequest.newBuilder()
+                    .uri(URI.create(TiktokApi.TIKTOK_OPENAPI_URL + "/v2/oauth/token/"))
+                    .POST(BodyPublishers.ofString(params.toString()))
+                    .header("Content-Type", "application/x-www-form-urlencoded"),
+                RsonBodyHandler.of(JsonObject.class),
+                null
+            ).body();
+            checkAndThrow(json);
+
+            return Rson.DEFAULT.fromJson(json, TiktokAuthData.class);
+        } catch (IOException e) {
+            throw new ApiAuthException(e);
         }
     }
 
