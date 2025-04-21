@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -28,7 +29,7 @@ import lombok.NonNull;
 
 @SuppressWarnings("deprecation")
 public class TrovoAuth extends AuthProvider<TrovoAuthData> {
-    private final Object lock = new Object();
+    private final ReentrantLock lock = new ReentrantLock();
 
     private @Getter String clientId;
     private @Nullable String clientSecret; // Null when application auth.
@@ -80,48 +81,49 @@ public class TrovoAuth extends AuthProvider<TrovoAuthData> {
     public void refresh() throws ApiAuthException {
         if (this.isApplicationAuth) return;
 
-        synchronized (this.lock) {
-            try {
-                JsonObject body = new JsonObject()
-                    .put("grant_type", "refresh_token")
-                    .put("client_secret", this.clientSecret)
-                    .put("refresh_token", this.data().refreshToken);
+        this.lock.lock();
+        try {
+            JsonObject body = new JsonObject()
+                .put("grant_type", "refresh_token")
+                .put("client_secret", this.clientSecret)
+                .put("refresh_token", this.data().refreshToken);
 
-                JsonObject authData = WebRequest.sendHttpRequest(
-                    HttpRequest.newBuilder()
-                        .uri(URI.create("https://open-api.trovo.live/openplatform/refreshtoken"))
-                        .POST(BodyPublishers.ofString(body.toString()))
-                        .header("Client-ID", this.clientId)
-                        .header("Accept", "application/json")
-                        .header("Content-Type", "application/json"),
-                    RsonBodyHandler.of(JsonObject.class),
-                    null
-                ).body();
-                checkAndThrow(authData);
+            JsonObject authData = WebRequest.sendHttpRequest(
+                HttpRequest.newBuilder()
+                    .uri(URI.create("https://open-api.trovo.live/openplatform/refreshtoken"))
+                    .POST(BodyPublishers.ofString(body.toString()))
+                    .header("Client-ID", this.clientId)
+                    .header("Accept", "application/json")
+                    .header("Content-Type", "application/json"),
+                RsonBodyHandler.of(JsonObject.class),
+                null
+            ).body();
+            checkAndThrow(authData);
 
-                // We don't deserialize because we only need the access token.
-                // We intend on replacing the scope field with our own data from the validation
-                // endpoint.
-                JsonObject validationData = WebRequest.sendHttpRequest(
-                    HttpRequest.newBuilder()
-                        .uri(URI.create("https://open-api.trovo.live/openplatform/validate"))
-                        .header("Authorization", "OAuth " + authData.getString("access_token"))
-                        .header("Client-ID", this.clientId)
-                        .header("Accept", "application/json"),
-                    RsonBodyHandler.of(JsonObject.class),
-                    null
-                ).body();
-                checkAndThrow(validationData);
+            // We don't deserialize because we only need the access token.
+            // We intend on replacing the scope field with our own data from the validation
+            // endpoint.
+            JsonObject validationData = WebRequest.sendHttpRequest(
+                HttpRequest.newBuilder()
+                    .uri(URI.create("https://open-api.trovo.live/openplatform/validate"))
+                    .header("Authorization", "OAuth " + authData.getString("access_token"))
+                    .header("Client-ID", this.clientId)
+                    .header("Accept", "application/json"),
+                RsonBodyHandler.of(JsonObject.class),
+                null
+            ).body();
+            checkAndThrow(validationData);
 
-                // Replace.
-                String scope = String.join(" ", Rson.DEFAULT.fromJson(validationData.get("scopes"), String[].class));
-                authData.put("scope", scope);
+            // Replace.
+            String scope = String.join(" ", Rson.DEFAULT.fromJson(validationData.get("scopes"), String[].class));
+            authData.put("scope", scope);
 
-                TrovoAuthData data = Rson.DEFAULT.fromJson(authData, TrovoAuthData.class);
-                this.dataProvider.save(data);
-            } catch (IOException e) {
-                throw new ApiAuthException(e);
-            }
+            TrovoAuthData data = Rson.DEFAULT.fromJson(authData, TrovoAuthData.class);
+            this.dataProvider.save(data);
+        } catch (IOException e) {
+            throw new ApiAuthException(e);
+        } finally {
+            this.lock.unlock();
         }
     }
 
@@ -134,11 +136,14 @@ public class TrovoAuth extends AuthProvider<TrovoAuthData> {
     }
 
     public String getAccessToken() throws ApiAuthException {
-        synchronized (this.lock) {
+        this.lock.lock();
+        try {
             if (this.isExpired()) {
                 this.refresh();
             }
             return this.data().accessToken;
+        } finally {
+            this.lock.unlock();
         }
     }
 
@@ -149,7 +154,8 @@ public class TrovoAuth extends AuthProvider<TrovoAuthData> {
 
     @Override
     public boolean isExpired() {
-        synchronized (this.lock) {
+        this.lock.lock();
+        try {
             TrovoAuthData data = this.data();
 
             if (data.accessToken == null) {
@@ -158,6 +164,8 @@ public class TrovoAuth extends AuthProvider<TrovoAuthData> {
 
             long secondsSinceIssuance = (System.currentTimeMillis() - data.issuedAt) / 1000;
             return secondsSinceIssuance > data.expiresIn;
+        } finally {
+            this.lock.unlock();
         }
     }
 
