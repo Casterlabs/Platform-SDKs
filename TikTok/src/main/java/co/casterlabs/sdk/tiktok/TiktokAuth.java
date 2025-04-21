@@ -5,6 +5,7 @@ import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.util.Map;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 import org.unbescape.uri.UriEscape;
@@ -28,7 +29,7 @@ import lombok.NonNull;
 
 @SuppressWarnings("deprecation")
 public class TiktokAuth extends AuthProvider<TiktokAuthData> {
-    private final Object lock = new Object();
+    private final ReentrantLock lock = new ReentrantLock();
 
     private @Getter String clientId;
     private String clientSecret;
@@ -61,46 +62,50 @@ public class TiktokAuth extends AuthProvider<TiktokAuthData> {
 
     @Override
     public void refresh() throws ApiAuthException {
-        synchronized (this.lock) {
-            try {
-                Map<String, String> body = Map.of(
-                    "grant_type", "refresh_token",
-                    "refresh_token", this.data().refreshToken,
-                    "client_key", this.clientId,
-                    "client_secret", this.clientSecret
-                );
+        this.lock.lock();
+        try {
+            Map<String, String> body = Map.of(
+                "grant_type", "refresh_token",
+                "refresh_token", this.data().refreshToken,
+                "client_key", this.clientId,
+                "client_secret", this.clientSecret
+            );
 
-                JsonObject json = WebRequest.sendHttpRequest(
-                    HttpRequest.newBuilder()
-                        .uri(URI.create(TiktokApi.TIKTOK_OPENAPI_URL + "/v2/oauth/token/"))
-                        .POST(
-                            BodyPublishers.ofString(
-                                body.entrySet()
-                                    .stream()
-                                    .map((e) -> UriEscape.escapeUriQueryParam(e.getKey()) + "=" + UriEscape.escapeUriQueryParam(e.getValue()))
-                                    .collect(Collectors.joining("&"))
-                            )
+            JsonObject json = WebRequest.sendHttpRequest(
+                HttpRequest.newBuilder()
+                    .uri(URI.create(TiktokApi.TIKTOK_OPENAPI_URL + "/v2/oauth/token/"))
+                    .POST(
+                        BodyPublishers.ofString(
+                            body.entrySet()
+                                .stream()
+                                .map((e) -> UriEscape.escapeUriQueryParam(e.getKey()) + "=" + UriEscape.escapeUriQueryParam(e.getValue()))
+                                .collect(Collectors.joining("&"))
                         )
-                        .header("Content-Type", "application/x-www-form-urlencoded"),
-                    RsonBodyHandler.of(JsonObject.class),
-                    null
-                ).body();
-                checkAndThrow(json);
+                    )
+                    .header("Content-Type", "application/x-www-form-urlencoded"),
+                RsonBodyHandler.of(JsonObject.class),
+                null
+            ).body();
+            checkAndThrow(json);
 
-                TiktokAuthData data = Rson.DEFAULT.fromJson(json, TiktokAuthData.class);
-                this.dataProvider.save(data);
-            } catch (IOException e) {
-                throw new ApiAuthException(e);
-            }
+            TiktokAuthData data = Rson.DEFAULT.fromJson(json, TiktokAuthData.class);
+            this.dataProvider.save(data);
+        } catch (IOException e) {
+            throw new ApiAuthException(e);
+        } finally {
+            this.lock.unlock();
         }
     }
 
     public String getAccessToken() throws ApiAuthException {
-        synchronized (this.lock) {
+        this.lock.lock();
+        try {
             if (this.isExpired()) {
                 this.refresh();
             }
             return this.data().accessToken;
+        } finally {
+            this.lock.unlock();
         }
     }
 
@@ -111,7 +116,8 @@ public class TiktokAuth extends AuthProvider<TiktokAuthData> {
 
     @Override
     public boolean isExpired() {
-        synchronized (this.lock) {
+        this.lock.lock();
+        try {
             TiktokAuthData data = this.data();
 
             if (data.accessToken == null) {
@@ -120,6 +126,8 @@ public class TiktokAuth extends AuthProvider<TiktokAuthData> {
 
             long secondsSinceIssuance = (System.currentTimeMillis() - data.issuedAt) / 1000;
             return secondsSinceIssuance > data.expiresIn;
+        } finally {
+            this.lock.unlock();
         }
     }
 
