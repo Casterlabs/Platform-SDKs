@@ -46,14 +46,14 @@ public class QueryBuilder {
 
     public QueryBuilder putAllAsSeparateKeys(@NonNull String key, @NonNull Collection<Object> values) {
         for (Object value : values) {
-            this.put(key, value);
+            this.optionalPut(key, value);
         }
         return this;
     }
 
     public QueryBuilder putAllAsSeparateKeys(@NonNull String key, @NonNull Object... values) {
         for (Object value : values) {
-            this.put(key, value);
+            this.optionalPut(key, value);
         }
         return this;
     }
