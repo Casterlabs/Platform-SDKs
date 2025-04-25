@@ -1,5 +1,7 @@
 package co.casterlabs.sdk.kick.webhook.v1.types;
 
+import java.util.List;
+
 import org.jetbrains.annotations.Nullable;
 
 import co.casterlabs.rakurai.json.annotating.JsonClass;
@@ -42,6 +44,8 @@ public class KickWebhookUserV1 {
 
         @JsonField("username_color")
         public final String color = null;
+
+        public final List<Badge> badges = null;
 
         @JsonClass(exposeAll = true)
         public static class Badge {
