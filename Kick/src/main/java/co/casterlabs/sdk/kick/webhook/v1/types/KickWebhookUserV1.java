@@ -40,7 +40,7 @@ public class KickWebhookUserV1 {
     public final @Nullable Identity identity = null;
 
     @JsonClass(exposeAll = true)
-    public class Identity {
+    public static class Identity {
 
         @JsonField("username_color")
         public final String color = null;
