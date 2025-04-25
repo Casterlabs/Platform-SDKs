@@ -21,6 +21,9 @@ public class KickWebhookSubscriptionRenewalV1 implements KickWebhookEvent {
     @JsonField("created_at")
     public final Instant createdAt = null;
 
+    @JsonField("expires_at")
+    public final Instant expiresAt = null;
+
     @Override
     public Type type() {
         return Type.CHANNEL_SUBSCRIPTION_RENEWAL_V1;
