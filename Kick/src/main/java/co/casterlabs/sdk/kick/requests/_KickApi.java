@@ -14,7 +14,9 @@ import co.casterlabs.rakurai.json.annotating.JsonClass;
 import co.casterlabs.rakurai.json.element.JsonElement;
 import co.casterlabs.rakurai.json.serialization.JsonParseException;
 import co.casterlabs.sdk.kick.KickAuth;
+import lombok.ToString;
 
+@ToString
 @JsonClass(exposeAll = true)
 class _KickApi {
     private final JsonElement data = null;
@@ -41,11 +43,14 @@ class _KickApi {
 
         _KickApi body = response.body();
 
+//        System.out.println(response.statusCode());
+//        System.out.println(body);
+
         if (response.statusCode() == 401) {
             throw new ApiAuthException(body.message);
         }
 
-        if (body.data == null || body.data.isJsonNull()) {
+        if (response.statusCode() < 200 || response.statusCode() > 299) {
             throw new ApiException(body.message);
         }
 
