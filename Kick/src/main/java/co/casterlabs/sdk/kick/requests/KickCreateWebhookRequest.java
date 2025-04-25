@@ -47,7 +47,8 @@ public class KickCreateWebhookRequest extends AuthenticatedWebRequest<KickCreate
 
         return _KickApi.request(
             HttpRequest.newBuilder(URI.create(url))
-                .POST(BodyPublishers.ofString(payload.toString())),
+                .POST(BodyPublishers.ofString(payload.toString()))
+                .header("Content-Type", "application/json"),
             this.auth,
             KickCreatedWebhook.ARRAY_TYPE
         )[0];
