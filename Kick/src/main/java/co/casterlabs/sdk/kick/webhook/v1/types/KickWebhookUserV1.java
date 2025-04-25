@@ -18,7 +18,7 @@ public class KickWebhookUserV1 {
     public final Boolean isAnonymous = null;
 
     @JsonField("user_id")
-    public final String id = null;
+    public final Integer id = null;
 
     @JsonField("is_verified")
     public final Boolean isVerified = null;
