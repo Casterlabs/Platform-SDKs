@@ -49,8 +49,8 @@ public class KickCreateWebhookRequest extends AuthenticatedWebRequest<KickCreate
             HttpRequest.newBuilder(URI.create(url))
                 .POST(BodyPublishers.ofString(payload.toString())),
             this.auth,
-            KickCreatedWebhook.class
-        );
+            KickCreatedWebhook.ARRAY_TYPE
+        )[0];
     }
 
 }
