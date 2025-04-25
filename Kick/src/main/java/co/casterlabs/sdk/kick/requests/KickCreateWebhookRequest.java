@@ -19,6 +19,7 @@ import lombok.experimental.Accessors;
 
 @Accessors(chain = true, fluent = true)
 public class KickCreateWebhookRequest extends AuthenticatedWebRequest<KickCreatedWebhook, KickAuth> {
+    private @Setter Integer forUserId = null;
     private @Setter KickWebhookEvent.Type withType = null;
 
     public KickCreateWebhookRequest(@NonNull KickAuth auth) {
@@ -28,10 +29,12 @@ public class KickCreateWebhookRequest extends AuthenticatedWebRequest<KickCreate
     @Override
     protected KickCreatedWebhook execute() throws ApiException, ApiAuthException, IOException {
         assert this.withType != null : "You must specify a type.";
+        assert this.forUserId != null : "You must specify a user id.";
 
         String url = "https://api.kick.com/public/v1/events/subscriptions";
 
         JsonObject payload = new JsonObject()
+            .put("broadcaster_user_id", this.forUserId)
             .put(
                 "events",
                 JsonArray.of(
