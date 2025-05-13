@@ -3,6 +3,8 @@ package co.casterlabs.sdk.youtube;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.BodyPublishers;
+import java.net.http.HttpResponse;
 import java.util.Collection;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -15,6 +17,8 @@ import co.casterlabs.apiutil.auth.AuthProvider;
 import co.casterlabs.apiutil.web.ApiException;
 import co.casterlabs.apiutil.web.ParsedQuery;
 import co.casterlabs.apiutil.web.QueryBuilder;
+import co.casterlabs.apiutil.web.RsonBodyHandler;
+import co.casterlabs.apiutil.web.WebRequest;
 import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.annotating.JsonClass;
 import co.casterlabs.rakurai.json.annotating.JsonDeserializationMethod;
@@ -211,21 +215,29 @@ public class YoutubeAuth extends AuthProvider<YoutubeAuthData> {
     /* Util             */
     /* ---------------- */
 
-    private static void checkAndThrow(JsonObject body) throws ApiAuthException {
-        if (body.containsKey("error") || body.containsKey("errors")) {
-            throw new ApiAuthException(body.toString());
-        }
-    }
-
     private static YoutubeAuthData tokenEndpoint(QueryBuilder params, String oldRefreshToken) throws ApiAuthException {
         try {
-            JsonObject json = YoutubeHttpUtil.insert(
-                params.toString(),
-                "application/x-www-form-urlencoded",
-                "https://oauth2.googleapis.com/token",
+            HttpResponse<JsonObject> response = WebRequest.sendHttpRequest(
+                HttpRequest
+                    .newBuilder()
+                    .uri(URI.create("https://oauth2.googleapis.com/token"))
+                    .POST(BodyPublishers.ofString(params.toString()))
+                    .header("Content-Type", "application/x-www-form-urlencoded")
+                    .header("X-Client-Type", "api"),
+                RsonBodyHandler.of(JsonObject.class),
                 null
             );
-            checkAndThrow(json);
+            JsonObject json = response.body();
+
+            if (response.statusCode() < 200 && response.statusCode() > 299) {
+                // Error!
+                if (response.statusCode() == 401) {
+                    throw new ApiAuthException(json.toString());
+                } else {
+                    throw new ApiException(json.toString());
+                }
+            }
+            // Success!
 
             if (!json.containsKey("refresh_token") && oldRefreshToken != null) {
                 // Server didn't give us a new refresh token, inject the old one so that we

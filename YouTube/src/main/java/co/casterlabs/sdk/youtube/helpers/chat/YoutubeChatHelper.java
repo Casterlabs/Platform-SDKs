@@ -2,7 +2,7 @@ package co.casterlabs.sdk.youtube.helpers.chat;
 
 import co.casterlabs.apiutil.web.ApiException;
 import co.casterlabs.sdk.youtube.YoutubeAuth;
-import co.casterlabs.sdk.youtube.requests.YoutubeListLiveChatMessagesRequest;
+import co.casterlabs.sdk.youtube.requests.YoutubeLiveChatMessages;
 import co.casterlabs.sdk.youtube.types.YoutubeLiveChatMessagesList;
 import co.casterlabs.sdk.youtube.types.livechat.YoutubeLiveChatEvent;
 import lombok.Getter;
@@ -37,7 +37,7 @@ public class YoutubeChatHelper {
 
     private void doLoop() {
         try {
-            YoutubeLiveChatMessagesList list = new YoutubeListLiveChatMessagesRequest(this.auth)
+            YoutubeLiveChatMessagesList list = new YoutubeLiveChatMessages.List(this.auth)
                 .forLiveChatId(this.liveChatId)
                 .withPageToken(this.paginationToken)
                 .send();
