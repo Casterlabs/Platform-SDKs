@@ -92,9 +92,10 @@ public class YoutubeLiveBroadcasts {
                 .map((e) -> e.getAsObject())
                 .map((item) -> {
                     // Inject the ID into the snippet.
-                    return item
+                    item
                         .getObject("snippet")
                         .put("id", item.getString("id"));
+                    return item;
                 })
                 .map((item) -> {
                     try {
