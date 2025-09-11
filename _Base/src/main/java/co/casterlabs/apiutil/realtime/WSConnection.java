@@ -3,6 +3,7 @@ package co.casterlabs.apiutil.realtime;
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -25,6 +26,8 @@ public abstract class WSConnection implements Closeable {
     private final FastLogger logger = new FastLogger("WSConnection (" + this.uri + ")");
 
     private @Setter(AccessLevel.PROTECTED) URI uri;
+    private @Setter(AccessLevel.PROTECTED) Map<String, String> additionalHeaders = Collections.emptyMap();
+
     private Connection conn;
 
     private Thread keepAliveThread = null;
@@ -88,7 +91,9 @@ public abstract class WSConnection implements Closeable {
 
     protected abstract void onOpen();
 
-    protected abstract void onMessage(String raw);
+    protected void onMessage(String raw) {}
+
+    protected void onMessage(byte[] raw) {}
 
     protected abstract void onClose(boolean remote);
 
@@ -97,6 +102,13 @@ public abstract class WSConnection implements Closeable {
     /* ------------ */
 
     protected void send(@NonNull String payload) throws IOException {
+        if (this.conn == null) {
+            throw new IllegalStateException("You must connect() before calling send().");
+        }
+        this.conn.send(payload);
+    }
+
+    protected void send(@NonNull byte[] payload) throws IOException {
         if (this.conn == null) {
             throw new IllegalStateException("You must connect() before calling send().");
         }
@@ -112,13 +124,18 @@ public abstract class WSConnection implements Closeable {
         private WebSocketClient ws;
 
         public Connection() {
-            this.ws = new WebSocketClient(WSConnection.this.uri);
+            this.ws = new WebSocketClient(WSConnection.this.uri, WSConnection.this.additionalHeaders);
             this.ws.setListener(this);
             this.ws.setThreadFactory(THREAD_FACTORY);
         }
 
         public void send(String payload) throws IOException {
             WSConnection.this.logger.trace(String.format(DEBUG_WS_SEND, payload));
+            this.ws.send(payload);
+        }
+
+        public void send(byte[] payload) throws IOException {
+            WSConnection.this.logger.trace(String.format(DEBUG_WS_SEND, "<binary>"));
             this.ws.send(payload);
         }
 
@@ -135,6 +152,16 @@ public abstract class WSConnection implements Closeable {
                 WSConnection.this.onMessage(string);
             } catch (Throwable t) {
                 logger.severe("An uncaught exception occurred whilst processing frame: %s\n%s", string, t);
+            }
+        }
+
+        @Override
+        public void onBinary(WebSocketClient client, byte[] bytes) {
+            WSConnection.this.logger.trace(String.format(DEBUG_WS_RECIEVE, "<binary>"));
+            try {
+                WSConnection.this.onMessage(bytes);
+            } catch (Throwable t) {
+                logger.severe("An uncaught exception occurred whilst processing frame: <binary>\n%s", t);
             }
         }
 

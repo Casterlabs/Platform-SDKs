@@ -5,6 +5,7 @@ import java.net.http.HttpRequest;
 import java.util.concurrent.ThreadLocalRandom;
 
 import co.casterlabs.apiutil.web.QueryBuilder;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
@@ -26,7 +27,16 @@ public class TiktokWebSession {
     private Device device = _Defaults.randomDevice();
     private String deviceId = generateDeviceId();
 
-    public QueryBuilder baseQuery() {
+    private @Setter(AccessLevel.NONE) String sessionIdCookie;
+    private @Setter(AccessLevel.NONE) String targetIdcCookie;
+
+    public TiktokWebSession authentication(@NonNull String sessionIdCookie, @NonNull String targetIdcCookie) {
+        this.sessionIdCookie = sessionIdCookie;
+        this.targetIdcCookie = targetIdcCookie;
+        return this;
+    }
+
+    public QueryBuilder httpQuery() {
         return new QueryBuilder()
             .put("aid", "1988")
             .put("app_language", this.location.lang)
@@ -58,6 +68,39 @@ public class TiktokWebSession {
             .put("device_id", this.deviceId);
     }
 
+    public QueryBuilder wsQuery() {
+        return new QueryBuilder()
+//            .put("version_code", 180800) // ?
+            .put("version_code", 270000)
+            .put("aid", 1988)
+            .put("app_language", this.location.lang)
+            .put("app_name", "tiktok_web")
+            .put("browser_platform", this.device.browserPlatform)
+            .put("browser_language", this.location.langCountry)
+            .put("browser_name", this.device.browserName)
+            .put("browser_version", this.device.browserVersion)
+            .put("browser_online", "true")
+            .put("cookie_enabled", "true")
+            .put("tz_name", this.location.timezone)
+            .put("device_platform", "web")
+//            .put("debug", "false")
+//            .put("host", "https://webcast.tiktok.com")
+            .put("identity", "audience")
+            .put("live_id", "12")
+            .put("sup_ws_ds_opt", "1")
+            .put("update_version_code", "2.0.0")
+            .put("did_rule", "3")
+            .put("screen_height", this.screen.height)
+            .put("screen_width", this.screen.width)
+            .put("heartbeat_duration", "0")
+            .put("resp_content_type", "protobuf")
+            .put("history_comment_count", "6")
+            .put("client_enter", "1")
+            .put("last_rtt", generateLastRTT())
+            .put("ws_direct", 0)
+            .put("webcast_language", this.location.lang);
+    }
+
     public HttpRequest.Builder createRequest(String url) {
         return HttpRequest.newBuilder(URI.create(url))
 //            .header("Connection", "keep-alive")
@@ -86,6 +129,10 @@ public class TiktokWebSession {
             result.append(ThreadLocalRandom.current().nextInt(0, 10));
         }
         return result.toString();
+    }
+
+    public static double generateLastRTT() {
+        return Math.random() * 100 + 100;
     }
 
     /* -------------------- */

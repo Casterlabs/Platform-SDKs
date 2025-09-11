@@ -29,7 +29,7 @@ public class TiktokWebGetLiveUserRoomRequest extends WebRequest<TiktokRoomData> 
 
     @Override
     protected TiktokRoomData execute() throws ApiException, ApiAuthException, IOException {
-        QueryBuilder query = this.session.baseQuery()
+        QueryBuilder query = this.session.httpQuery()
             .put("uniqueId", this.byHandle)
             .put("sourceType", 54);
         String url = String.format("%s/api-live/user/room/?%s", this.session.webUrl(), query);

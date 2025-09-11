@@ -1,0 +1,26 @@
+/*
+Synthetic protobuf defs NOT encoded in the APK's *_ProtoDecoder.java classes (i.e. hidden)
+ */
+
+syntax = "proto3";
+package TikTok;
+
+option java_multiple_files = true;
+option java_package = "co.casterlabs.sdk.tiktok.unsupported.types.protobuf.synthetic";
+
+// Heartbeat message
+message HeartbeatMessage {
+    uint64 roomId = 1;
+}
+
+// Incoming & outbound messages
+message WebcastPushFrame {
+    int64 seqId = 1;
+    int64 logId = 2;
+    int64 service = 3;
+    int64 method = 4;
+    map<string, string> headers = 5;
+    string payloadEncoding = 6;
+    string payloadType = 7;
+    bytes payload = 8;
+}

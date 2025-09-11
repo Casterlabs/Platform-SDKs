@@ -32,7 +32,7 @@ public class TiktokWebcastGetUserRoomRequest extends WebRequest<TiktokRoomData> 
             this.byHandle = this.byHandle.substring(1);
         }
 
-        QueryBuilder query = this.session.baseQuery()
+        QueryBuilder query = this.session.httpQuery()
             .put("unique_id", this.byHandle);
         String url = String.format("%s/room/info_by_user/?%s", this.session.webcastUrl(), query);
 
