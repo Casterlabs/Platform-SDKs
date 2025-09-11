@@ -1,42 +1,48 @@
-package co.casterlabs.sdk.tiktok.requests.unsupported;
+package co.casterlabs.sdk.tiktok.unsupported.requests;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpRequest;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.unbescape.uri.UriEscape;
 
 import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.web.ApiException;
 import co.casterlabs.apiutil.web.WebRequest;
 import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.element.JsonObject;
-import co.casterlabs.sdk.tiktok.TiktokApi;
-import co.casterlabs.sdk.tiktok.types.unsupported.TiktokWebcastRoomData;
+import co.casterlabs.sdk.tiktok.unsupported.TiktokWebSession;
+import co.casterlabs.sdk.tiktok.unsupported.types.TiktokRoomData;
+import co.casterlabs.sdk.tiktok.unsupported.types.TiktokWebRoomData;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
 @Setter
 @Accessors(chain = true, fluent = true)
-public class TiktokScrapeWebcastRoomRequest extends WebRequest<TiktokWebcastRoomData> {
-    // We're looking for the initial hydration data.
+public class TiktokWebScrapeRoomRequest extends WebRequest<TiktokRoomData> {
     private static final Pattern HYDRATION_DATA = Pattern.compile("<script id=\"SIGI_STATE\" type=\"application\\/json\">.+?<\\/script>");
-    private static final String UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36";
 
+    private final TiktokWebSession session;
     private String byHandle;
 
+    public TiktokWebScrapeRoomRequest(@NonNull TiktokWebSession session) {
+        this.session = session;
+    }
+
     @Override
-    protected TiktokWebcastRoomData execute() throws ApiException, ApiAuthException, IOException {
+    protected TiktokRoomData execute() throws ApiException, ApiAuthException, IOException {
         if (this.byHandle.startsWith("@")) {
             this.byHandle = this.byHandle.substring(1);
         }
 
+        String url = String.format("%s/@%s/live", this.session.webUrl(), UriEscape.escapeUriPath(this.byHandle));
+
         for (int i = 0; i < 10; i++) {
             String pageHtml = WebRequest.sendHttpRequest(
-                HttpRequest.newBuilder(URI.create(TiktokApi.TIKTOK_WEB_URL + "/@" + this.byHandle + "/live"))
-                    .header("User-Agent", UA),
+                this.session.createRequest(url),
                 BodyHandlers.ofString(),
                 null
             ).body();
@@ -84,7 +90,7 @@ public class TiktokScrapeWebcastRoomRequest extends WebRequest<TiktokWebcastRoom
             // We want THIS loading state.
             combinedJson.put("loadingState", currentRoom.get("loadingState"));
 
-            return Rson.DEFAULT.fromJson(combinedJson, TiktokWebcastRoomData.class);
+            return Rson.DEFAULT.fromJson(combinedJson, TiktokWebRoomData.class);
         }
 
         throw new ApiException("We're getting firewalled!");

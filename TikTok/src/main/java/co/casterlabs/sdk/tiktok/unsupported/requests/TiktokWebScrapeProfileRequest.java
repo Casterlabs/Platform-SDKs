@@ -1,29 +1,34 @@
-package co.casterlabs.sdk.tiktok.requests.unsupported;
+package co.casterlabs.sdk.tiktok.unsupported.requests;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpRequest;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.unbescape.uri.UriEscape;
 
 import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.web.ApiException;
 import co.casterlabs.apiutil.web.WebRequest;
 import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.element.JsonObject;
-import co.casterlabs.sdk.tiktok.TiktokApi;
-import co.casterlabs.sdk.tiktok.types.unsupported.TiktokScrapedProfileData;
+import co.casterlabs.sdk.tiktok.unsupported.TiktokWebSession;
+import co.casterlabs.sdk.tiktok.unsupported.types.TiktokScrapedProfileData;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
 @Setter
 @Accessors(chain = true, fluent = true)
-public class TiktokScrapeProfileRequest extends WebRequest<TiktokScrapedProfileData> {
-    // We're looking for the initial hydration data.
+public class TiktokWebScrapeProfileRequest extends WebRequest<TiktokScrapedProfileData> {
     private static final Pattern HYDRATION_DATA = Pattern.compile("<script id=\"__UNIVERSAL_DATA_FOR_REHYDRATION__\" type=\"application\\/json\">.+?<\\/script>");
 
+    private final TiktokWebSession session;
     private String byHandle;
+
+    public TiktokWebScrapeProfileRequest(@NonNull TiktokWebSession session) {
+        this.session = session;
+    }
 
     @Override
     protected TiktokScrapedProfileData execute() throws ApiException, ApiAuthException, IOException {
@@ -31,8 +36,10 @@ public class TiktokScrapeProfileRequest extends WebRequest<TiktokScrapedProfileD
             this.byHandle = this.byHandle.substring(1);
         }
 
+        String url = String.format("%s/@%s", this.session.webUrl(), UriEscape.escapeUriPath(this.byHandle));
+
         String pageHtml = WebRequest.sendHttpRequest(
-            HttpRequest.newBuilder(URI.create(TiktokApi.TIKTOK_WEB_URL + "/@" + this.byHandle)),
+            this.session.createRequest(url),
             BodyHandlers.ofString(),
             null
         ).body();

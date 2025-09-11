@@ -1,4 +1,4 @@
-package co.casterlabs.sdk.tiktok.types.unsupported;
+package co.casterlabs.sdk.tiktok.unsupported.types;
 
 import co.casterlabs.rakurai.json.annotating.JsonClass;
 import co.casterlabs.rakurai.json.annotating.JsonField;

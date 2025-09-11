@@ -1,8 +1,6 @@
-package co.casterlabs.sdk.tiktok.requests.unsupported;
+package co.casterlabs.sdk.tiktok.unsupported.requests;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 
@@ -10,6 +8,7 @@ import co.casterlabs.apiutil.web.ApiException;
 import co.casterlabs.apiutil.web.WebRequest;
 import co.casterlabs.sdk.tiktok.TiktokApi;
 import co.casterlabs.sdk.tiktok.types.TiktokUserInfo;
+import co.casterlabs.sdk.tiktok.unsupported.TiktokWebSession;
 import lombok.NonNull;
 
 /**
@@ -17,8 +16,14 @@ import lombok.NonNull;
  */
 @Deprecated
 public class TiktokGetUserHandleRequest extends WebRequest<String> {
+    private final TiktokWebSession session;
+
     private @NonNull String profileDeepLink;
     private long deepLinkRequestedAt;
+
+    public TiktokGetUserHandleRequest(@NonNull TiktokWebSession session) {
+        this.session = session;
+    }
 
     public TiktokGetUserHandleRequest byUserInfo(@NonNull TiktokUserInfo userInfo) {
         this.profileDeepLink = userInfo.profileDeepLink;
@@ -75,7 +80,7 @@ public class TiktokGetUserHandleRequest extends WebRequest<String> {
     private static final String DEFAULT_TIKTOK_DEEPLINK_URL = "https://vm.tiktok.com";
     private static final String DEFAULT_TIKTOK_OPENAPI2_URL = "https://open-api.tiktok.com";
 
-    private static HttpResponse<String> request(@NonNull String url) throws IOException {
+    private HttpResponse<String> request(@NonNull String url) throws IOException {
         String rewrittenUrl = url
             .replace(DEFAULT_TIKTOK_DEEPLINK_URL, TiktokApi.TIKTOK_DEEPLINK_URL)
             .replace(DEFAULT_TIKTOK_OPENAPI2_URL, TiktokApi.TIKTOK_OPENAPI2_URL);
@@ -83,7 +88,7 @@ public class TiktokGetUserHandleRequest extends WebRequest<String> {
 //        System.out.printf("%s became %s\n", url, rewrittenUrl);
 
         return WebRequest.sendHttpRequest(
-            HttpRequest.newBuilder(URI.create(rewrittenUrl)),
+            this.session.createRequest(rewrittenUrl),
             BodyHandlers.ofString(),
             null
         );
