@@ -23,11 +23,20 @@ public class TiktokUserInfo {
     @JsonField("avatar_url")
     public final String avatarUrl = null;
 
+    @JsonField("display_name")
+    public final String displayName = null;
+
     @JsonField("bio_description")
     public final String bio = null;
 
-    @JsonField("display_name")
-    public final String displayName = null;
+    @JsonField("profile_deep_link")
+    public final String profileDeepLink = null;
+
+    @JsonField("is_verified")
+    public final Boolean isVerified = null;
+
+    @JsonField("username")
+    public final String username = null;
 
     @JsonField("follower_count")
     public final Integer followerCount = null;
@@ -38,10 +47,7 @@ public class TiktokUserInfo {
     @JsonField("likes_count")
     public final Integer likesCount = null;
 
-    @JsonField("is_verified")
-    public final Boolean isVerified = null;
-
-    @JsonField("profile_deep_link")
-    public final String profileDeepLink = null;
+    @JsonField("video_count")
+    public final Integer videoCount = null;
 
 }
