@@ -2,15 +2,19 @@ package co.casterlabs.sdk.youtube.requests;
 
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpRequest.Builder;
+import java.util.Map;
 
 import org.jetbrains.annotations.Nullable;
 
 import co.casterlabs.apiutil.web.QueryBuilder;
+import co.casterlabs.rakurai.json.Rson;
+import co.casterlabs.rakurai.json.TypeToken;
 import co.casterlabs.rakurai.json.element.JsonObject;
 import co.casterlabs.rakurai.json.serialization.JsonParseException;
 import co.casterlabs.rakurai.json.validation.JsonValidationException;
 import co.casterlabs.sdk.youtube.YoutubeApiRequest;
 import co.casterlabs.sdk.youtube.YoutubeAuth;
+import co.casterlabs.sdk.youtube.types.YoutubeThumbnail;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -19,9 +23,12 @@ import lombok.experimental.Accessors;
 public class YoutubeThumbnails {
     private static final String URL = "https://www.googleapis.com/upload/youtube/v3/thumbnails";
 
+    private static final TypeToken<Map<String, YoutubeThumbnail>> TYPE = new TypeToken<Map<String, YoutubeThumbnail>>() {
+    };
+
     @Setter
     @Accessors(chain = true, fluent = true)
-    public static class Set extends YoutubeApiRequest<Void> {
+    public static class Set extends YoutubeApiRequest<Map<String, YoutubeThumbnail>> {
         private String forVideoId;
         private byte[] withImageBytes;
 
@@ -58,8 +65,8 @@ public class YoutubeThumbnails {
         }
 
         @Override
-        protected Void deserialize(JsonObject json) throws JsonValidationException, JsonParseException {
-            return null;
+        protected Map<String, YoutubeThumbnail> deserialize(JsonObject json) throws JsonValidationException, JsonParseException {
+            return Rson.DEFAULT.fromJson(json.get("items"), TYPE);
         }
 
     }
