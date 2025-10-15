@@ -81,7 +81,8 @@ public class YoutubeLiveBroadcasts {
         @Override
         protected @Nullable QueryBuilder query() {
             QueryBuilder query = QueryBuilder.from(
-                "part", "id,snippet,contentDetails,status"
+                "part", "id,snippet,contentDetails,status",
+                "maxResults", "50"
             );
             switch (this.queryMode) {
                 case 0:
