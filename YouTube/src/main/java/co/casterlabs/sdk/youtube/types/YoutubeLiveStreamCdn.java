@@ -23,7 +23,7 @@ public class YoutubeLiveStreamCdn {
 
         IngestionType status = IngestionType.valueOf(converted);
 
-        Field f = YoutubeLiveBroadcastStatus.class.getField("ingestionType");
+        Field f = YoutubeLiveStreamCdn.class.getField("ingestionType");
         f.setAccessible(true);
         f.set(this, status);
     }
