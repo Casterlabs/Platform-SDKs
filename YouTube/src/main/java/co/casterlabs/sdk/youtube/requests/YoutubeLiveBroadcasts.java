@@ -195,16 +195,20 @@ public class YoutubeLiveBroadcasts {
         private JsonObject body;
 
         @SneakyThrows
-        public Update(@NonNull YoutubeAuth auth, @NonNull String id) {
+        public Update(@NonNull YoutubeAuth auth) {
             super(auth);
 
             this.body = new JsonObject()
-                .put("id", id)
                 // Initialize the structure.
                 .put("snippet", new JsonObject())
                 .put("status", new JsonObject())
                 .put("contentDetails", new JsonObject().put("monitorStream", new JsonObject()))
                 .put("monetizationDetails", new JsonObject().put("cuepointSchedule", new JsonObject()));
+        }
+
+        public YoutubeLiveBroadcasts.Update forId(@NonNull String id) {
+            this.body.put("id", id);
+            return this;
         }
 
         /**
@@ -371,17 +375,24 @@ public class YoutubeLiveBroadcasts {
         private String streamId = null;
 
         @SneakyThrows
-        public Bind(@NonNull YoutubeAuth auth, @NonNull String id) {
+        public Bind(@NonNull YoutubeAuth auth) {
             super(auth);
-            this.broadcastId = id;
         }
 
-        public YoutubeLiveBroadcasts.Bind to(@NonNull String streamId) {
+        public YoutubeLiveBroadcasts.Bind forBroadcastId(@NonNull String broadcastId) {
+            this.broadcastId = broadcastId;
+            return this;
+        }
+
+        /**
+         * @param streamId A null value is equivalent to calling {@link #noStreamId()}
+         */
+        public YoutubeLiveBroadcasts.Bind toStreamId(@Nullable String streamId) {
             this.streamId = streamId;
             return this;
         }
 
-        public YoutubeLiveBroadcasts.Bind none() {
+        public YoutubeLiveBroadcasts.Bind noStreamId() {
             this.streamId = null;
             return this;
         }
@@ -416,18 +427,20 @@ public class YoutubeLiveBroadcasts {
 
     }
 
+    @Setter
+    @Accessors(chain = true, fluent = true)
     public static class Delete extends YoutubeApiRequest.Delete<Void> {
-        private String broadcastId;
+        private String forId;
 
         @SneakyThrows
-        public Delete(@NonNull YoutubeAuth auth, @NonNull String id) {
+        public Delete(@NonNull YoutubeAuth auth) {
             super(auth);
-            this.broadcastId = id;
         }
 
         @Override
         protected void validate() {
             assert !this.auth.isApplicationAuth() : "You must use user auth.";
+            assert this.forId != null : "You must specify an id.";
         }
 
         @Override
@@ -438,7 +451,7 @@ public class YoutubeLiveBroadcasts {
         @Override
         protected @Nullable QueryBuilder query() {
             return QueryBuilder.from(
-                "id", this.broadcastId
+                "id", this.forId
             );
         }
 
