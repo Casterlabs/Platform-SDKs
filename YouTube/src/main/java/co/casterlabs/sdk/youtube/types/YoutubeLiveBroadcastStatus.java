@@ -14,6 +14,9 @@ public class YoutubeLiveBroadcastStatus {
     public final @JsonExclude LifeCycleStatus lifeCycleStatus = null;
     public final @JsonExclude PrivacyStatus privacyStatus = null;
 
+    public final Boolean madeForKids = null;
+    public final Boolean selfDeclaredMadeForKids = null;
+
     @JsonDeserializationMethod("lifeCycleStatus")
     private void $deserialize_lifeCycleStatus(JsonElement e) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
         String converted = e.getAsString()

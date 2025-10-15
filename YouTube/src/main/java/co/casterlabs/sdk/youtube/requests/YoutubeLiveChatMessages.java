@@ -97,11 +97,6 @@ public class YoutubeLiveChatMessages {
         }
 
         @Override
-        protected String contentType() {
-            return "application/json";
-        }
-
-        @Override
         protected Void deserialize(JsonObject json) {
             return null;
         }

@@ -91,9 +91,42 @@ public abstract class YoutubeApiRequest<T> extends AuthenticatedWebRequest<T, Yo
 
     }
 
-    public static abstract class Insert<T> extends YoutubeApiRequest<T> {
+    public static abstract class List<T> extends YoutubeApiRequest<T> {
 
+        public List(@NonNull YoutubeAuth auth) {
+            super(auth);
+        }
+
+        @Override
+        protected abstract String url();
+
+    }
+
+    public static abstract class Insert<T> extends PostRequest<T> {
         public Insert(@NonNull YoutubeAuth auth) {
+            super(auth);
+        }
+    }
+
+    public static abstract class Bind<T> extends PostRequest<T> {
+        public Bind(@NonNull YoutubeAuth auth) {
+            super(auth);
+        }
+    }
+
+    public static abstract class Update<T> extends PostRequest<T> {
+        public Update(@NonNull YoutubeAuth auth) {
+            super(auth);
+        }
+    }
+
+    /* ---------------- */
+    /* Ancestor Classes */
+    /* ---------------- */
+
+    public static abstract class PostRequest<T> extends YoutubeApiRequest<T> {
+
+        public PostRequest(@NonNull YoutubeAuth auth) {
             super(auth);
         }
 
@@ -113,21 +146,16 @@ public abstract class YoutubeApiRequest<T> extends AuthenticatedWebRequest<T, Yo
         protected Builder request() {
             String body = this.body();
             String contentType = this.contentType();
-            return super.request()
-                .POST(BodyPublishers.ofString(body))
-                .header("Content-Type", contentType);
+
+            if (body == null) {
+                return super.request()
+                    .POST(BodyPublishers.noBody());
+            } else {
+                return super.request()
+                    .POST(BodyPublishers.ofString(body))
+                    .header("Content-Type", contentType);
+            }
         }
-
-    }
-
-    public static abstract class List<T> extends YoutubeApiRequest<T> {
-
-        public List(@NonNull YoutubeAuth auth) {
-            super(auth);
-        }
-
-        @Override
-        protected abstract String url();
 
     }
 
