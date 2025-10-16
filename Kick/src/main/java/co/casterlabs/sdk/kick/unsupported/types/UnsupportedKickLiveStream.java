@@ -1,5 +1,7 @@
 package co.casterlabs.sdk.kick.unsupported.types;
 
+import java.util.List;
+
 import org.jetbrains.annotations.Nullable;
 
 import co.casterlabs.rakurai.json.annotating.JsonClass;
@@ -35,7 +37,6 @@ public class UnsupportedKickLiveStream {
     @JsonField("viewer_count")
     private int viewersCount;
 
-    // TODO figure out how their category system works.
-    // TODO figure out how their tags system works.
+    private List<UnsupportedKickCategory> categories;
 
 }

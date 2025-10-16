@@ -1,5 +1,7 @@
 package co.casterlabs.sdk.kick.unsupported.types;
 
+import java.util.List;
+
 import org.jetbrains.annotations.Nullable;
 
 import co.casterlabs.rakurai.json.annotating.JsonClass;
@@ -50,6 +52,9 @@ public class UnsupportedKickChannel {
 
     @JsonExclude
     private boolean isVerified;
+
+    @JsonField("previous_livestreams")
+    private List<UnsupportedKickLiveStream> previousLivestreams;
 
     @JsonField("subscriber_badges")
     private SubscriberBadge[] subscriberBadges = {};
