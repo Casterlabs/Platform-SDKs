@@ -1,5 +1,6 @@
 package co.casterlabs.sdk.twitch.helix.types;
 
+import java.time.Instant;
 import java.util.List;
 
 import co.casterlabs.rakurai.json.annotating.JsonClass;
@@ -33,6 +34,9 @@ public class HelixStream {
 
     @JsonField("thumbnail_url")
     public final String thumbnailUrl = null;
+
+    @JsonField("started_at")
+    public final Instant startedAt = null;
 
     public String formatThumbnailUrl(int width, int height) {
         return this.thumbnailUrl
