@@ -45,6 +45,7 @@ class _KickApi {
 
 //        System.out.println(response.statusCode());
 //        System.out.println(body);
+//        System.out.println(body.data);
 
         if (response.statusCode() == 401) {
             throw new ApiAuthException(body.message);
