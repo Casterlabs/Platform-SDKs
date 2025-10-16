@@ -8,6 +8,7 @@ import java.net.http.HttpRequest.BodyPublishers;
 import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.web.ApiException;
 import co.casterlabs.apiutil.web.AuthenticatedWebRequest;
+import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.element.JsonObject;
 import co.casterlabs.sdk.kick.KickAuth;
 import lombok.NonNull;
@@ -18,9 +19,15 @@ import lombok.experimental.Accessors;
 public class KickUpdateChannelRequest extends AuthenticatedWebRequest<Void, KickAuth> {
     private @Setter Integer withCategoryId = null;
     private @Setter String withStreamTitle = null;
+    private String[] tags = {};
 
     public KickUpdateChannelRequest(@NonNull KickAuth auth) {
         super(auth);
+    }
+
+    public KickUpdateChannelRequest withTags(@NonNull String... tags) {
+        this.tags = tags;
+        return this;
     }
 
     @Override
@@ -32,6 +39,7 @@ public class KickUpdateChannelRequest extends AuthenticatedWebRequest<Void, Kick
 
         JsonObject payload = new JsonObject()
             .put("category_id", this.withCategoryId)
+            .put("custom_tags", Rson.DEFAULT.toJson(this.tags))
             .put("stream_title", this.withStreamTitle);
 
         _KickApi.request(
