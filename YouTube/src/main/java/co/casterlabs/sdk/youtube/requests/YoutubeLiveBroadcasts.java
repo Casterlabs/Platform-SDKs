@@ -74,7 +74,7 @@ public class YoutubeLiveBroadcasts {
         @Override
         protected @Nullable QueryBuilder query() {
             QueryBuilder query = QueryBuilder.from(
-                "part", "id,snippet,contentDetails,status",
+                "part", "id,snippet,contentDetails,monetizationDetails,status",
                 "maxResults", "50"
             );
             switch (this.queryMode) {
@@ -153,7 +153,7 @@ public class YoutubeLiveBroadcasts {
         @Override
         protected @Nullable QueryBuilder query() {
             return QueryBuilder.from(
-                "part", "id,snippet,contentDetails,status"
+                "part", "id,snippet,contentDetails,monetizationDetails,status"
             );
         }
 
@@ -414,7 +414,7 @@ public class YoutubeLiveBroadcasts {
         @Override
         protected @Nullable QueryBuilder query() {
             return QueryBuilder.from(
-                "part", "id,snippet,contentDetails,status"
+                "part", "id,snippet,contentDetails,monetizationDetails,status"
             );
         }
 
