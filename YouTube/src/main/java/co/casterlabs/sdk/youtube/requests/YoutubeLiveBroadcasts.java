@@ -1,6 +1,5 @@
 package co.casterlabs.sdk.youtube.requests;
 
-import java.io.IOException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -10,7 +9,6 @@ import java.util.stream.Collectors;
 
 import org.jetbrains.annotations.Nullable;
 
-import co.casterlabs.apiutil.web.ApiException;
 import co.casterlabs.apiutil.web.QueryBuilder;
 import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.annotating.JsonClass;
@@ -213,12 +211,13 @@ public class YoutubeLiveBroadcasts {
          * Helper to prefill the update request with data from the existing live
          * broadcast.
          */
-        public YoutubeLiveBroadcasts.Update prefill(YoutubeLiveBroadcastData data) throws IOException, ApiException {
+        @SneakyThrows
+        public YoutubeLiveBroadcasts.Update prefill(YoutubeLiveBroadcastData data) {
             JsonObject prefill = Rson.DEFAULT.fromJson(data.raw, JsonObject.class);
 
             // Allegedly, these are the ONLY fields we can modify.
 
-            {
+            if (prefill.containsKey("snippet")) {
                 JsonObject thisContext = this.body.getObject("snippet");
                 JsonObject prefillContext = prefill.getObject("snippet");
 
@@ -235,7 +234,8 @@ public class YoutubeLiveBroadcasts {
                     thisContext.put(field, prefillValue);
                 }
             }
-            {
+
+            if (prefill.containsKey("status")) {
                 JsonObject thisContext = this.body.getObject("status");
                 JsonObject prefillContext = prefill.getObject("status");
 
@@ -250,7 +250,8 @@ public class YoutubeLiveBroadcasts {
                     thisContext.put(field, prefillValue);
                 }
             }
-            {
+
+            if (prefill.containsKey("contentDetails")) {
                 JsonObject thisContext = this.body.getObject("contentDetails");
                 JsonObject prefillContext = prefill.getObject("contentDetails");
 
@@ -269,7 +270,8 @@ public class YoutubeLiveBroadcasts {
                     thisContext.put(field, prefillValue);
                 }
             }
-            {
+
+            if (prefill.containsKey("contentDetails") && prefill.getObject("contentDetails").containsKey("monitorStream")) {
                 JsonObject thisContext = this.body.getObject("contentDetails").getObject("monitorStream");
                 JsonObject prefillContext = prefill.getObject("contentDetails").getObject("monitorStream");
 
@@ -284,7 +286,8 @@ public class YoutubeLiveBroadcasts {
                     thisContext.put(field, prefillValue);
                 }
             }
-            {
+
+            if (prefill.containsKey("monetizationDetails") && prefill.getObject("monetizationDetails").containsKey("cuepointSchedule")) {
                 JsonObject thisContext = this.body.getObject("monetizationDetails").getObject("cuepointSchedule");
                 JsonObject prefillContext = prefill.getObject("monetizationDetails").getObject("cuepointSchedule");
 
