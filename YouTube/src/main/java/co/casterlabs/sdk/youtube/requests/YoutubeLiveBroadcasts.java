@@ -285,6 +285,11 @@ public class YoutubeLiveBroadcasts {
             return this;
         }
 
+        public YoutubeLiveBroadcasts.Update withStatusSelfDeclaredMadeForKids(boolean madeForKids) {
+            this.body.getObject("status").put("selfDeclaredMadeForKids", madeForKids);
+            return this;
+        }
+
         public YoutubeLiveBroadcasts.Update withContentDetailsMonitorStreamEnableMonitorStream(boolean enable) {
             this.body.getObject("contentDetails").getObject("monitorStream").put("enableMonitorStream", enable);
             return this;
@@ -356,6 +361,7 @@ public class YoutubeLiveBroadcasts {
 
         @Override
         protected String body() {
+            this.body.getObject("status").remove("madeForKids"); // Can't include this otherwise YouTube throws a fit. Thanks.
             return this.body.toString();
         }
 
