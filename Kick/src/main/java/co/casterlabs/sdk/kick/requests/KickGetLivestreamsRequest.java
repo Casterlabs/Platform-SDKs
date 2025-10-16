@@ -13,7 +13,9 @@ import co.casterlabs.sdk.kick.KickAuth;
 import co.casterlabs.sdk.kick.types.KickLivestream;
 import lombok.NonNull;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
+@Accessors(chain = true, fluent = true)
 public class KickGetLivestreamsRequest extends AuthenticatedWebRequest<List<KickLivestream>, KickAuth> {
     private @Setter Integer forUserId = null;
     private @Setter Integer forCategoryId = null;
