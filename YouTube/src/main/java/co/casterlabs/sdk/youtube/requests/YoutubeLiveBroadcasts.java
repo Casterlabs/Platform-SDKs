@@ -241,7 +241,7 @@ public class YoutubeLiveBroadcasts {
 
                 final String[] FIELDS_TO_COPY = {
                         "privacyStatus",
-                        "selfDeclaredMadeForKids", // Undocumented.
+//                        "selfDeclaredMadeForKids", 
                 };
 
                 for (String field : FIELDS_TO_COPY) {
@@ -344,10 +344,10 @@ public class YoutubeLiveBroadcasts {
             return this;
         }
 
-        public YoutubeLiveBroadcasts.Update withStatusSelfDeclaredMadeForKids(boolean madeForKids) {
-            this.body.getObject("status").put("selfDeclaredMadeForKids", madeForKids);
-            return this;
-        }
+//        public YoutubeLiveBroadcasts.Update withStatusSelfDeclaredMadeForKids(boolean madeForKids) {
+//            this.body.getObject("status").put("selfDeclaredMadeForKids", madeForKids);
+//            return this;
+//        }
 
         public YoutubeLiveBroadcasts.Update withContentDetailsMonitorStreamEnableMonitorStream(boolean enable) {
             this.body.getObject("contentDetails").getObject("monitorStream").put("enableMonitorStream", enable);
