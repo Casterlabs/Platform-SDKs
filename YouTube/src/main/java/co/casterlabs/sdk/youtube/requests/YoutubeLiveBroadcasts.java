@@ -1,9 +1,6 @@
 package co.casterlabs.sdk.youtube.requests;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -13,14 +10,12 @@ import java.util.stream.Collectors;
 
 import org.jetbrains.annotations.Nullable;
 
-import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.web.ApiException;
 import co.casterlabs.apiutil.web.QueryBuilder;
-import co.casterlabs.apiutil.web.RsonBodyHandler;
-import co.casterlabs.apiutil.web.WebRequest;
 import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.annotating.JsonClass;
 import co.casterlabs.rakurai.json.element.JsonArray;
+import co.casterlabs.rakurai.json.element.JsonElement;
 import co.casterlabs.rakurai.json.element.JsonObject;
 import co.casterlabs.rakurai.json.serialization.JsonParseException;
 import co.casterlabs.rakurai.json.validation.JsonValidationException;
@@ -110,6 +105,7 @@ public class YoutubeLiveBroadcasts {
                 .stream()
                 .map((e) -> e.getAsObject())
                 .map((item) -> {
+                    item.put("raw", item.toString());
                     try {
                         return Rson.DEFAULT.fromJson(item, YoutubeLiveBroadcastData.class);
                     } catch (JsonParseException ex) {
@@ -182,6 +178,8 @@ public class YoutubeLiveBroadcasts {
 
         @Override
         protected YoutubeLiveBroadcastData deserialize(JsonObject json) throws JsonValidationException, JsonParseException {
+            json.put("raw", json.toString());
+
             try {
                 return Rson.DEFAULT.fromJson(json, YoutubeLiveBroadcastData.class);
             } catch (JsonParseException ex) {
@@ -215,35 +213,93 @@ public class YoutubeLiveBroadcasts {
          * Helper to prefill the update request with data from the existing live
          * broadcast.
          */
-        public YoutubeLiveBroadcasts.Update prefill() throws IOException, ApiException {
-            QueryBuilder query = QueryBuilder.from(
-                "part", "id,snippet,contentDetails,status",
-                "id", this.body.getString("id")
-            );
+        public YoutubeLiveBroadcasts.Update prefill(YoutubeLiveBroadcastData data) throws IOException, ApiException {
+            JsonObject prefill = Rson.DEFAULT.fromJson(data.raw, JsonObject.class);
 
-            HttpRequest.Builder request = HttpRequest
-                .newBuilder()
-                .uri(URI.create(URL + "?" + query))
-                .header("X-Client-Type", "api");
+            // Allegedly, these are the ONLY fields we can modify.
 
-            HttpResponse<JsonObject> response = WebRequest.sendHttpRequest(
-                request,
-                RsonBodyHandler.of(JsonObject.class),
-                this.auth
-            );
-            JsonObject body = response.body();
+            {
+                JsonObject thisContext = this.body.getObject("snippet");
+                JsonObject prefillContext = prefill.getObject("snippet");
 
-            if (response.statusCode() >= 200 && response.statusCode() <= 299) {
-                // Success!
-                this.body = body.getArray("items").getObject(0);
-                return this;
+                final String[] FIELDS_TO_COPY = {
+                        "title",
+                        "description",
+                        "scheduledStartTime",
+                        "scheduledEndTime",
+                };
+
+                for (String field : FIELDS_TO_COPY) {
+                    JsonElement prefillValue = prefillContext.get(field);
+                    if (prefillValue == null) continue;
+                    thisContext.put(field, prefillValue);
+                }
+            }
+            {
+                JsonObject thisContext = this.body.getObject("status");
+                JsonObject prefillContext = prefill.getObject("status");
+
+                final String[] FIELDS_TO_COPY = {
+                        "privacyStatus",
+                        "selfDeclaredMadeForKids", // Undocumented.
+                };
+
+                for (String field : FIELDS_TO_COPY) {
+                    JsonElement prefillValue = prefillContext.get(field);
+                    if (prefillValue == null) continue;
+                    thisContext.put(field, prefillValue);
+                }
+            }
+            {
+                JsonObject thisContext = this.body.getObject("contentDetails");
+                JsonObject prefillContext = prefill.getObject("contentDetails");
+
+                final String[] FIELDS_TO_COPY = {
+                        "enableAutoStart",
+                        "enableAutoStop",
+                        "enableClosedCaptions",
+                        "enableDvr",
+                        "enableEmbed",
+                        "recordFromStart",
+                };
+
+                for (String field : FIELDS_TO_COPY) {
+                    JsonElement prefillValue = prefillContext.get(field);
+                    if (prefillValue == null) continue;
+                    thisContext.put(field, prefillValue);
+                }
+            }
+            {
+                JsonObject thisContext = this.body.getObject("contentDetails").getObject("monitorStream");
+                JsonObject prefillContext = prefill.getObject("contentDetails").getObject("monitorStream");
+
+                final String[] FIELDS_TO_COPY = {
+                        "enableMonitorStream",
+                        "broadcastStreamDelayMs",
+                };
+
+                for (String field : FIELDS_TO_COPY) {
+                    JsonElement prefillValue = prefillContext.get(field);
+                    if (prefillValue == null) continue;
+                    thisContext.put(field, prefillValue);
+                }
+            }
+            {
+                JsonObject thisContext = this.body.getObject("monetizationDetails").getObject("cuepointSchedule");
+                JsonObject prefillContext = prefill.getObject("monetizationDetails").getObject("cuepointSchedule");
+
+                final String[] FIELDS_TO_COPY = {
+                        "pauseAdsUntil",
+                };
+
+                for (String field : FIELDS_TO_COPY) {
+                    JsonElement prefillValue = prefillContext.get(field);
+                    if (prefillValue == null) continue;
+                    thisContext.put(field, prefillValue);
+                }
             }
 
-            if (response.statusCode() == 401) {
-                throw new ApiAuthException(body.toString());
-            } else {
-                throw new ApiException(body.toString());
-            }
+            return this;
         }
 
         public YoutubeLiveBroadcasts.Update withSnippetTitle(String title) {
@@ -361,12 +417,12 @@ public class YoutubeLiveBroadcasts {
 
         @Override
         protected String body() {
-            this.body.getObject("status").remove("madeForKids"); // Can't include this otherwise YouTube throws a fit. Thanks.
             return this.body.toString();
         }
 
         @Override
         protected YoutubeLiveBroadcastData deserialize(JsonObject json) throws JsonValidationException, JsonParseException {
+            json.put("raw", json.toString());
             try {
                 return Rson.DEFAULT.fromJson(json, YoutubeLiveBroadcastData.class);
             } catch (JsonParseException ex) {
@@ -471,6 +527,8 @@ public class YoutubeLiveBroadcasts {
     @ToString
     @JsonClass(exposeAll = true)
     public static class YoutubeLiveBroadcastData {
+        private final String raw = null;
+
         public final String id = null;
         public final YoutubeLiveBroadcastSnippet snippet = null;
         public final YoutubeLiveBroadcastStatus status = null;
