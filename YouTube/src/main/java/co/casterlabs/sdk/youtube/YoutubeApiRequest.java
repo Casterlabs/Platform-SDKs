@@ -114,10 +114,11 @@ public abstract class YoutubeApiRequest<T> extends AuthenticatedWebRequest<T, Yo
         }
     }
 
-    public static abstract class Update<T> extends PostRequest<T> {
+    public static abstract class Update<T> extends PutRequest<T> {
         public Update(@NonNull YoutubeAuth auth) {
             super(auth);
         }
+
     }
 
     /* ---------------- */
@@ -153,6 +154,41 @@ public abstract class YoutubeApiRequest<T> extends AuthenticatedWebRequest<T, Yo
             } else {
                 return super.request()
                     .POST(BodyPublishers.ofString(body))
+                    .header("Content-Type", contentType);
+            }
+        }
+
+    }
+
+    public static abstract class PutRequest<T> extends YoutubeApiRequest<T> {
+
+        public PutRequest(@NonNull YoutubeAuth auth) {
+            super(auth);
+        }
+
+        @Override
+        protected abstract String url();
+
+        /**
+         * Override as-needed.
+         */
+        protected String contentType() {
+            return "application/json";
+        }
+
+        protected abstract String body();
+
+        @Override
+        protected Builder request() {
+            String body = this.body();
+            String contentType = this.contentType();
+
+            if (body == null) {
+                return super.request()
+                    .PUT(BodyPublishers.noBody());
+            } else {
+                return super.request()
+                    .PUT(BodyPublishers.ofString(body))
                     .header("Content-Type", contentType);
             }
         }
