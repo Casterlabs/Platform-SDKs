@@ -66,7 +66,7 @@ public class YoutubeThumbnails {
 
         @Override
         protected Map<String, YoutubeThumbnail> deserialize(JsonObject json) throws JsonValidationException, JsonParseException {
-            return Rson.DEFAULT.fromJson(json.get("items"), TYPE);
+            return Rson.DEFAULT.fromJson(json.getArray("items").get(0), TYPE);
         }
 
     }
