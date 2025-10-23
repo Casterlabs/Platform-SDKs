@@ -44,7 +44,7 @@ public class KickUpdateChannelRequest extends AuthenticatedWebRequest<Void, Kick
 
         _KickApi.request(
             HttpRequest.newBuilder(URI.create(url))
-                .POST(BodyPublishers.ofString(payload.toString()))
+                .method("PATCH", BodyPublishers.ofString(payload.toString()))
                 .header("Content-Type", "application/json"),
             this.auth
         );
