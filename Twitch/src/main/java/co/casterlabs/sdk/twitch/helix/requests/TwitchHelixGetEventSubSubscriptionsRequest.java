@@ -24,6 +24,7 @@ import lombok.experimental.Accessors;
 public class TwitchHelixGetEventSubSubscriptionsRequest extends AuthenticatedWebRequest<PaginatedResponse<HelixEventSubSubscription>, TwitchHelixAuth> {
     private HelixEventSubStatus byStatus;
     private String byUserId;
+    private String bySubscriptionId;
     private String byType;
 
     /**
@@ -42,6 +43,7 @@ public class TwitchHelixGetEventSubSubscriptionsRequest extends AuthenticatedWeb
                 String url = "https://api.twitch.tv/helix/eventsub/subscriptions?" + new QueryBuilder()
                     .optionalPut("status", byStatus == null ? null : byStatus.name().toLowerCase())
                     .optionalPut("user_id", byUserId)
+                    .optionalPut("subscription_id", bySubscriptionId)
                     .optionalPut("type", byType)
                     .optionalPut("after", cursor);
                 return HttpRequest.newBuilder()
