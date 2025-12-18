@@ -5,6 +5,7 @@ import co.casterlabs.sdk.youtube.YoutubeAuth;
 import co.casterlabs.sdk.youtube.requests.YoutubeLiveChatMessages;
 import co.casterlabs.sdk.youtube.types.YoutubeLiveChatMessagesList;
 import co.casterlabs.sdk.youtube.types.livechat.YoutubeLiveChatEvent;
+import co.casterlabs.sdk.youtube.types.livechat.events.YoutubeLiveEventType;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -45,12 +46,17 @@ public class YoutubeChatHelper {
             if (list.isHistorical) {
                 this.listener.onHistory(list.events);
             } else {
-                try {
-                    for (YoutubeLiveChatEvent event : list.events) {
-                        this.listener.onEvent(event);
+                for (YoutubeLiveChatEvent lce : list.events) {
+                    try {
+                        this.listener.onEvent(lce);
+                    } catch (Throwable t) {
+                        this.listener.onError(t);
                     }
-                } catch (Throwable t) {
-                    this.listener.onError(t);
+
+                    if (lce.event().type == YoutubeLiveEventType.CHAT_ENDED_EVENT) {
+                        // We're done. Cleanup!
+                        this.shouldLoop = false;
+                    }
                 }
             }
 

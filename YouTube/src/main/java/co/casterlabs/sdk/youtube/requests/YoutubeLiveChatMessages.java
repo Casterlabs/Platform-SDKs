@@ -17,6 +17,7 @@ import co.casterlabs.sdk.youtube.types.YoutubeLiveChatMessagesList;
 import co.casterlabs.sdk.youtube.types.protobuf.LiveChatMessage;
 import co.casterlabs.sdk.youtube.types.protobuf.LiveChatMessageListRequest;
 import co.casterlabs.sdk.youtube.types.protobuf.LiveChatMessageListResponse;
+import co.casterlabs.sdk.youtube.types.protobuf.LiveChatMessageSnippet;
 import co.casterlabs.sdk.youtube.types.protobuf.V3DataLiveChatMessageServiceGrpc;
 import co.casterlabs.sdk.youtube.types.protobuf.V3DataLiveChatMessageServiceGrpc.V3DataLiveChatMessageServiceBlockingStub;
 import io.grpc.ManagedChannel;
@@ -204,7 +205,16 @@ public class YoutubeLiveChatMessages {
                         this.request.setPageToken(resp.getNextPageToken());
 
                         for (LiveChatMessage message : resp.getItemsList()) {
-                            this.listener.onEvent(message);
+                            try {
+                                this.listener.onEvent(message);
+                            } catch (Throwable t) {
+                                this.listener.onError(t);
+                            }
+
+                            if (message.getSnippet().getType() == LiveChatMessageSnippet.TypeWrapper.Type.CHAT_ENDED_EVENT) {
+                                // We're done. Cleanup!
+                                this.shouldRun = false;
+                            }
                         }
                     }
                 }
