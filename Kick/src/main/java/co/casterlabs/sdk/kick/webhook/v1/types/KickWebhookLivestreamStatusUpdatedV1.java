@@ -11,10 +11,10 @@ public class KickWebhookLivestreamStatusUpdatedV1 implements KickWebhookEvent {
 
     public final KickWebhookUserV1 broadcaster = null;
 
-    public final String title = null;
-
     @JsonField("is_live")
     public final Boolean id = null;
+
+    public final String title = null;
 
     @JsonField("started_at")
     public final Instant startedAt = null;
