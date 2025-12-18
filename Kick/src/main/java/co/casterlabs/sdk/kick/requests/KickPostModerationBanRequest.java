@@ -26,15 +26,31 @@ public class KickPostModerationBanRequest extends AuthenticatedWebRequest<KickPo
         super(auth);
     }
 
+    public KickPostModerationBanRequest withNoReason() {
+        this.withReason = null;
+        return this;
+    }
+
+    public KickPostModerationBanRequest indefinite() {
+        this.withTimeoutDurationInMinutes = null;
+        return this;
+    }
+
     @Override
     protected KickPostedChatMessage execute() throws ApiException, ApiAuthException, IOException {
         String url = "https://api.kick.com/public/v1/moderation/bans";
 
         JsonObject payload = new JsonObject()
             .put("broadcaster_user_id", this.forChannelId)
-            .put("user_id", this.forUserId)
-            .put("duration", this.withTimeoutDurationInMinutes)
-            .put("reason", this.withReason);
+            .put("user_id", this.forUserId);
+
+        if (this.withTimeoutDurationInMinutes != null) {
+            payload.put("duration", this.withTimeoutDurationInMinutes);
+        }
+
+        if (this.withReason != null) {
+            payload.put("reason", this.withReason);
+        }
 
         return _KickApi.request(
             HttpRequest.newBuilder(URI.create(url))
