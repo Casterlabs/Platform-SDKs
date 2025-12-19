@@ -157,7 +157,7 @@ public class TiktokAuth extends AuthProvider<TiktokAuthData> {
             "response_type", "code",
             "client_key", clientKey,
             "redirect_uri", redirectUri,
-            "scope", String.join(" ", scopes),
+            "scope", String.join(",", scopes),
             "state", state
         );
     }
