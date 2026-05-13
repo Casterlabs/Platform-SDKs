@@ -172,7 +172,7 @@ public class FourthwallAuth extends AuthProvider<FourthwallAuthData> {
     /* ---------------- */
 
     public static String startCodeGrant(@NonNull String clientId, @NonNull String redirectUri, @Nullable String state) {
-        return "https://my-shop.fourthwall.com/admin/platform-apps/" + clientId + "/connect" + QueryBuilder.from(
+        return "https://my-shop.fourthwall.com/admin/platform-apps/" + clientId + "/connect?" + QueryBuilder.from(
             "redirect_uri", redirectUri,
             "state", state
         );
