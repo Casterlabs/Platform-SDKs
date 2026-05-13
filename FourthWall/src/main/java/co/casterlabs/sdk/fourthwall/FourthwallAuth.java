@@ -75,6 +75,8 @@ public class FourthwallAuth extends AuthProvider<FourthwallAuthData> {
 
     @Override
     public void authenticateRequest(@NonNull HttpRequest.Builder request) throws ApiAuthException {
+        request.header("Accept-Encoding", "identity");
+
         if (this.isApplicationAuth()) {
             request.header("Authorization", "Basic " + this.basic);
         } else {
@@ -202,7 +204,8 @@ public class FourthwallAuth extends AuthProvider<FourthwallAuthData> {
                     .newBuilder()
                     .uri(URI.create("https://api.fourthwall.com/open-api/v1.0/platform/token"))
                     .POST(BodyPublishers.ofString(params.toString()))
-                    .header("Content-Type", "application/x-www-form-urlencoded"),
+                    .header("Content-Type", "application/x-www-form-urlencoded")
+                    .header("Accept-Encoding", "identity"),
                 RsonBodyHandler.of(JsonObject.class),
                 null
             );
