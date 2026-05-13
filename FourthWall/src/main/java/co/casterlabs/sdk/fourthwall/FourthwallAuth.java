@@ -6,7 +6,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.util.Base64;
-import java.util.Collection;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.jetbrains.annotations.Nullable;
@@ -172,7 +171,7 @@ public class FourthwallAuth extends AuthProvider<FourthwallAuthData> {
     /* Code Grant       */
     /* ---------------- */
 
-    public static String startCodeGrant(@NonNull String clientId, @NonNull String redirectUri, @NonNull Collection<String> scopes, @Nullable String state) {
+    public static String startCodeGrant(@NonNull String clientId, @NonNull String redirectUri, @Nullable String state) {
         return "https://my-shop.fourthwall.com/admin/platform-apps/" + clientId + "/connect" + QueryBuilder.from(
             "redirect_uri", redirectUri,
             "state", state
