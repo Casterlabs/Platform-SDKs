@@ -22,16 +22,16 @@ public class FourthwallProductVariant {
     @ToString
     @JsonClass(exposeAll = true)
     public static class Weight {
-        public final String value = null;
+        public final Double value = null;
         public final String unit = null;
     }
 
     @ToString
     @JsonClass(exposeAll = true)
     public static class Dimensions {
-        public final String length = null;
-        public final String width = null;
-        public final String height = null;
+        public final Double length = null;
+        public final Double width = null;
+        public final Double height = null;
         public final String unit = null;
     }
 
