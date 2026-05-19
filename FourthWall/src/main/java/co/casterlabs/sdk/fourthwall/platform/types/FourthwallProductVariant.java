@@ -21,14 +21,14 @@ public class FourthwallProductVariant {
 
     @ToString
     @JsonClass(exposeAll = true)
-    public class Weight {
+    public static class Weight {
         public final String value = null;
         public final String unit = null;
     }
 
     @ToString
     @JsonClass(exposeAll = true)
-    public class Dimensions {
+    public static class Dimensions {
         public final String length = null;
         public final String width = null;
         public final String height = null;

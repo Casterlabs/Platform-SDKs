@@ -61,7 +61,7 @@ public class FourthwallWebhookOrderPlaced extends FourthwallWebhookEvent<Fourthw
 
     @ToString
     @JsonClass(exposeAll = true)
-    public class Source {
+    public static class Source {
         public final String type = null;
         public final String giftId = null;
 
