@@ -1,16 +1,11 @@
 package co.casterlabs.sdk.fourthwall.platform.requests;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpRequest;
-import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 
 import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.web.ApiException;
 import co.casterlabs.apiutil.web.AuthenticatedWebRequest;
-import co.casterlabs.apiutil.web.RsonBodyHandler;
-import co.casterlabs.apiutil.web.WebRequest;
 import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.element.JsonObject;
 import co.casterlabs.sdk.fourthwall.FourthwallAuth;
@@ -45,19 +40,7 @@ public class FourthwallCreateWebhookRequest extends AuthenticatedWebRequest<Four
             .put("url", this.url)
             .put("allowedTypes", Rson.DEFAULT.toJson(this.allowedTypes));
 
-        HttpResponse<JsonObject> response = WebRequest.sendHttpRequest(
-            HttpRequest.newBuilder()
-                .uri(URI.create("https://api.fourthwall.com/open-api/v1.0/webhooks"))
-                .POST(BodyPublishers.ofString(body.toString()))
-                .header("Content-Type", "application/json"),
-            RsonBodyHandler.of(JsonObject.class),
-            this.auth
-        );
-
-        if (response.statusCode() < 200 || response.statusCode() > 299) {
-            throw new ApiException(response.body().toString());
-        }
-
+        HttpResponse<JsonObject> response = _RequestHelper.POST("https://api.fourthwall.com/open-api/v1.0/webhooks", body, this.auth);
         return Rson.DEFAULT.fromJson(response.body(), FourthwallWebhook.class);
     }
 
