@@ -15,6 +15,7 @@
 		<module>DLive</module>
 		<module>Kick</module>
 		<module>FourthWall</module>
+		<module>X</module>
 	</modules>
 
 	<properties>
