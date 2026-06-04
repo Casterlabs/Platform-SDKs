@@ -24,7 +24,6 @@ public class Xv1GetCurrentUserRequest extends AuthenticatedWebRequest<Xv1User, X
             "https://api.x.com/1.1/account/verify_credentials.json",
             this.auth
         );
-        System.out.println(response.body());
         return Rson.DEFAULT.fromJson(response.body(), Xv1User.class);
     }
 
