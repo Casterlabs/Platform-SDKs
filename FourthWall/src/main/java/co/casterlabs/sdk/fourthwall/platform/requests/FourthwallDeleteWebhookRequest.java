@@ -37,7 +37,7 @@ public class FourthwallDeleteWebhookRequest extends AuthenticatedWebRequest<Void
             this.auth
         );
 
-        if (response.statusCode() < 200 && response.statusCode() > 299) {
+        if (response.statusCode() < 200 || response.statusCode() > 299) {
             throw new ApiException(response.body().toString());
         }
 
