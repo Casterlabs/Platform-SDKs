@@ -18,7 +18,7 @@ public class XSignedRequestHelper {
 
     public static void checkError(HttpResponse<?> response) throws ApiException {
         if (response.statusCode() < 200 || response.statusCode() > 299) {
-            throw new ApiException(String.format("%d: %s", response.statusCode(), response.body()));
+            throw new ApiException(String.format("%d: %s %s", response.statusCode(), response.headers(), response.body()));
         }
     }
 
