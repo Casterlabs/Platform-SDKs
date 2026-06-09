@@ -109,7 +109,7 @@ public class Xv1Auth extends AuthProvider<Xv1AuthData> {
                 throw new ApiAuthException("Twitter auth data is missing an access token or token secret.");
             }
 
-            request.header(
+            request.setHeader(
                 "Authorization",
                 OAuth1.sign(
                     method,

@@ -23,7 +23,7 @@ public class UnsupportedKickAuth extends AuthProvider<KickAuthData> {
 
     @Override
     public void authenticateRequest(@NonNull HttpRequest.Builder request) {
-        request.header("Authorization", "Bearer " + this.data().token);
+        request.setHeader("Authorization", "Bearer " + this.data().token);
     }
 
     @Override

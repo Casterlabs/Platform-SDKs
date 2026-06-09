@@ -75,9 +75,9 @@ public class TrovoAuth extends AuthProvider<TrovoAuthData> {
     @Override
     public void authenticateRequest(@NonNull HttpRequest.Builder request) throws ApiAuthException {
         if (!this.isApplicationAuth) {
-            request.header("Authorization", "OAuth " + this.getAccessToken());
+            request.setHeader("Authorization", "OAuth " + this.getAccessToken());
         }
-        request.header("Client-ID", this.clientId);
+        request.setHeader("Client-ID", this.clientId);
     }
 
     @Override

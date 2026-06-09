@@ -77,7 +77,7 @@ public class DliveAuth extends AuthProvider<DliveAuthData> {
 
     @Override
     public void authenticateRequest(@NonNull HttpRequest.Builder request) throws ApiAuthException {
-        request.header("Authorization", this.getAccessToken());
+        request.setHeader("Authorization", this.getAccessToken());
     }
 
     @Override

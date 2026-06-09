@@ -66,7 +66,7 @@ public class KickAuth extends AuthProvider<KickAuthData> {
 
     @Override
     public void authenticateRequest(@NonNull HttpRequest.Builder request) throws ApiAuthException {
-        request.header("Authorization", "Bearer " + this.getAccessToken());
+        request.setHeader("Authorization", "Bearer " + this.getAccessToken());
     }
 
     public String getAccessToken() throws ApiAuthException {

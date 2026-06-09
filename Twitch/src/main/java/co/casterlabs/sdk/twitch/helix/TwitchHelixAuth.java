@@ -74,8 +74,8 @@ public class TwitchHelixAuth extends AuthProvider<TwitchHelixAuthData> {
 
     @Override
     public void authenticateRequest(@NonNull HttpRequest.Builder request) throws ApiAuthException {
-        request.header("Authorization", "Bearer " + this.getAccessToken());
-        request.header("Client-ID", this.clientId);
+        request.setHeader("Authorization", "Bearer " + this.getAccessToken());
+        request.setHeader("Client-ID", this.clientId);
     }
 
     @Override

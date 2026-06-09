@@ -78,11 +78,17 @@ public class YoutubeAuth extends AuthProvider<YoutubeAuthData> {
     @Override
     public void authenticateRequest(@NonNull HttpRequest.Builder request) throws ApiAuthException {
         if (!this.isApplicationAuth()) {
-            request.header("Authorization", "Bearer " + this.getAccessToken());
+            request.setHeader("Authorization", "Bearer " + this.getAccessToken());
         }
 
         // Inject the client key.
         String uri = request.build().uri().toString();
+
+        if (uri.contains("key=" + this.apiKey)) {
+            // Already has the key, don't inject another one.
+            return;
+        }
+
         if (uri.indexOf('?') == -1) {
             request.uri(URI.create(uri + "?key=" + this.apiKey));
         } else {

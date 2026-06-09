@@ -58,7 +58,7 @@ public class TiktokAuth extends AuthProvider<TiktokAuthData> {
 
     @Override
     public void authenticateRequest(@NonNull HttpRequest.Builder request) throws ApiAuthException {
-        request.header("Authorization", "Bearer " + this.getAccessToken());
+        request.setHeader("Authorization", "Bearer " + this.getAccessToken());
     }
 
     @Override

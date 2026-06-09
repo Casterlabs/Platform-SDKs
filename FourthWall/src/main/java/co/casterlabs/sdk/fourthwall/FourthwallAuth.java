@@ -75,12 +75,12 @@ public class FourthwallAuth extends AuthProvider<FourthwallAuthData> {
 
     @Override
     public void authenticateRequest(@NonNull HttpRequest.Builder request) throws ApiAuthException {
-        request.header("Accept-Encoding", "identity");
+        request.setHeader("Accept-Encoding", "identity");
 
         if (this.isApplicationAuth()) {
-            request.header("Authorization", "Basic " + this.basic);
+            request.setHeader("Authorization", "Basic " + this.basic);
         } else {
-            request.header("Authorization", "Bearer " + this.getAccessToken());
+            request.setHeader("Authorization", "Bearer " + this.getAccessToken());
         }
     }
 
