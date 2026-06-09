@@ -32,7 +32,9 @@ public class Ratelimiter {
             final String[] HEADERS = {
                     "Retry-After",
                     "Ratelimit-Reset",
-                    "X-Ratelimit-Reset"
+                    "Rate-Limit-Reset",
+                    "X-Ratelimit-Reset",
+                    "X-Rate-Limit-Reset"
             };
             for (String headerName : HEADERS) {
                 OptionalLong value = headers.firstValueAsLong(headerName);
