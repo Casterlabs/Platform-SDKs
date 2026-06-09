@@ -1,4 +1,4 @@
-package co.casterlabs.sdk.x.v1.requests;
+package co.casterlabs.sdk.x;
 
 import java.io.IOException;
 import java.net.URI;
@@ -13,11 +13,16 @@ import co.casterlabs.apiutil.web.ApiException;
 import co.casterlabs.apiutil.web.RsonBodyHandler;
 import co.casterlabs.apiutil.web.WebRequest;
 import co.casterlabs.rakurai.json.element.JsonObject;
-import co.casterlabs.sdk.x.Xv1Auth;
 
-class _RequestHelper {
+public class XSignedRequestHelper {
 
-    static HttpResponse<JsonObject> GET(String url, Xv1Auth auth) throws IOException, ApiException, ApiAuthException {
+    public static void checkError(HttpResponse<?> response) throws ApiException {
+        if (response.statusCode() < 200 || response.statusCode() > 299) {
+            throw new ApiException(String.format("%d: %s", response.statusCode(), response.body()));
+        }
+    }
+
+    public static HttpResponse<JsonObject> GET(String url, Xv1Auth auth) throws IOException, ApiException, ApiAuthException {
         URI uri = URI.create(url);
 
         HttpRequest.Builder request = HttpRequest
@@ -28,14 +33,65 @@ class _RequestHelper {
 
         auth.authenticateRequest(request, "GET", uri, null);
 
-        return WebRequest.sendHttpRequest(
+        HttpResponse<JsonObject> response = WebRequest.sendHttpRequest(
             request,
             RsonBodyHandler.of(JsonObject.class),
             null
         );
+        checkError(response);
+        return response;
     }
 
-    static HttpResponse<JsonObject> POST_FORM(String url, Map<String, String> params, Xv1Auth auth) throws IOException, ApiException, ApiAuthException {
+    public static HttpResponse<JsonObject> PUT_JSON(String url, JsonObject json, Xv1Auth auth) throws IOException, ApiException, ApiAuthException {
+        URI uri = URI.create(url);
+        String body = json.toString();
+
+        HttpRequest.Builder request = HttpRequest
+            .newBuilder()
+            .uri(uri)
+            .PUT(HttpRequest.BodyPublishers.ofString(body))
+            .header("Content-Type", "application/json")
+            .header("Accept-Encoding", "identity");
+
+        // Important: null params.
+        // application/json bodies are not part of the OAuth v1 signature parameter
+        // string.
+        auth.authenticateRequest(request, "PUT", uri, null);
+
+        HttpResponse<JsonObject> response = WebRequest.sendHttpRequest(
+            request,
+            RsonBodyHandler.of(JsonObject.class),
+            null
+        );
+        checkError(response);
+        return response;
+    }
+
+    public static HttpResponse<JsonObject> POST_JSON(String url, JsonObject json, Xv1Auth auth) throws IOException, ApiException, ApiAuthException {
+        URI uri = URI.create(url);
+        String body = json.toString();
+
+        HttpRequest.Builder request = HttpRequest
+            .newBuilder()
+            .uri(uri)
+            .POST(HttpRequest.BodyPublishers.ofString(body))
+            .header("Content-Type", "application/json")
+            .header("Accept-Encoding", "identity");
+
+        // Important: null params here.
+        // The JSON body is NOT part of the OAuth v1 signature.
+        auth.authenticateRequest(request, "POST", uri, null);
+
+        HttpResponse<JsonObject> response = WebRequest.sendHttpRequest(
+            request,
+            RsonBodyHandler.of(JsonObject.class),
+            null
+        );
+        checkError(response);
+        return response;
+    }
+
+    public static HttpResponse<JsonObject> POST_FORM(String url, Map<String, String> params, Xv1Auth auth) throws IOException, ApiException, ApiAuthException {
         URI uri = URI.create(url);
         String body = form(params);
 
@@ -48,11 +104,13 @@ class _RequestHelper {
 
         auth.authenticateRequest(request, "POST", uri, params);
 
-        return WebRequest.sendHttpRequest(
+        HttpResponse<JsonObject> response = WebRequest.sendHttpRequest(
             request,
             RsonBodyHandler.of(JsonObject.class),
             null
         );
+        checkError(response);
+        return response;
     }
 
     private static String form(@Nullable Map<String, String> params) {
