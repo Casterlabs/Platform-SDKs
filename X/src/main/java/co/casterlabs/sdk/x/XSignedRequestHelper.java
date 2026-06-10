@@ -4,15 +4,18 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
 import java.util.Map;
 
 import org.jetbrains.annotations.Nullable;
 
 import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.web.ApiException;
-import co.casterlabs.apiutil.web.RsonBodyHandler;
 import co.casterlabs.apiutil.web.WebRequest;
+import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.element.JsonObject;
+import co.casterlabs.rakurai.json.serialization.JsonParseException;
+import co.casterlabs.rakurai.json.validation.JsonValidationException;
 
 public class XSignedRequestHelper {
 
@@ -22,7 +25,7 @@ public class XSignedRequestHelper {
         }
     }
 
-    public static HttpResponse<JsonObject> GET(String url, Xv1Auth auth) throws IOException, ApiException, ApiAuthException {
+    public static Response GET(String url, Xv1Auth auth) throws IOException, ApiException, ApiAuthException {
         URI uri = URI.create(url);
 
         HttpRequest.Builder request = HttpRequest
@@ -33,16 +36,16 @@ public class XSignedRequestHelper {
 
         auth.authenticateRequest(request, "GET", uri, null);
 
-        HttpResponse<JsonObject> response = WebRequest.sendHttpRequest(
+        HttpResponse<String> response = WebRequest.sendHttpRequest(
             request,
-            RsonBodyHandler.of(JsonObject.class),
+            BodyHandlers.ofString(),
             null
         );
         checkError(response);
-        return response;
+        return new Response(response);
     }
 
-    public static HttpResponse<JsonObject> PUT_JSON(String url, JsonObject json, Xv1Auth auth) throws IOException, ApiException, ApiAuthException {
+    public static Response PUT_JSON(String url, JsonObject json, Xv1Auth auth) throws IOException, ApiException, ApiAuthException {
         URI uri = URI.create(url);
         String body = json.toString();
 
@@ -58,16 +61,16 @@ public class XSignedRequestHelper {
         // string.
         auth.authenticateRequest(request, "PUT", uri, null);
 
-        HttpResponse<JsonObject> response = WebRequest.sendHttpRequest(
+        HttpResponse<String> response = WebRequest.sendHttpRequest(
             request,
-            RsonBodyHandler.of(JsonObject.class),
+            BodyHandlers.ofString(),
             null
         );
         checkError(response);
-        return response;
+        return new Response(response);
     }
 
-    public static HttpResponse<JsonObject> POST_JSON(String url, JsonObject json, Xv1Auth auth) throws IOException, ApiException, ApiAuthException {
+    public static Response POST_JSON(String url, JsonObject json, Xv1Auth auth) throws IOException, ApiException, ApiAuthException {
         URI uri = URI.create(url);
         String body = json.toString();
 
@@ -82,16 +85,16 @@ public class XSignedRequestHelper {
         // The JSON body is NOT part of the OAuth v1 signature.
         auth.authenticateRequest(request, "POST", uri, null);
 
-        HttpResponse<JsonObject> response = WebRequest.sendHttpRequest(
+        HttpResponse<String> response = WebRequest.sendHttpRequest(
             request,
-            RsonBodyHandler.of(JsonObject.class),
+            BodyHandlers.ofString(),
             null
         );
         checkError(response);
-        return response;
+        return new Response(response);
     }
 
-    public static HttpResponse<JsonObject> POST_FORM(String url, Map<String, String> params, Xv1Auth auth) throws IOException, ApiException, ApiAuthException {
+    public static Response POST_FORM(String url, Map<String, String> params, Xv1Auth auth) throws IOException, ApiException, ApiAuthException {
         URI uri = URI.create(url);
         String body = form(params);
 
@@ -104,13 +107,21 @@ public class XSignedRequestHelper {
 
         auth.authenticateRequest(request, "POST", uri, params);
 
-        HttpResponse<JsonObject> response = WebRequest.sendHttpRequest(
+        HttpResponse<String> response = WebRequest.sendHttpRequest(
             request,
-            RsonBodyHandler.of(JsonObject.class),
+            BodyHandlers.ofString(),
             null
         );
         checkError(response);
-        return response;
+        return new Response(response);
+    }
+
+    public static record Response(HttpResponse<String> http) {
+
+        public <T> T as(Class<T> clazz) throws JsonValidationException, JsonParseException {
+            return Rson.DEFAULT.fromJson(this.http.body(), clazz);
+        }
+
     }
 
     private static String form(@Nullable Map<String, String> params) {
