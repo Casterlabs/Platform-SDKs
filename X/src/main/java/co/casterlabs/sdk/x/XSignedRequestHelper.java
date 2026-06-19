@@ -45,6 +45,26 @@ public class XSignedRequestHelper {
         return new Response(response);
     }
 
+    public static Response DELETE(String url, Xv1Auth auth) throws IOException, ApiException, ApiAuthException {
+        URI uri = URI.create(url);
+
+        HttpRequest.Builder request = HttpRequest
+            .newBuilder()
+            .uri(uri)
+            .DELETE()
+            .header("Accept-Encoding", "identity");
+
+        auth.authenticateRequest(request, "DELETE", uri, null);
+
+        HttpResponse<String> response = WebRequest.sendHttpRequest(
+            request,
+            BodyHandlers.ofString(),
+            null
+        );
+        checkError(response);
+        return new Response(response);
+    }
+
     public static Response PUT_JSON(String url, JsonObject json, Xv1Auth auth) throws IOException, ApiException, ApiAuthException {
         URI uri = URI.create(url);
         String body = json.toString();
