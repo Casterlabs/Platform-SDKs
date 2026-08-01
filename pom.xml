@@ -9,10 +9,8 @@
 		<module>_Base</module>
 
 		<module>Twitch</module>
-		<module>Trovo</module>
 		<module>YouTube</module>
 		<module>TikTok</module>
-		<module>DLive</module>
 		<module>Kick</module>
 		<module>FourthWall</module>
 		<module>X</module>
