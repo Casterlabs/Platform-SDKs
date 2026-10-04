@@ -22,14 +22,14 @@ import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.annotating.JsonClass;
 import co.casterlabs.rakurai.json.annotating.JsonField;
 import co.casterlabs.rakurai.json.element.JsonObject;
-import co.casterlabs.sdk.x.Xv2Auth.XAuthData;
+import co.casterlabs.sdk.x.Xv2Auth.Xv2AuthData;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 @SuppressWarnings("deprecation")
-public class Xv2Auth extends AuthProvider<XAuthData> {
+public class Xv2Auth extends AuthProvider<Xv2AuthData> {
     private final ReentrantLock lock = new ReentrantLock();
 
     private @Getter String clientId;
@@ -40,7 +40,7 @@ public class Xv2Auth extends AuthProvider<XAuthData> {
     /**
      * User
      */
-    protected Xv2Auth(AuthDataProvider<XAuthData> dataProvider, String clientId, String clientSecret) {
+    protected Xv2Auth(AuthDataProvider<Xv2AuthData> dataProvider, String clientId, String clientSecret) {
         super(dataProvider);
         this.clientId = clientId;
         this.clientSecret = clientSecret;
@@ -51,13 +51,13 @@ public class Xv2Auth extends AuthProvider<XAuthData> {
      * Application
      */
     protected Xv2Auth(String clientId, String clientSecret) {
-        super(new InMemoryAuthDataProvider<>(XAuthData.of(null)));
+        super(new InMemoryAuthDataProvider<>(Xv2AuthData.of(null)));
         this.clientId = clientId;
         this.clientSecret = clientSecret;
         this.isApplicationAuth = true;
     }
 
-    public static Xv2Auth ofUser(AuthDataProvider<XAuthData> dataProvider, String clientId, String clientSecret) {
+    public static Xv2Auth ofUser(AuthDataProvider<Xv2AuthData> dataProvider, String clientId, String clientSecret) {
         return new Xv2Auth(dataProvider, clientId, clientSecret);
     }
 
@@ -86,7 +86,7 @@ public class Xv2Auth extends AuthProvider<XAuthData> {
     public void refresh() throws ApiAuthException {
         this.lock.lock();
         try {
-            XAuthData data;
+            Xv2AuthData data;
             if (this.isApplicationAuth) {
                 QueryBuilder params = QueryBuilder.from("grant_type", "client_credentials");
                 data = tokenEndpoint(params, null, this.clientId, this.clientSecret);
@@ -111,7 +111,7 @@ public class Xv2Auth extends AuthProvider<XAuthData> {
     public boolean isExpired() {
         this.lock.lock();
         try {
-            XAuthData data = this.data();
+            Xv2AuthData data = this.data();
 
             if (data.accessToken == null) {
                 return true;
@@ -132,7 +132,7 @@ public class Xv2Auth extends AuthProvider<XAuthData> {
     @EqualsAndHashCode
     @NoArgsConstructor
     @JsonClass(exposeAll = true)
-    public static class XAuthData {
+    public static class Xv2AuthData {
         @JsonField("issued_at")
         public long issuedAt = System.currentTimeMillis();
 
@@ -150,8 +150,8 @@ public class Xv2Auth extends AuthProvider<XAuthData> {
         @JsonField("token_type")
         public String tokenType;
 
-        public static XAuthData of(String refreshToken) {
-            XAuthData d = new XAuthData();
+        public static Xv2AuthData of(String refreshToken) {
+            Xv2AuthData d = new Xv2AuthData();
             d.issuedAt = 0;
             d.refreshToken = refreshToken;
             return d;
@@ -178,7 +178,7 @@ public class Xv2Auth extends AuthProvider<XAuthData> {
         );
     }
 
-    public static XAuthData exchangeCodeGrant(@NonNull ParsedQuery query, @NonNull String clientId, @NonNull String clientSecret, @NonNull String redirectUri, @NonNull String verifier) throws ApiAuthException {
+    public static Xv2AuthData exchangeCodeGrant(@NonNull ParsedQuery query, @NonNull String clientId, @NonNull String clientSecret, @NonNull String redirectUri, @NonNull String verifier) throws ApiAuthException {
         return tokenEndpoint(
             QueryBuilder.from(
                 "code", query.getSingle("code"),
@@ -200,7 +200,7 @@ public class Xv2Auth extends AuthProvider<XAuthData> {
         }
     }
 
-    private static XAuthData tokenEndpoint(QueryBuilder params, String oldRefreshToken, String basicUser, String basicPassword) throws ApiAuthException {
+    protected static Xv2AuthData tokenEndpoint(QueryBuilder params, String oldRefreshToken, String basicUser, String basicPassword) throws ApiAuthException {
         try {
             HttpRequest.Builder request = HttpRequest.newBuilder()
                 .uri(URI.create("https://api.x.com/2/oauth2/token"))
@@ -233,7 +233,7 @@ public class Xv2Auth extends AuthProvider<XAuthData> {
                 json.put("refresh_token", oldRefreshToken);
             }
 
-            return Rson.DEFAULT.fromJson(json, XAuthData.class);
+            return Rson.DEFAULT.fromJson(json, Xv2AuthData.class);
         } catch (IOException e) {
             throw new ApiAuthException(e);
         }

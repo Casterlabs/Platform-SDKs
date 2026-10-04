@@ -30,10 +30,12 @@ import co.casterlabs.apiutil.auth.AuthDataProvider.InMemoryAuthDataProvider;
 import co.casterlabs.apiutil.auth.AuthProvider;
 import co.casterlabs.apiutil.web.ApiException;
 import co.casterlabs.apiutil.web.ParsedQuery;
+import co.casterlabs.apiutil.web.QueryBuilder;
 import co.casterlabs.apiutil.web.WebRequest;
 import co.casterlabs.rakurai.json.annotating.JsonClass;
 import co.casterlabs.rakurai.json.annotating.JsonField;
 import co.casterlabs.sdk.x.Xv1Auth.Xv1AuthData;
+import co.casterlabs.sdk.x.Xv2Auth.Xv2AuthData;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -171,6 +173,33 @@ public class Xv1Auth extends AuthProvider<Xv1AuthData> {
             return d;
         }
 
+    }
+
+    /**
+     * https://docs.x.com/fundamentals/authentication/oauth-2-0/oauth-1-0a-token-exchange
+     * 
+     * @param   clientId     your OAuth2 client id
+     * @param   clientSecret your OAuth2 client secret
+     * @param   scopes       https://docs.x.com/fundamentals/authentication/oauth-2-0/oauth-1-0a-token-exchange#what-permissions-do-the-new-tokens-get
+     * 
+     * @apiNote              Migration is non-destructive to the original OAuth1
+     *                       token. You can re-exchange the token at a later date as
+     *                       many times as you want. However, it invalidates the
+     *                       previously generated OAuth2 token data.
+     */
+    public Xv2AuthData migrate(String clientId, String clientSecret, String[] scopes) throws ApiAuthException {
+        Xv1AuthData data = this.data();
+
+        return Xv2Auth.tokenEndpoint(
+            QueryBuilder.from(
+                "grant_type", "urn:ietf:params:oauth:grant-type:token-exchange",
+                "subject_token_type", "urn:x:params:oauth:token-type:oauth1_token",
+                "subject_token", data.accessToken,
+                "oauth_token_secret", data.accessTokenSecret,
+                "scope", String.join(" ", scopes)
+            ),
+            null, clientId, clientSecret
+        );
     }
 
     /* ---------------- */
