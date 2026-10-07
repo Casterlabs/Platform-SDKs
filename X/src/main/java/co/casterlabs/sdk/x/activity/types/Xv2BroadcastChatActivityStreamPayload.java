@@ -16,6 +16,12 @@ public class Xv2BroadcastChatActivityStreamPayload {
 
     public final String message = null;
 
+    @JsonField("is_subscriber")
+    public final Boolean isSubscriber = null;
+
+    @JsonField("is_moderator")
+    public final Boolean isModerator = null;
+
     public final Author author = null;
 
     @ToString
