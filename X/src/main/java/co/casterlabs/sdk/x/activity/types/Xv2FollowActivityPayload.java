@@ -5,7 +5,7 @@ import lombok.ToString;
 
 @ToString
 @JsonClass(exposeAll = true)
-public class Xv2FollowActivityStreamPayload {
+public class Xv2FollowActivityPayload {
 
     public final Source source = null;
 

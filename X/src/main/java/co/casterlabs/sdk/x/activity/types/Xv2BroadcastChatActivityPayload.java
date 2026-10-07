@@ -6,7 +6,7 @@ import lombok.ToString;
 
 @ToString
 @JsonClass(exposeAll = true)
-public class Xv2BroadcastChatActivityStreamPayload {
+public class Xv2BroadcastChatActivityPayload {
 
     @JsonField("broadcast_id")
     public final String broadcastId = null;
