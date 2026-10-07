@@ -1,5 +1,7 @@
 package co.casterlabs.sdk.x.activity.types;
 
+import org.jetbrains.annotations.Nullable;
+
 import co.casterlabs.rakurai.json.annotating.JsonClass;
 import co.casterlabs.rakurai.json.annotating.JsonField;
 import lombok.ToString;
@@ -13,6 +15,9 @@ public class Xv2BroadcastChatActivityPayload {
 
     @JsonField("message_id")
     public final String messageId = null;
+
+    @JsonField("reply_to")
+    public final @Nullable String replyTo = null;
 
     public final String message = null;
 
